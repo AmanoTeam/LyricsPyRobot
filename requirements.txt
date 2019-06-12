@@ -1,0 +1,6 @@
+lyricspy
+amanobot
+requests
+google
+bs4
+telegraph
