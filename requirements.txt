@@ -4,3 +4,4 @@ requests
 google
 bs4
 telegraph
+markdown2
