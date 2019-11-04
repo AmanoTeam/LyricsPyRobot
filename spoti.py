@@ -30,7 +30,7 @@ def spoti(msg,bot):
             if a == None:
                 bot.sendMessage(msg['chat']['id'],'Você não está tocando nada')
             else:
-                bot.sendMessage(msg['chat']['id'],f"todando: {a['item']['album']['artists'][0]['name']} {a['item']['name']}")
+                bot.sendMessage(msg['chat']['id'],f"🎶 {a['item']['album']['artists'][0]['name']} - {a['item']['name']}")
                 a = lyricspy.auto(f"{a['item']['album']['artists'][0]['name']} {a['item']['name']}",limit=1)[0]
                 if a.get('letra'):
                     mik = re.split(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br)', a["link"])[-1]
