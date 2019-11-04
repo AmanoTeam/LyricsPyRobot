@@ -1,4 +1,5 @@
-lyricspy
+git+https://github.com/AmanoTeam/LyricsPy.git
+git+https://github.com/plamere/spotipy.git
 amanobot
 requests
 google

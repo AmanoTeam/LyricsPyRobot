@@ -6,6 +6,7 @@ from telegraph import Telegraph
 from amanobot.loop import MessageLoop
 from amanobot.namedtuple import InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup
 import re
+from spoti import spoti
 
 telegraph = Telegraph()
 telegraph.create_account(short_name='LyricsPyRobot', author_name='amn')
@@ -28,8 +29,11 @@ def handle_thread(*args, **kwargs):
 
 
 def handle(msg):
+    print(msg)
     if 'text' in msg:
-        if msg['text'] == '/start':
+        if '/spoti' in msg['text']:
+            spoti(msg,bot)
+        elif msg['text'] == '/start':
             teclado = InlineKeyboardMarkup(inline_keyboard=[[dict(text='Pesquisar letras', switch_inline_query_current_chat='')]])
             bot.sendMessage(msg['chat']['id'], f'Pesquise por letras de músicas direto do telegram\n\nTeste apertando o botão abaixo:',
                             reply_to_message_id=msg['message_id'],
