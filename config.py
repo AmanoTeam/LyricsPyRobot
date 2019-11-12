@@ -1,5 +1,7 @@
 import amanobot
 
+sudos = [652890017]
+
 keys = {
         'token':'',#key of telegram-api
         'basic':'',#encrypt 'client_id:client_secret' in base64

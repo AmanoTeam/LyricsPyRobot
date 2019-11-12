@@ -1,12 +1,13 @@
 import lyricspy
 import threading
 import markdown2
-from config import bot
+from config import bot,sudos
 from telegraph import Telegraph
 from amanobot.loop import MessageLoop
 from amanobot.namedtuple import InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup
 import re
-from spoti import spoti
+from db import dbc
+from spoti import spoti, inline
 
 telegraph = Telegraph()
 telegraph.create_account(short_name='LyricsPyRobot', author_name='amn')
@@ -29,7 +30,6 @@ def handle_thread(*args, **kwargs):
 
 
 def handle(msg):
-    print(msg)
     if 'text' in msg:
         if '/spoti' in msg['text']:
             spoti(msg,bot)
@@ -52,35 +52,29 @@ def handle(msg):
                 bot.sendMessage(msg['chat']['id'], 'uso:\n/letra nome ou url da letra',
                                 reply_to_message_id=msg['message_id'])
             elif re.match(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+', text):
-                print('tem')
                 a = lyricspy.letra(text)
                 if a:
                     mik = re.split(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br)', a["link"])[-1]
-                    print(mik)
                     teclado = InlineKeyboardMarkup(inline_keyboard=[
                             [dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')]])
                     if a.get('traducao'):
                         teclado = InlineKeyboardMarkup(inline_keyboard=[
                             [dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')] +
                             [dict(text='Tradução', callback_data=f'tr_{mik}|{msg["from"]["id"]}')]])
-                    print(teclado)
                     bot.sendMessage(msg['chat']['id'],
                                     '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra']),
                                     reply_to_message_id=msg['message_id'], parse_mode='markdown',
                                     disable_web_page_preview=True, reply_markup=teclado) 
             else:
-                print('não tem')
                 a = lyricspy.auto(text)[0]
                 if a.get('letra'):
                     mik = re.split(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br)', a["link"])[-1]
-                    print(mik)
                     teclado = InlineKeyboardMarkup(inline_keyboard=[
                             [dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')]])
                     if a.get('traducao'):
                         teclado = InlineKeyboardMarkup(inline_keyboard=[
                             [dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')] +
                             [dict(text='Tradução', callback_data=f'tr_{mik}|{msg["from"]["id"]}')]])
-                    print(teclado)
                     bot.sendMessage(msg['chat']['id'],
                                     '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra']),
                                     reply_to_message_id=msg['message_id'], parse_mode='markdown',
@@ -88,7 +82,7 @@ def handle(msg):
 
     elif 'data' in msg:
         if 'tr_' in msg['data']:
-            if msg["from"]["id"] == int(msg['data'].split('|')[1]):
+            if msg["from"]["id"] == int(msg['data'].split('|')[1]) or msg["from"]["id"] in sudos:
                 link = msg['data'][3:].split("|")[0]
                 a = lyricspy.letra('https://m.letras.mus.br'+link)
                 teclado = InlineKeyboardMarkup(inline_keyboard=[
@@ -108,7 +102,7 @@ def handle(msg):
             else:
                 bot.answerCallbackQuery(msg['id'], text='Você não pode editar esta mensagem',show_alert=True)
         if 'tell-' in msg['data']:
-            if msg["from"]["id"] == int(msg['data'].split('|')[1]):
+            if msg["from"]["id"] == int(msg['data'].split('|')[1]) or msg["from"]["id"] in sudos:
                 link = msg['data'][5:].split("|")[0]
                 a = lyricspy.letra('https://m.letras.mus.br'+link)
                 response = send_te(a, a['letra'])
@@ -127,7 +121,7 @@ def handle(msg):
             else:
                 bot.answerCallbackQuery(msg['id'], text='Você não pode editar esta mensagem',show_alert=True)
         if 'tell_' in msg['data']:
-            if msg["from"]["id"] == int(msg['data'].split('|')[1]):
+            if msg["from"]["id"] == int(msg['data'].split('|')[1]) or msg["from"]["id"] in sudos:
                 link =  msg['data'][5:].split("|")[0]
                 a = lyricspy.letra('https://m.letras.mus.br'+link)
                 response = send_te(a, a['traducao'])
@@ -146,7 +140,7 @@ def handle(msg):
             else:
                 bot.answerCallbackQuery(msg['id'], text='Você não pode editar esta mensagem',show_alert=True)
         if 'tr-' in msg['data']:
-            if msg["from"]["id"] == int(msg['data'].split('|')[1]):
+            if msg["from"]["id"] == int(msg['data'].split('|')[1]) or msg["from"]["id"] in sudos:
                 link = msg['data'][3:].split("|")[0]
                 a = lyricspy.letra('https://m.letras.mus.br'+link)
                 teclado = InlineKeyboardMarkup(inline_keyboard=[
@@ -170,20 +164,39 @@ def handle(msg):
             teclado = None
             try:
                 a = lyricspy.letra(msg['result_id'])
+                mik = re.split(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br)', a["link"])[-1]
                 teclado = InlineKeyboardMarkup(
-                    inline_keyboard=[[dict(text='Telegra.ph', callback_data=f'tell-{a["link"]}|{msg["from"]["id"]}')]])
+                    inline_keyboard=[[dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')]])
                 if a.get('traducao'):
                     teclado = InlineKeyboardMarkup(inline_keyboard=[
-                        [dict(text='Telegra.ph', callback_data=f'tell-{a["link"]}|{msg["from"]["id"]}')] +
-                        [dict(text='Tradução', callback_data=f'tr_{a["link"]}|{msg["from"]["id"]}')]])
-                bot.editMessageText(msg['inline_message_id'],
+                        [dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')] +
+                        [dict(text='Tradução', callback_data=f'tr_{mik}|{msg["from"]["id"]}')]])
+                print(teclado)
+                try:
+                    bot.editMessageText(msg['inline_message_id'],
                                     '[{} - {}]({})\n{}'.format(a['musica'], a['autor'], a['link'], a['letra']),
                                     parse_mode='markdown', disable_web_page_preview=True, reply_markup=teclado)
+                except:
+                    bot.editMessageText(msg['inline_message_id'],
+                                    '[{} - {}]({})\n{}'.format(a['musica'], a['autor'], a['link'], a['letra']),
+                                    parse_mode='markdown', disable_web_page_preview=True)
             except Exception as e:
                 print(e)
-                bot.editMessageText(msg['inline_message_id'], 'ocorreu um erro ao exibir a letra')
+                bot.editMessageText(msg['inline_message_id'], f'ocorreu um erro ao exibir a letra\nErro:{e}')
+        elif msg['query'] == '':
+            db = dbc()
+            if str(msg['from']['id']) in db:
+                articles = inline(msg, bot)
+            else:
+                articles = []
+            bot.answerInlineQuery(msg['id'], results=articles, is_personal=True, cache_time=0)
         elif msg['query'] != '':
-            articles = []
+            db = dbc()
+            if str(msg['from']['id']) in db:
+                articles = inline(msg, bot)
+                resy = articles
+            else:
+                articles = []
             result = lyricspy.auto(msg['query'])
             for a in result:
                 teclado = InlineKeyboardMarkup(inline_keyboard=[
@@ -201,7 +214,11 @@ def handle(msg):
                 articles = [InlineQueryResultArticle(id='abcde', title=f'sem resultado',
                                                      input_message_content=InputTextMessageContent(
                                                          message_text=f"sem resultado para {msg['query']}"))]
-            bot.answerInlineQuery(msg['id'], results=articles, is_personal=True)
+            try:
+                bot.answerInlineQuery(msg['id'], results=articles, is_personal=True, cache_time=0)
+            except:
+                if resy:
+                    bot.answerInlineQuery(msg['id'], results=resy, is_personal=True, cache_time=0)
 
 
 print('LyricsPyRobot...')
