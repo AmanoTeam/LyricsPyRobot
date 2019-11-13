@@ -12,13 +12,7 @@ from db import dbc, save
 
 def inline(msg, bot):
     db = dbc()
-    a = spotipy.Spotify(auth=db[str(msg['from']['id'])]['access_token'])
-    try:
-        a = a.current_user_playing_track()
-    except SpotifyException:
-        new_token = refresh_token(msg['from']['id'], db)
-        a = spotipy.Spotify(auth=new_token)
-        a = a.current_user_playing_track()
+    a = get_current_playing(str(msg['from']['id']), db)
     if a is None:
         articles = [InlineQueryResultArticle(
             id='a',
@@ -71,6 +65,16 @@ def get_token(user_id, auth_code, db):
         return True, b['access_token']
 
 
+def get_current_playing(user_id, db):
+    a = spotipy.Spotify(auth=db[user_id]['access_token'])
+    try:
+        return a.current_user_playing_track()
+    except SpotifyException:
+        new_token = refresh_token(user_id, db)
+        a = spotipy.Spotify(auth=new_token)
+        return a.current_user_playing_track()
+
+
 def spoti(msg, bot):
     db = dbc()
     if msg['text'] == '/spoti':
@@ -83,20 +87,15 @@ def spoti(msg, bot):
                             'faça o login e mande o link para mim logo após o comando /spoti',
                             parse_mode='html', reply_markup=kb)
         else:
-            a = spotipy.Spotify(auth=db[str(msg['from']['id'])]['access_token'])
-            try:
-                a = a.current_user_playing_track()
-            except SpotifyException:
-                new_token = refresh_token(msg['from']['id'], db)
-                a = spotipy.Spotify(auth=new_token)
-                a = a.current_user_playing_track()
+            a = get_current_playing(str(msg['from']['id']), db)
             if a is None:
                 bot.sendMessage(msg['chat']['id'], 'Você não está tocando nada')
             else:
-                bot.sendMessage(msg['chat']['id'],
-                                f"🎶 {a['item']['album']['artists'][0]['name']} - {a['item']['name']}")
-                a = lyricspy.auto(f"{a['item']['album']['artists'][0]['name']} {a['item']['name']}", limit=1)[0]
-                if a.get('letra'):
+                sent = bot.sendMessage(msg['chat']['id'],
+                                       f"🎶 {a['item']['album']['artists'][0]['name']} - {a['item']['name']}")
+                a = lyricspy.auto(f"{a['item']['album']['artists'][0]['name']} {a['item']['name']}", limit=1)
+                if a:
+                    a = a[0]
                     mik = re.split(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br)', a["link"])[-1]
                     print(mik)
                     teclado = InlineKeyboardMarkup(inline_keyboard=[
@@ -110,6 +109,10 @@ def spoti(msg, bot):
                                     '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra']),
                                     reply_to_message_id=msg['message_id'], parse_mode='markdown',
                                     disable_web_page_preview=True, reply_markup=teclado)
+                else:
+                    bot.sendMessage(msg['chat']['id'],
+                                    "A letra desta música não foi encontrada.",
+                                    reply_to_message_id=sent['message_id'])
     else:
         text = msg['text'][7:]
         if 'lyricspy.ml' in text:
