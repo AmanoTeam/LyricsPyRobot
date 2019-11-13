@@ -1,6 +1,4 @@
 import re
-import subprocess
-from json import loads
 
 import lyricspy
 import requests
@@ -24,9 +22,9 @@ def inline(msg, bot):
     if a is None:
         articles = [InlineQueryResultArticle(
             id='a',
-            title=f'spoti: Você não está tocando nada',
+            title='spoti: Você não está tocando nada',
             input_message_content=InputTextMessageContent(
-                message_text=f"Você não está tocando nada")
+                message_text="Você não está tocando nada")
         )]
     else:
         a = lyricspy.auto(f"{a['item']['album']['artists'][0]['name']} {a['item']['name']}", limit=1)[0]

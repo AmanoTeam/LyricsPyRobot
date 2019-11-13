@@ -40,7 +40,7 @@ def handle(msg):
             teclado = InlineKeyboardMarkup(
                 inline_keyboard=[[dict(text='Pesquisar letras', switch_inline_query_current_chat='')]])
             bot.sendMessage(msg['chat']['id'],
-                            f'Pesquise por letras de músicas direto do telegram\n\nTeste apertando o botão abaixo:',
+                            'Pesquise por letras de músicas direto do telegram\n\nTeste apertando o botão abaixo:',
                             reply_to_message_id=msg['message_id'],
                             reply_markup=teclado)
         elif msg['text'].split()[0] == '/letras':
@@ -188,7 +188,6 @@ def handle(msg):
             db = dbc()
             if str(msg['from']['id']) in db:
                 articles = inline(msg, bot)
-                resy = articles
             else:
                 articles = []
             result = lyricspy.auto(msg['query'])
