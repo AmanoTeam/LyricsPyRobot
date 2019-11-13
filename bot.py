@@ -41,6 +41,11 @@ def inline_thread(*args, **kwargs):
     t.start()
 
 
+def chosen_thread(*args, **kwargs):
+    t = threading.Thread(target=chosen_inline_result, args=args, kwargs=kwargs)
+    t.start()
+
+
 def handle(msg):
     if 'text' in msg:
         if '/spoti' in msg['text']:
@@ -170,24 +175,7 @@ def callback_data(msg):
 
 
 def inline_query(msg):
-    if msg.get('inline_message_id'):
-        try:
-            a = lyricspy.letra(msg['result_id'])
-            mik = re.split(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br)', a["link"])[-1]
-            teclado = InlineKeyboardMarkup(
-                inline_keyboard=[[dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')]])
-            if a.get('traducao'):
-                teclado = InlineKeyboardMarkup(inline_keyboard=[
-                    [dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')] +
-                    [dict(text='Tradução', callback_data=f'tr_{mik}|{msg["from"]["id"]}')]])
-            print(teclado)
-            bot.editMessageText(msg['inline_message_id'],
-                                    '[{} - {}]({})\n{}'.format(a['musica'], a['autor'], a['link'], a['letra']),
-                                    parse_mode='markdown', disable_web_page_preview=True, reply_markup=teclado)
-        except Exception as e:
-            print(e)
-            bot.editMessageText(msg['inline_message_id'], f'ocorreu um erro ao exibir a letra\nErro:{e}')
-    elif msg['query'] == '':
+    if msg['query'] == '':
         db = dbc()
         if str(msg['from']['id']) in db:
             articles = inline(msg, bot)
@@ -220,11 +208,31 @@ def inline_query(msg):
         bot.answerInlineQuery(msg['id'], results=articles, is_personal=True, cache_time=0)
 
 
+def chosen_inline_result(msg):
+    try:
+        a = lyricspy.letra(msg['result_id'])
+        mik = re.split(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br)', a["link"])[-1]
+        teclado = InlineKeyboardMarkup(
+            inline_keyboard=[[dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')]])
+        if a.get('traducao'):
+            teclado = InlineKeyboardMarkup(inline_keyboard=[
+                [dict(text='Telegra.ph', callback_data=f'tell-{mik}|{msg["from"]["id"]}')] +
+                [dict(text='Tradução', callback_data=f'tr_{mik}|{msg["from"]["id"]}')]])
+        print(teclado)
+        bot.editMessageText(msg['inline_message_id'],
+                                '[{} - {}]({})\n{}'.format(a['musica'], a['autor'], a['link'], a['letra']),
+                                parse_mode='markdown', disable_web_page_preview=True, reply_markup=teclado)
+    except Exception as e:
+        print(e)
+        bot.editMessageText(msg['inline_message_id'], f'ocorreu um erro ao exibir a letra\nErro:{e}')
+
+
 print('LyricsPyRobot...')
 
 MessageLoop(bot, dict(chat=handle_thread,
                       callback_query=callback_thread,
-                      inline_query=inline_thread)).run_as_thread()
+                      inline_query=inline_thread,
+                      chosen_inline_result=chosen_thread)).run_as_thread()
 
 while True:
     time.sleep(10)
