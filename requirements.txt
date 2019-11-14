@@ -1,6 +1,6 @@
 git+https://github.com/AmanoTeam/LyricsPy.git
 git+https://github.com/plamere/spotipy.git
-amanobot
+amanobot>=1.4.4
 requests
 google
 bs4
