@@ -1,6 +1,5 @@
 import re
 import threading
-import time
 
 import lyricspy
 import markdown2
@@ -232,7 +231,4 @@ print('LyricsPyRobot...')
 MessageLoop(bot, dict(chat=handle_thread,
                       callback_query=callback_thread,
                       inline_query=inline_thread,
-                      chosen_inline_result=chosen_thread)).run_as_thread()
-
-while True:
-    time.sleep(10)
+                      chosen_inline_result=chosen_thread)).run_forever()
