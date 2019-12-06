@@ -53,14 +53,27 @@ def handle(msg):
             teclado = InlineKeyboardMarkup(
                 inline_keyboard=[[dict(text='Pesquisar letras', switch_inline_query_current_chat='')]])
             bot.sendMessage(msg['chat']['id'],
-                            'Pesquise por letras de músicas direto do telegram\n\nTeste apertando o botão abaixo:',
+                            'Pesquise por letras de músicas direto do Telegram :D\n\n'
+                            '   - __Para mais informaçoes, use__ /help\n\n'
+                            'Vamos iniciar? Comece testando pelo botão abaixo:',
                             reply_to_message_id=msg['message_id'],
-                            reply_markup=teclado)
+                            reply_markup=teclado,
+                            parse_mode='markdown')
+        elif msg['text'] == '/help':
+            bot.sendMessage(msg['chat']['id'],
+                            'Este bot exibe letra de músicas de acordo com sua pesquisa, utilizando o letras.mus.br.\n\n'
+                            'Você pode pesquisar atravez do modo inline (@lyricspyrobot <música>), ou até mesmo ver a letra da música que está tocando em seu Spotify atravez do spoti (necessitalogin) :D\n\n'
+                            'Os seguintes comandos estão disponiveis:\n'
+                            '   • /letra <música> (pesquisa determinada letra)\n'
+                            '   • /spoti (mostra a música atual tocando ~não necessita premium~)\n\n'
+                            'Em caso de dúvida, entre em contato pelo @AmanoSupport ou por nosso chat @AmanoChat. '
+                            '- Novidades e atualizações serão postadas no canal @AmanoTeam.',reply_to_message_id=msg['message_id'])
         elif msg['text'].split()[0] == '/letras':
             text = msg['text'].split()[1]
             if text == '':
-                bot.sendMessage(msg['chat']['id'], 'uso:\n/letras nome da musica',
-                                reply_to_message_id=msg['message_id'])
+                bot.sendMessage(msg['chat']['id'], '**Uso:** /letra <nome da música>',
+                                reply_to_message_id=msg['message_id'],
+                                parse_mode='markdown')
             else:
                 res = ['{}: <a href="{}">{} - {}</a>'.format(num + 1, i['link'], i["musica"], i["autor"]) for num, i in
                        enumerate(lyricspy.auto(text, 30))] or "Nenhum resultado foi encontrado"
@@ -69,8 +82,9 @@ def handle(msg):
         elif msg['text'].split()[0] == '/letra':
             text = msg['text'][7:]
             if not text:
-                return bot.sendMessage(msg['chat']['id'], 'uso:\n/letra nome ou url da letra',
-                                       reply_to_message_id=msg['message_id'])
+                return bot.sendMessage(msg['chat']['id'], '**Uso:** /letra <nome da música>',
+                                       reply_to_message_id=msg['message_id'],
+                                       parse_mode='markdown')
             elif re.match(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+', text):
                 a = lyricspy.letra(text)
             else:
@@ -88,7 +102,7 @@ def handle(msg):
                                 reply_to_message_id=msg['message_id'], parse_mode='markdown',
                                 disable_web_page_preview=True, reply_markup=teclado)
             else:
-                bot.sendMessage(msg['chat']['id'], "Letra não encontrada.",
+                bot.sendMessage(msg['chat']['id'], "Letra não encontrada :(",
                                 reply_to_message_id=msg['message_id'])
 
 
