@@ -107,7 +107,7 @@ def spoti(msg, bot):
         else:
             a = get_current_playing(str(msg['from']['id']), db)
             if a is None:
-                bot.sendMessage(msg['chat']['id'], 'No momento não há nada tocando. Que tal dar um __play__ em seu Spotify?',
+                bot.sendMessage(msg['chat']['id'], 'No momento não há nada tocando. Que tal dar um _play_ em seu Spotify?',
                                 parse_mode='markdown',
                                 reply_to_message_id=msg['message_id'])
             else:

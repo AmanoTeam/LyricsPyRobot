@@ -54,7 +54,7 @@ def handle(msg):
                 inline_keyboard=[[dict(text='Pesquisar letras', switch_inline_query_current_chat='')]])
             bot.sendMessage(msg['chat']['id'],
                             'Pesquise por letras de músicas direto do Telegram :D\n\n'
-                            '   - __Para mais informaçoes, use__ /help\n\n'
+                            '   - _Para mais informaçoes, use_ /help\n\n'
                             'Vamos iniciar? Comece testando pelo botão abaixo:',
                             reply_to_message_id=msg['message_id'],
                             reply_markup=teclado,
@@ -66,7 +66,7 @@ def handle(msg):
                             'Os seguintes comandos estão disponiveis:\n'
                             '   • /letra <música> (pesquisa determinada letra)\n'
                             '   • /spoti (mostra a música atual tocando ~não necessita premium~)\n\n'
-                            'Em caso de dúvida, entre em contato pelo @AmanoSupport ou por nosso chat @AmanoChat. '
+                            'Em caso de dúvida, entre em contato pelo @AmanoSupport ou por nosso chat @AmanoChat.\n'
                             '- Novidades e atualizações serão postadas no canal @AmanoTeam.',reply_to_message_id=msg['message_id'])
         elif msg['text'].split()[0] == '/letras':
             text = msg['text'].split()[1]
@@ -209,6 +209,7 @@ def inline_query(msg):
             articles.append(InlineQueryResultArticle(
                 id=a['link'],
                 title=f'{a["musica"]} - {a["autor"]}',
+                thumb_url='https://piics.ml/i/010.png',
                 input_message_content=InputTextMessageContent(
                     message_text='Aguarde...',
                     parse_mode='markdown', disable_web_page_preview=True),
