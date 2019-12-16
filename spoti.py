@@ -36,7 +36,7 @@ def inline(msg, bot):
                 message_text="Você não está tocando nada")
         )]
     else:
-        a = lyricspy.auto(f"{a['item']['album']['artists'][0]['name']} {a['item']['name']}", limit=1)[0]
+        a = lyricspy.auto(f"{a['item']['artists'][0]['name']} {a['item']['name']}", limit=1)[0]
         teclado = InlineKeyboardMarkup(inline_keyboard=[[dict(text='Aguarde...', callback_data='a')]])
         articles = [InlineQueryResultArticle(
             id=a['link'],
@@ -112,8 +112,8 @@ def spoti(msg, bot):
                                 reply_to_message_id=msg['message_id'])
             else:
                 sent = bot.sendMessage(msg['chat']['id'],
-                                       f"🎶 {a['item']['album']['artists'][0]['name']} - {a['item']['name']}")
-                a = lyricspy.auto(f"{a['item']['album']['artists'][0]['name']} {a['item']['name']}", limit=1)
+                                       f"🎶 {a['item']['artists'][0]['name']} - {a['item']['name']}")
+                a = lyricspy.auto(f"{a['item']['artists'][0]['name']} {a['item']['name']}", limit=1)
                 if a:
                     a = a[0]
                     mik = re.split(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br)', a["link"])[-1]
