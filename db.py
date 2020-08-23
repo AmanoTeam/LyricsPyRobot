@@ -1,18 +1,94 @@
-import json
+import sqlite3
+from telegraph import Telegraph
+
+telegraph = Telegraph()
+telegraph.create_account(short_name='LyricsPyRobot', author_name='amn')
 
 
-def dbc():
+def send_te(a, b):
+    response = telegraph.create_page(
+        a['musica'],
+        html_content=b.replace('\n', '<br>'),
+        author_name=a["autor"],
+        author_url=a["link"]
+    )
+    return 'https://telegra.ph/'+response['path']
+
+
+db = sqlite3.connect("users.db")
+dbc = db.cursor()
+
+
+dbc.execute('''CREATE TABLE IF NOT EXISTS users (user_id INTEGER,
+                                                 access_token,
+                                                 refresh_token,
+                                                 inline_results,
+                                                 user)''')
+
+dbc.execute('''CREATE TABLE IF NOT EXISTS saves (hash,
+                                                 url,
+                                                 tl,
+                                                 tlt)''')
+
+
+def add_hash(hash, h):
+    dbc.execute('SELECT url FROM saves WHERE hash = (?)', (hash,))
     try:
-        db = json.load(open('db.json', 'r'))
-    except FileNotFoundError:
-        with open('db.json', 'w') as memoria:
-            memoria.write('{}')
-        db = json.load(open('db.json', 'r'))
-    return db
+        a = dbc.fetchone()
+    except IndexError:
+        a =  None
+    if not a:
+        tl = send_te(h, h['letra'])
+        if 'traducao' in h:
+            tlt = send_te(h, h['traducao'])
+        else:
+            tlt = ''
+        dbc.execute('INSERT INTO saves (hash, url, tl, tlt) VALUES (?,?,?,?)',
+                           (hash, h['link'],tl,tlt))
+        db.commit()
 
+def get_url(hash):
+    dbc.execute('SELECT url, tl, tlt FROM saves WHERE hash = (?)', (hash,))
+    try:
+        return dbc.fetchone()
+    except IndexError:
+        return None
 
-def save(rq):
-    mem = open('db.json', 'w')
-    json.dump(rq, mem)
-    mem.close()
-    return True
+def add_user_last(id, user):
+    if get(id):
+        dbc.execute('UPDATE users SET user = ? WHERE user_id = ?', (user, id))
+    else:
+        dbc.execute('INSERT INTO users (user_id, user) VALUES (?,?)',
+                               (id, user))
+    db.commit()
+
+def add_user(user, atoken, rtoken):
+    if get(user):
+        dbc.execute('UPDATE users SET access_token = ? , refresh_token = ? , inline_results = ? WHERE user_id = ?', 
+                    (atoken, rtoken, '{}',user))
+    else:
+        dbc.execute('INSERT INTO users (user_id, access_token, refresh_token, inline_results) VALUES (?,?,?,?)',
+                           (user, atoken, rtoken, '{}'))
+    db.commit()
+    
+def update_user(user, atoken):
+    dbc.execute('UPDATE users SET access_token = ? WHERE user_id = ?', (atoken, user))
+    db.commit()
+
+def tem(user_id, json=None):
+    if json:
+        dbc.execute('UPDATE users SET inline_results = ? WHERE user_id = ?', (str(json), user_id))
+        db.commit()
+    else:
+        dbc.execute('SELECT inline_results FROM users WHERE user_id = (?)', (user_id,))
+        try:
+            return dbc.fetchone()
+        except IndexError:
+            return None
+
+def get(uid):
+    dbc.execute('SELECT access_token, refresh_token, user FROM users WHERE user_id = (?)', (uid,))
+    try:
+        return dbc.fetchone()
+    except IndexError:
+        return None

@@ -1,6 +1,14 @@
-import amanobot
+import amanobot.aio
+import asyncio
 
-sudos = [652890017]
+loop = asyncio.get_event_loop()
+
+sudos = [652890017,
+         123892996,
+         200097591
+         ]
+
+plgns = ['handle', 'callback','inline','chosen']
 
 keys = {
     'token': '',  # key of telegram-api
@@ -9,4 +17,4 @@ keys = {
     'client_secret': ''  # https://developer.spotify.com/
 }
 
-bot = amanobot.Bot(keys['token'])
+bot = amanobot.aio.Bot(keys['token'])
