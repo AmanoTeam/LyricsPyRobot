@@ -54,7 +54,7 @@ def get_current_playing(user_id):
 async def spoti(msg):
     if msg['text'] == '/spoti':
         tk = db.get(msg['from']['id'])
-        if not tk[0]:
+        if not tk:
             kb = InlineKeyboardMarkup(inline_keyboard=[
                 [dict(text='Login', url='https://xn--f77h6a.ml/1ec28a')]
             ])
