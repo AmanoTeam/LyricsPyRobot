@@ -1,4 +1,4 @@
-from config import bot, sudos, loop, plgns
+from config import bot, loop, plgns
 from amanobot.aio.loop import MessageLoop
 
 for i in plgns:
