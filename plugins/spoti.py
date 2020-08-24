@@ -101,7 +101,7 @@ async def spoti(msg):
             access_code = text
         res = get_token(msg['from']['id'], access_code)
         if res[0]:
-            await bot.sendMessage(msg['chat']['id'], f'ok')
+            await bot.sendMessage(msg['chat']['id'], 'ok')
         else:
             await bot.sendMessage(msg['chat']['id'], f'ocorreu um erro:\n{res[1]}')
 

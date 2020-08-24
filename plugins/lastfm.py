@@ -60,4 +60,4 @@ async def lastfm(msg):
     else:
         text = msg['text'].split(' ',1)[1]
         db.add_user_last(msg['from']['id'], text)
-        await bot.sendMessage(msg['chat']['id'], f'ok')
+        await bot.sendMessage(msg['chat']['id'], 'ok')
