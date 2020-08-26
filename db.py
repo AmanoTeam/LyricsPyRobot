@@ -77,7 +77,12 @@ def update_user(user, atoken):
 
 def tem(user_id, json=None):
     if json:
-        dbc.execute('UPDATE users SET inline_results = ? WHERE user_id = ?', (str(json), user_id))
+        if not get(user_id):
+            dbc.execute('INSERT INTO users (user_id, inline_results) VALUES (?,?)',
+                               (user_id, str(json)))
+        else:
+            print('tem')
+            dbc.execute('UPDATE users SET inline_results = ? WHERE user_id = ?', (str(json), user_id))
         db.commit()
     else:
         dbc.execute('SELECT inline_results FROM users WHERE user_id = (?)', (user_id,))

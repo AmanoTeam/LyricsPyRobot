@@ -1,8 +1,0 @@
-git+https://github.com/AmanoTeam/LyricsPy.git
-git+https://github.com/plamere/spotipy.git
-amanobot>=1.4.4
-requests
-google
-bs4
-telegraph
-markdown2

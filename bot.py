@@ -1,12 +1,12 @@
-from config import bot, sudos, loop, plgns
-from amanobot.aio.loop import MessageLoop
+import asyncio
+from config import TOKEN, API_HASH, API_ID
+from pyrogram import Client
 
-for i in plgns:
-    exec('from plugins.{0} import {0}'.format(i))
+async def main(client):
+    await client.start()
+    await client.idle()
 
-if __name__ == '__main__':
-    loop.create_task(MessageLoop(bot, dict(chat=handle,
-                      callback_query=callback,
-                      inline_query=inline,
-                      chosen_inline_result=chosen)).run_forever())
-    loop.run_forever()
+client = Client("bot", API_ID, API_HASH, bot_token=TOKEN, plugins=dict(root='plugins'))
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main(client))

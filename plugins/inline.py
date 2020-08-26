@@ -1,36 +1,60 @@
-from plugins.spoti import ainline
-import db
-from config import bot
-from lyricspy.aio import muximatch
-from amanobot.namedtuple import InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup
+from lyricspy.aio import letras, muximatch
+from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
 import hashlib
+import db
+import json
 
 mux = muximatch()
 
-async def inline(msg):
-    print(msg['query'])
-    tk = db.get(msg['from']['id'])
-    if tk[0]:
-        r, articles = await ainline(msg)
-    else:
-        r, articles = {}, []
-    if msg['query'] != '':
-        a = await mux.auto(msg['query'])
+#+ original, - traduzido, _ telegraph
+
+@Client.on_inline_query()
+async def inline(c, m):
+    print(m.query)
+    tk = db.get(m.from_user.id)
+    articles = []
+    r = {}
+    #if tk[0]:
+    #    spoti
+    #if tk[1]:
+    #    lfm
+    if m.query:
+        a = await mux.auto(m.query)
         for i in a:
-            hash = hashlib.md5(i['link'].encode()).hexdigest()
-            r.update({hash:i['link']})
-            teclado = InlineKeyboardMarkup(inline_keyboard=[
-                [dict(text='Aguarde...', callback_data='a')]
+            hash = hashlib.md5(i["link"].encode()).hexdigest()
+            r.update({hash:i["link"]})
+            keybpard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='aguarde...', callback_data='a')]
             ])
             articles.append(InlineQueryResultArticle(
-                id=hash,
                 title=f'{i["musica"]} - {i["autor"]}',
+                id=hash,
                 thumb_url='https://piics.ml/i/010.png',
-                reply_markup=teclado,
+                reply_markup=keybpard,
                 input_message_content=InputTextMessageContent(
-                    message_text='Aguarde...',
-                    parse_mode='markdown', disable_web_page_preview=True))
-            )
-        db.tem(msg['from']['id'], r)
-    print(r)
-    await bot.answerInlineQuery(msg['id'], results=articles, is_personal=True, cache_time=0)
+                    message_text='aguarde...',
+                )
+            ))
+        db.tem(m.from_user.id, r)
+    await m.answer(articles)
+
+@Client.on_chosen_inline_result()
+async def choosen(c, m):
+    tk = db.tem(m.from_user.id)
+    s = json.loads((tk[0]).replace('\'','\"'))
+    hash = m.result_id
+    text = s[hash]
+    a = await mux.letra(text)
+    uid = m.from_user.id
+    if 'traducao' in a:
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]+
+            [InlineKeyboardButton(text=a['tr_name']or'tradução', callback_data=f'-{uid}|{hash}')]
+
+        ])
+    else:
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
+        ])
+    db.add_hash(hash, a)
+    await c.edit_inline_text(m.inline_message_id,'[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)
