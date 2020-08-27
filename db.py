@@ -12,7 +12,7 @@ def send_te(a, b):
         author_name=a["autor"],
         author_url=a["link"]
     )
-    return 'https://telegra.ph/'+response['path']
+    return response['url']
 
 
 db = sqlite3.connect("users.db")

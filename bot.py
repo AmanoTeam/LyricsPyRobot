@@ -1,10 +1,10 @@
 import asyncio
 from config import TOKEN, API_HASH, API_ID
-from pyrogram import Client
+from pyrogram import Client, idle
 
 async def main(client):
     await client.start()
-    await client.idle()
+    await idle()
 
 client = Client("bot", API_ID, API_HASH, bot_token=TOKEN, plugins=dict(root='plugins'))
 

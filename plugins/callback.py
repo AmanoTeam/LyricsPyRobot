@@ -1,5 +1,6 @@
 from lyricspy.aio import letras, muximatch
-from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import re
 import db
 
@@ -8,7 +9,7 @@ let = letras()
 
 #+ original, - traduzido, _ telegraph
 
-@Client.on_callback_query(Filters.regex("^(_\+)"))
+@Client.on_callback_query(filters.regex("^(_\+)"))
 async def teor(c, m):
     user, hash = m.data[2:].split('|')
     n = db.get_url(hash)
@@ -33,7 +34,7 @@ async def teor(c, m):
             ])
         await m.edit_message_text('{} - {}\n{}'.format(a["musica"], a["autor"], n[1]), reply_markup=keyboard)
 
-@Client.on_callback_query(Filters.regex("^(_\-)"))
+@Client.on_callback_query(filters.regex("^(_\-)"))
 async def tetr(c, m):
     user, hash = m.data[2:].split('|')
     n = db.get_url(hash)
@@ -53,7 +54,7 @@ async def tetr(c, m):
         ])
         await m.edit_message_text('{} - {}\n{}'.format(a["musica"], a["autor"], n[2]), reply_markup=keyboard)
 
-@Client.on_callback_query(Filters.regex("^(\+)"))
+@Client.on_callback_query(filters.regex("^(\+)"))
 async def ori(c, m):
     user, hash = m.data[1:].split('|')
     n = db.get_url(hash)
@@ -78,7 +79,7 @@ async def ori(c, m):
             ])
         await m.edit_message_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)
 
-@Client.on_callback_query(Filters.regex("^(\-)"))
+@Client.on_callback_query(filters.regex("^(\-)"))
 async def tr(c, m):
     user, hash = m.data[1:].split('|')
     n = db.get_url(hash)
@@ -96,4 +97,4 @@ async def tr(c, m):
             [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_-{user}|{hash}')]+
             [InlineKeyboardButton(text='Original', callback_data=f'+{user}|{hash}')]
         ])
-        await m.edit_message_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['traducao'])[:4096], reply_markup=keyboard)
+        await m.edit_message_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['traducao'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)

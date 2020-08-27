@@ -1,5 +1,6 @@
 from lyricspy.aio import letras, muximatch
-from pyrogram import Client, Filters, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import re
 import db
 import hashlib
@@ -9,8 +10,9 @@ let = letras()
 
 #+ original, - traduzido, _ telegraph
 
-@Client.on_message(Filters.command("letra"))
+@Client.on_message(filters.command("letra"))
 async def letra(c, m):
+    print('ok')
     text = m.text.split(' ',1)[1]
     if not text:
         await m.reply_text('**Uso:** /letra <nome da música>')

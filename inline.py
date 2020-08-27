@@ -76,16 +76,15 @@ async def inline(c, m):
                     message_text='aguarde...',
                 )
             ))
-    db.tem(m.from_user.id, r)
+        db.tem(m.from_user.id, r)
     await m.answer(articles)
 
 @Client.on_chosen_inline_result()
 async def choosen(c, m):
-    if m.result_id[0] == 's' or m.result_id[0] == 'l':
-        hash = m.result_id[1:]
     tk = db.tem(m.from_user.id)
     s = json.loads((tk[0]).replace('\'','\"'))
-    text = s[m.result_id]
+    hash = m.result_id
+    text = s[hash]
     a = await mux.letra(text)
     uid = m.from_user.id
     if 'traducao' in a:

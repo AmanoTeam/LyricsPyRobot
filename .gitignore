@@ -1,4 +1,4 @@
 __pycache__/
-db.json
 config.py
 *.session
+*.db
