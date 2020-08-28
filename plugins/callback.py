@@ -32,7 +32,7 @@ async def teor(c, m):
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Texto', callback_data=f'+{user}|{hash}')]
             ])
-        await m.edit_message_text('{} - {}\n{}'.format(a["musica"], a["autor"], n[1]), reply_markup=keyboard)
+        await m.edit_message_text('{} - {}\n{}'.format(a["musica"], a["autor"], n[1]).encode("latin-1", 'ignore').decode("utf-8", 'ignore'), reply_markup=keyboard)
 
 @Client.on_callback_query(filters.regex("^(_\-)"))
 async def tetr(c, m):
@@ -52,7 +52,7 @@ async def tetr(c, m):
             [InlineKeyboardButton(text='Texto', callback_data=f'-{user}|{hash}')]+
             [InlineKeyboardButton(text='Original', callback_data=f'_+{user}|{hash}')]
         ])
-        await m.edit_message_text('{} - {}\n{}'.format(a["musica"], a["autor"], n[2]), reply_markup=keyboard)
+        await m.edit_message_text('{} - {}\n{}'.format(a["musica"], a["autor"], n[2]).encode("latin-1", 'ignore').decode("utf-8", 'ignore'), reply_markup=keyboard)
 
 @Client.on_callback_query(filters.regex("^(\+)"))
 async def ori(c, m):
@@ -77,7 +77,7 @@ async def ori(c, m):
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{user}|{hash}')]
             ])
-        await m.edit_message_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)
+        await m.edit_message_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("latin-1", 'ignore').decode("utf-8", 'ignore'), reply_markup=keyboard, disable_web_page_preview=True)
 
 @Client.on_callback_query(filters.regex("^(\-)"))
 async def tr(c, m):
@@ -97,4 +97,4 @@ async def tr(c, m):
             [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_-{user}|{hash}')]+
             [InlineKeyboardButton(text='Original', callback_data=f'+{user}|{hash}')]
         ])
-        await m.edit_message_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['traducao'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)
+        await m.edit_message_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['traducao'])[:4096].encode("latin-1", 'ignore').decode("utf-8", 'ignore'), reply_markup=keyboard, disable_web_page_preview=True)

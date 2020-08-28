@@ -12,7 +12,7 @@ async def lfm(c ,m):
         await m.reply_text('Pronto, pode usar o /lfm agora :)')
     else:
         tk = db.get(m.from_user.id)
-        if not tk[2]:
+        if not tk or not tk[2]:
             await m.reply_text('Mande seu user do last.fm após o /lfm.\n\n'
                                '**Ex.:** ```/lfm alisson```')
         else:
@@ -23,4 +23,3 @@ async def lfm(c ,m):
                 await m.reply_text(f"🎶 {a[0]['artist']['#text']} - {a[0]['name']}")
                 m.text = f"/letra {a[0]['artist']['#text']} {a[0]['name']}"
                 await letra(c, m)
-    

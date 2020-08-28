@@ -20,7 +20,7 @@ async def spoti(c, m):
     else:
         tk = db.get(m.from_user.id)
         print(tk)
-        if not tk[0]:
+        if not tk or not tk[0]:
             kb = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Login', url='https://xn--f77h6a.ml/1ec28a')]
             ])

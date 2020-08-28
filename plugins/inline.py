@@ -32,7 +32,7 @@ async def inline(c, m):
                 r.update({hash:i["link"]})
                 articles.append(InlineQueryResultArticle(
                     title='Current in spotify',
-                    description=f'{i["musica"]} - {i["autor"]}',
+                    description=f'{i["musica"]} - {i["autor"]}'.encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
                     id=hash,
                     thumb_url='https://piics.ml/amn/lpy/spoti.png',
                     reply_markup=keyboard,
@@ -53,7 +53,7 @@ async def inline(c, m):
                 r.update({hash:i["link"]})
                 articles.append(InlineQueryResultArticle(
                     title='Current in Last.fm',
-                    description=f'{i["musica"]} - {i["autor"]}',
+                    description=f'{i["musica"]} - {i["autor"]}'.encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
                     id=hash,
                     thumb_url='https://piics.ml/amn/lpy/lastfm.png',
                     reply_markup=keyboard,
@@ -68,7 +68,7 @@ async def inline(c, m):
             hash = hashlib.md5(i["link"].encode()).hexdigest()
             r.update({hash:i["link"]})
             articles.append(InlineQueryResultArticle(
-                title=f'{i["musica"]} - {i["autor"]}',
+                title=f'{i["musica"]} - {i["autor"]}'.encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
                 id=hash,
                 thumb_url='https://piics.ml/i/010.png',
                 reply_markup=keyboard,

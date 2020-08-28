@@ -17,19 +17,21 @@ def get_token(user_id, auth_code):
     if b.get("error"):
         return False, b['error']
     else:
+        print(b)
         db.add_user(user_id, b['refresh_token'], b['access_token'])
         return True, b['access_token']
 
 def refresh_token(user_id):
+    print('refreh')
     tk = db.get(user_id)
-    print(tk[0])
+    print(tk[1])
     b = requests.post("https://accounts.spotify.com/api/token",
                       headers=dict(
                           Authorization=f"Basic {BASIC}"
                       ),
                       data=dict(
                           grant_type="refresh_token",
-                          refresh_token=tk[0]
+                          refresh_token=tk[1]
                       )).json()
     print(b)
     db.update_user(user_id,b['access_token'])
