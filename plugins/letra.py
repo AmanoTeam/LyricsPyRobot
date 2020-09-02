@@ -41,4 +41,4 @@ async def letra(c, m):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
         ])
-    await m.reply_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("latin-1", 'ignore').decode("utf-8", 'ignore'), reply_markup=keyboard, disable_web_page_preview=True)
+    await m.reply_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("latin-1", 'ignbackslashreplaceore').decode("utf-8", 'backslashreplace'), reply_markup=keyboard, disable_web_page_preview=True)

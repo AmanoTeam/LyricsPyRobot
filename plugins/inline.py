@@ -83,6 +83,8 @@ async def inline(c, m):
 async def choosen(c, m):
     if m.result_id[0] == 's' or m.result_id[0] == 'l':
         hash = m.result_id[1:]
+    else:
+        hash = m.result_id
     tk = db.tem(m.from_user.id)
     s = json.loads((tk[0]).replace('\'','\"'))
     text = s[m.result_id]
@@ -99,4 +101,4 @@ async def choosen(c, m):
             [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
         ])
     db.add_hash(hash, a)
-    await c.edit_inline_text(m.inline_message_id,'[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)
+    await c.edit_inline_text(m.inline_message_id,'[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("latin-1", 'ignore').decode("utf-8", 'ignore'), reply_markup=keyboard, disable_web_page_preview=True)
