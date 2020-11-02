@@ -44,7 +44,7 @@ async def teor(c, m):
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
 
 
-@Client.on_callback_query(filters.regex("^(_\-)"))
+@Client.on_callback_query(filters.regex(r"^(_\-)"))
 async def tetr(c, m):
     user, hash = m.data[2:].split('|')
     if m.from_user.id == int(user) or m.from_user.id in sudos:
@@ -71,7 +71,7 @@ async def tetr(c, m):
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
 
 
-@Client.on_callback_query(filters.regex("^(\+)"))
+@Client.on_callback_query(filters.regex(r"^(\+)"))
 async def ori(c, m):
     user, hash = m.data[1:].split('|')
     if m.from_user.id == int(user) or m.from_user.id in sudos:
@@ -96,15 +96,16 @@ async def ori(c, m):
                     [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{user}|{hash}')]
                 ])
             await m.edit_message_text(
-                '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("latin-1",
-                                                                                                         'backslashreplace').decode(
-                    "unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
+                '[{} - {}]({})\n{}'.format(a["musica"], a["autor"],
+                                           a['link'], a['letra']).encode("latin-1", 'backslashreplace')
+                                                                 .decode("unicode_escape")[:4096],
+                reply_markup=keyboard, disable_web_page_preview=True)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
 
 
-@Client.on_callback_query(filters.regex("^(\-)"))
+@Client.on_callback_query(filters.regex(r"^(\-)"))
 async def tr(c, m):
     user, hash = m.data[1:].split('|')
     if m.from_user.id == int(user) or m.from_user.id in sudos:
