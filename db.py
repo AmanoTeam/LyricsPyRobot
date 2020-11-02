@@ -18,7 +18,6 @@ def send_te(a, b):
 db = sqlite3.connect("users.db")
 dbc = db.cursor()
 
-
 dbc.execute('''CREATE TABLE IF NOT EXISTS users (user_id INTEGER,
                                                  access_token,
                                                  refresh_token,
@@ -37,7 +36,7 @@ def add_hash(hash, h):
     try:
         a = dbc.fetchone()
     except IndexError:
-        a =  None
+        a = None
     if not a:
         tl = send_te(h, h['letra'])
         if 'traducao' in h:
@@ -45,8 +44,9 @@ def add_hash(hash, h):
         else:
             tlt = ''
         dbc.execute('INSERT INTO saves (hash, url, tl, tlt) VALUES (?,?,?,?)',
-                           (hash, h['link'],tl,tlt))
+                    (hash, h['link'], tl, tlt))
         db.commit()
+
 
 def get_url(hash):
     dbc.execute('SELECT url, tl, tlt FROM saves WHERE hash = (?)', (hash,))
@@ -55,32 +55,36 @@ def get_url(hash):
     except IndexError:
         return None
 
+
 def add_user_last(id, user):
     if get(id):
         dbc.execute('UPDATE users SET user = ? WHERE user_id = ?', (user, id))
     else:
         dbc.execute('INSERT INTO users (user_id, user) VALUES (?,?)',
-                               (id, user))
+                    (id, user))
     db.commit()
+
 
 def add_user(user, rtoken, atoken):
     if get(user):
-        dbc.execute('UPDATE users SET access_token = ? , refresh_token = ? , inline_results = ? WHERE user_id = ?', 
-                    (atoken, rtoken, '{}',user))
+        dbc.execute('UPDATE users SET access_token = ? , refresh_token = ? , inline_results = ? WHERE user_id = ?',
+                    (atoken, rtoken, '{}', user))
     else:
         dbc.execute('INSERT INTO users (user_id, access_token, refresh_token, inline_results) VALUES (?,?,?,?)',
-                           (user, atoken, rtoken, '{}'))
+                    (user, atoken, rtoken, '{}'))
     db.commit()
-    
+
+
 def update_user(user, atoken):
     dbc.execute('UPDATE users SET access_token = ? WHERE user_id = ?', (atoken, user))
     db.commit()
+
 
 def tem(user_id, json=None):
     if json:
         if not get(user_id):
             dbc.execute('INSERT INTO users (user_id, inline_results) VALUES (?,?)',
-                               (user_id, str(json)))
+                        (user_id, str(json)))
         else:
             print('tem')
             dbc.execute('UPDATE users SET inline_results = ? WHERE user_id = ?', (str(json), user_id))
@@ -92,12 +96,14 @@ def tem(user_id, json=None):
         except IndexError:
             return None
 
+
 def get(uid):
     dbc.execute('SELECT access_token, refresh_token, user FROM users WHERE user_id = (?)', (uid,))
     try:
         return dbc.fetchone()
     except IndexError:
         return None
+
 
 def theme(uid):
     dbc.execute('SELECT color FROM users WHERE user_id = (?)', (uid,))

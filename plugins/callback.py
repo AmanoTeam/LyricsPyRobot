@@ -8,9 +8,11 @@ import db
 mux = muximatch()
 let = letras()
 
-#+ original, - traduzido, _ telegraph
 
-@Client.on_callback_query(filters.regex("^(_\+)"))
+# + original, - traduzido, _ telegraph
+
+
+@Client.on_callback_query(filters.regex(r'^(_\+)'))
 async def teor(c, m):
     user, hash = m.data[2:].split('|')
     if m.from_user.id == int(user) or m.from_user.id in sudos:
@@ -27,17 +29,20 @@ async def teor(c, m):
                 return True
             if n[2]:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text='Texto', callback_data=f'+{user}|{hash}')]+
-                    [InlineKeyboardButton(text=a['tr_name']or'tradução', callback_data=f'_-{user}|{hash}')]
+                    [InlineKeyboardButton(text='Texto', callback_data=f'+{user}|{hash}')] +
+                    [InlineKeyboardButton(text=a['tr_name'] or 'tradução', callback_data=f'_-{user}|{hash}')]
                 ])
             else:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
                     [InlineKeyboardButton(text='Texto', callback_data=f'+{user}|{hash}')]
                 ])
-            await m.edit_message_text('{} - {}\n{}'.format(a["musica"], a["autor"], n[1]).encode("latin-1", 'backslashreplace').decode("unicode_escape"), reply_markup=keyboard)
+            await m.edit_message_text(
+                '{} - {}\n{}'.format(a["musica"], a["autor"], n[1]).encode("latin-1", 'backslashreplace').decode(
+                    "unicode_escape"), reply_markup=keyboard)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
+
 
 @Client.on_callback_query(filters.regex("^(_\-)"))
 async def tetr(c, m):
@@ -55,13 +60,16 @@ async def tetr(c, m):
                 await m.answer(f'link inválido:\n{n[0]}', show_alert=True)
                 return True
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Texto', callback_data=f'-{user}|{hash}')]+
+                [InlineKeyboardButton(text='Texto', callback_data=f'-{user}|{hash}')] +
                 [InlineKeyboardButton(text='Original', callback_data=f'_+{user}|{hash}')]
             ])
-            await m.edit_message_text('{} - {}\n{}'.format(a["musica"], a["autor"], n[2]).encode("latin-1", 'backslashreplace').decode("unicode_escape"), reply_markup=keyboard)
+            await m.edit_message_text(
+                '{} - {}\n{}'.format(a["musica"], a["autor"], n[2]).encode("latin-1", 'backslashreplace').decode(
+                    "unicode_escape"), reply_markup=keyboard)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
+
 
 @Client.on_callback_query(filters.regex("^(\+)"))
 async def ori(c, m):
@@ -80,17 +88,21 @@ async def ori(c, m):
                 return True
             if n[2]:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{user}|{hash}')]+
+                    [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{user}|{hash}')] +
                     [InlineKeyboardButton(text=a['tr_name'] or 'traducao', callback_data=f'-{user}|{hash}')]
                 ])
             else:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
                     [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{user}|{hash}')]
                 ])
-            await m.edit_message_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("latin-1", 'backslashreplace').decode("unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
+            await m.edit_message_text(
+                '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("latin-1",
+                                                                                                         'backslashreplace').decode(
+                    "unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
+
 
 @Client.on_callback_query(filters.regex("^(\-)"))
 async def tr(c, m):
@@ -108,10 +120,13 @@ async def tr(c, m):
                 await m.answer(f'link inválido:\n{n[0]}', show_alert=True)
                 return True
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_-{user}|{hash}')]+
+                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_-{user}|{hash}')] +
                 [InlineKeyboardButton(text='Original', callback_data=f'+{user}|{hash}')]
             ])
-            await m.edit_message_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['traducao'])[:4096].encode("latin-1", 'backslashreplace').decode("unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
+            await m.edit_message_text(
+                '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['traducao'])[:4096].encode("latin-1",
+                                                                                                            'backslashreplace').decode(
+                    "unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')

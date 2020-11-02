@@ -8,7 +8,8 @@ import json
 
 mux = muximatch()
 
-#+ original, - traduzido, _ telegraph
+# + original, - traduzido, _ telegraph
+
 
 @Client.on_inline_query()
 async def inline(c, m):
@@ -28,8 +29,8 @@ async def inline(c, m):
             i = await mux.auto(text, limit=1)
             if i:
                 i = i[0]
-                hash = 's'+hashlib.md5(i["link"].encode()).hexdigest()
-                r.update({hash:i["link"]})
+                hash = 's' + hashlib.md5(i["link"].encode()).hexdigest()
+                r.update({hash: i["link"]})
                 articles.append(InlineQueryResultArticle(
                     title='Current in spotify',
                     description=f'{i["musica"]} - {i["autor"]}'.encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
@@ -49,8 +50,8 @@ async def inline(c, m):
             i = await mux.auto(text, limit=1)
             if i:
                 i = i[0]
-                hash = 'l'+hashlib.md5(i["link"].encode()).hexdigest()
-                r.update({hash:i["link"]})
+                hash = 'l' + hashlib.md5(i["link"].encode()).hexdigest()
+                r.update({hash: i["link"]})
                 articles.append(InlineQueryResultArticle(
                     title='Current in Last.fm',
                     description=f'{i["musica"]} - {i["autor"]}'.encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
@@ -66,7 +67,7 @@ async def inline(c, m):
         a = await mux.auto(m.query, limit=2)
         for i in a:
             hash = hashlib.md5(i["link"].encode()).hexdigest()
-            r.update({hash:i["link"]})
+            r.update({hash: i["link"]})
             articles.append(InlineQueryResultArticle(
                 title=f'{i["musica"]} - {i["autor"]}'.encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
                 id=hash,
@@ -79,6 +80,7 @@ async def inline(c, m):
     db.tem(m.from_user.id, r)
     await m.answer(articles)
 
+
 @Client.on_chosen_inline_result()
 async def choosen(c, m):
     if m.result_id[0] == 's' or m.result_id[0] == 'l':
@@ -86,14 +88,14 @@ async def choosen(c, m):
     else:
         hash = m.result_id
     tk = db.tem(m.from_user.id)
-    s = json.loads((tk[0]).replace('\'','\"'))
+    s = json.loads((tk[0]).replace('\'', '\"'))
     text = s[m.result_id]
     a = await mux.letra(text)
     uid = m.from_user.id
     if 'traducao' in a:
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]+
-            [InlineKeyboardButton(text=a['tr_name']or'tradução', callback_data=f'-{uid}|{hash}')]
+            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')] +
+            [InlineKeyboardButton(text=a['tr_name'] or 'tradução', callback_data=f'-{uid}|{hash}')]
 
         ])
     else:
@@ -101,4 +103,7 @@ async def choosen(c, m):
             [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
         ])
     db.add_hash(hash, a)
-    await c.edit_inline_text(m.inline_message_id,'[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("latin-1", 'ignore').decode("utf-8", 'ignore'), reply_markup=keyboard, disable_web_page_preview=True)
+    await c.edit_inline_text(m.inline_message_id,
+                             '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode(
+                                 "latin-1", 'ignore').decode("utf-8", 'ignore'), reply_markup=keyboard,
+                             disable_web_page_preview=True)

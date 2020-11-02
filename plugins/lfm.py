@@ -3,9 +3,10 @@ from plugins.letra import letra
 from utils import get_current
 import db
 
+
 @Client.on_message(filters.command('lfm'))
-async def lfm(c ,m):
-    text = m.text.split(' ',1)
+async def lfm(c, m):
+    text = m.text.split(' ', 1)
     print(text)
     if len(text) == 2:
         db.add_user_last(m.from_user.id, text[1])

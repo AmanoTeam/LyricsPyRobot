@@ -1,14 +1,15 @@
 from pyrogram import Client, filters
 from plugins.letra import letra
-from utils import get_token, get_current_playing,send
+from utils import get_token, get_current_playing, send
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from time import time
 import db
 import os
 
+
 @Client.on_message(filters.command('spoti'))
 async def spoti(c, m):
-    text = m.text.split(' ',1)
+    text = m.text.split(' ', 1)
     if len(text) == 2:
         if 'code=' in text[1]:
             access_code = text[1].split('code=')[1]
@@ -26,7 +27,7 @@ async def spoti(c, m):
             kb = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Login', url='https://xn--f77h6a.ml/1ec28a')]
             ])
-            await m.reply_text('Use o botão abaixo e faça login. Em copie o comando e mande para mim',reply_markup=kb)
+            await m.reply_text('Use o botão abaixo e faça login. Em copie o comando e mande para mim', reply_markup=kb)
         else:
             a = get_current_playing(m.from_user.id)
             if not a:

@@ -8,12 +8,13 @@ import hashlib
 mux = muximatch()
 let = letras()
 
-#+ original, - traduzido, _ telegraph
+# + original, - traduzido, _ telegraph
+
 
 @Client.on_message(filters.command("letra"))
 async def letra(c, m):
     print('ok')
-    text = m.text.split(' ',1)[1]
+    text = m.text.split(' ', 1)[1]
     if not text:
         await m.reply_text('**Uso:** /letra <nome da música>')
     elif re.match(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+', text):
@@ -33,12 +34,15 @@ async def letra(c, m):
     uid = m.from_user.id
     if 'traducao' in a:
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]+
-            [InlineKeyboardButton(text=a['tr_name']or'tradução', callback_data=f'-{uid}|{hash}')]
+            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')] +
+            [InlineKeyboardButton(text=a['tr_name'] or 'tradução', callback_data=f'-{uid}|{hash}')]
 
         ])
     else:
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
         ])
-    await m.reply_text('[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("windows-1252", "backslashreplace").decode("unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
+    await m.reply_text(
+        '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("windows-1252",
+                                                                                                 "backslashreplace").decode(
+            "unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
