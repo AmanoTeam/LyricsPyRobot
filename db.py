@@ -7,10 +7,10 @@ telegraph.create_account(short_name='LyricsPyRobot', author_name='amn')
 
 def send_te(a, b):
     response = telegraph.create_page(
-        a['musica'].encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
-        html_content=b.replace('\n', '<br>').encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
-        author_name=a["autor"].encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
-        author_url=a["link"].encode("latin-1", 'ignore').decode("utf-8", 'ignore')
+        a['musica'].encode("latin-1", 'backslashreplace').decode("unicode_escape"),
+        html_content=b.replace('\n', '<br>').encode("latin-1", 'backslashreplace').decode("unicode_escape"),
+        author_name=a["autor"].encode("latin-1", 'backslashreplace').decode("unicode_escape"),
+        author_url=a["link"].encode("latin-1", 'backslashreplace').decode("unicode_escape")
     )
     return response['url']
 
