@@ -3,3 +3,4 @@ config.py
 *.session
 *.db
 *.session-journal
+users.db-journal

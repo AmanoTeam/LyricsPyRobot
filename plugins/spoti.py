@@ -1,14 +1,16 @@
 from pyrogram import Client, filters
 from plugins.letra import letra
-from utils import get_token, get_current_playing
+from utils import get_token, get_current_playing,send
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from time import time
 import db
+import os
 
 @Client.on_message(filters.command('spoti'))
 async def spoti(c, m):
     text = m.text.split(' ',1)
     if len(text) == 2:
-        if 'lyricspy.ml' in text[1]:
+        if 'code=' in text[1]:
             access_code = text[1].split('code=')[1]
         else:
             access_code = text[1]
@@ -30,6 +32,8 @@ async def spoti(c, m):
             if not a:
                 await m.reply_text('No momento não há nada tocando. Que tal dar um __play__ em seu Spotify?')
             else:
-                await m.reply_text(f"🎶 {a['item']['artists'][0]['name']} - {a['item']['name']}")
+                nam = send(a, time(), db.theme(m.from_user.id))
+                await m.reply_sticker(nam)
+                os.remove(nam)
                 m.text = f"/letra {a['item']['artists'][0]['name']} {a['item']['name']}"
                 await letra(c, m)

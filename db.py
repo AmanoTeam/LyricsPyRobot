@@ -23,7 +23,8 @@ dbc.execute('''CREATE TABLE IF NOT EXISTS users (user_id INTEGER,
                                                  access_token,
                                                  refresh_token,
                                                  inline_results,
-                                                 user)''')
+                                                 user,
+                                                 color)''')
 
 dbc.execute('''CREATE TABLE IF NOT EXISTS saves (hash,
                                                  url,
@@ -95,5 +96,12 @@ def get(uid):
     dbc.execute('SELECT access_token, refresh_token, user FROM users WHERE user_id = (?)', (uid,))
     try:
         return dbc.fetchone()
+    except IndexError:
+        return None
+
+def theme(uid):
+    dbc.execute('SELECT color FROM users WHERE user_id = (?)', (uid,))
+    try:
+        return dbc.fetchone()[0]
     except IndexError:
         return None
