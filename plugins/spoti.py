@@ -38,7 +38,7 @@ async def spoti(c, m):
             if not spotify_json:
                 await m.reply_text('No momento não há nada tocando. Que tal dar um __play__ em seu Spotify?')
             else:
-                album_art = get_song_art(webdrv, spotify_json, "dark" if db.theme(m.from_user.id) else "light", True)
+                album_art = await get_song_art(webdrv, spotify_json, "dark" if db.theme(m.from_user.id) else "light", True)
                 await m.reply_sticker(album_art)
                 m.text = f"/letra {spotify_json['item']['artists'][0]['name']} {spotify_json['item']['name']}"
                 await letra(c, m)

@@ -1,5 +1,6 @@
 import math
 import os
+import asyncio
 import textwrap
 import urllib.request
 
@@ -8,7 +9,8 @@ import spotipy
 from time import time
 from yarl import URL
 from io import BytesIO
-from typing import Union
+from typing import Coroutine, Callable, Union
+from functools import wraps, partial
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
 from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxWebDriver
@@ -18,7 +20,20 @@ from spotipy.client import SpotifyException
 import db
 from config import BASIC, KEY
 
+loop = asyncio.get_event_loop()
 
+
+def aiowrap(fn: Callable) -> Coroutine:
+    @wraps(fn)
+    def decorator(*args, **kwargs):
+        wrapped = partial(fn, *args, **kwargs)
+
+        return loop.run_in_executor(None, wrapped)
+
+    return decorator
+
+
+@aiowrap
 def get_song_art(webdriver: Union[ChromeWebDriver, FirefoxWebDriver],
                  spotify_dict: dict,
                  color: str = "dark",
