@@ -1,7 +1,8 @@
 from pyrogram import Client, filters
+
+import db
 from plugins.letra import letra
 from utils import get_current
-import db
 
 
 @Client.on_message(filters.command('lfm'))

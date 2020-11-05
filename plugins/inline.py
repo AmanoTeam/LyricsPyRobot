@@ -1,10 +1,12 @@
-from lyricspy.aio import letras, muximatch
-from pyrogram import Client
-from utils import get_current_playing, get_current
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
 import hashlib
-import db
 import json
+
+from lyricspy.aio import muximatch
+from pyrogram import Client
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
+
+import db
+from utils import get_current_playing, get_current
 
 mux = muximatch()
 

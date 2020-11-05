@@ -1,21 +1,18 @@
-import math
-import os
 import asyncio
-import textwrap
-import urllib.request
+import os
+from functools import wraps, partial
+from io import BytesIO
+from time import time
+from typing import Coroutine, Callable, Union
 
 import requests
 import spotipy
-from time import time
-from yarl import URL
-from io import BytesIO
-from typing import Coroutine, Callable, Union
-from functools import wraps, partial
+from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
 from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxWebDriver
-from PIL import Image
 from spotipy.client import SpotifyException
+from yarl import URL
 
 import db
 from config import BASIC, KEY
