@@ -1,7 +1,9 @@
 git+https://github.com/AmanoTeam/lyricspy
 pillow
+selenium
 pyrogram==1.0.*
 requests
 spotipy
 telegraph
 tgcrypto
+yarl
