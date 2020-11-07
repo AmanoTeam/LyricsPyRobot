@@ -40,7 +40,7 @@ async def teor(c, m):
                 ])
             await m.edit_message_text(
                 '{} - {}\n{}'.format(a["musica"], a["autor"], n[1]).encode("latin-1", 'backslashreplace').decode(
-                    "unicode_escape"), reply_markup=keyboard)
+                    "unicode_escape"), reply_markup=keyboard, parse_mode=None)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
@@ -67,7 +67,7 @@ async def tetr(c, m):
             ])
             await m.edit_message_text(
                 '{} - {}\n{}'.format(a["musica"], a["autor"], n[2]).encode("latin-1", 'backslashreplace').decode(
-                    "unicode_escape"), reply_markup=keyboard)
+                    "unicode_escape"), reply_markup=keyboard, parse_mode=None)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')

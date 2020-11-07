@@ -62,4 +62,4 @@ async def letra(c, m):
             ])
         await m.reply_text(
             '{} - {}\n{}'.format(a["musica"], a["autor"], db.get_url(hash)[1]).encode("latin-1", 'backslashreplace').decode(
-                "unicode_escape"), reply_markup=keyboard)
+                "unicode_escape"), reply_markup=keyboard, parse_mode=None)
