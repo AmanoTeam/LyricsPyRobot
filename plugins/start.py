@@ -5,11 +5,12 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 @Client.on_message(filters.command("start"))
 async def start(c, m):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='Pesquisar letra', switch_inline_query_current_chat='')]
+        [InlineKeyboardButton(text='Pesquisar letra', switch_inline_query_current_chat='')]+
+        [InlineKeyboardButton(text='Configurações', callback_data='settings')]
     ])
     await m.reply_text('Pesquise por letras de músicas direto do Telegram :D\n\n'
                        '   - __Para mais informaçoes, use__ /help\n\n'
-                       'Vamos iniciar? Comece testando pelo botão abaixo:', reply_markup=keyboard)
+                       'Vamos iniciar? Comece navegue pelo botão abaixo:', reply_markup=keyboard)
 
 
 @Client.on_message(filters.command("help"))

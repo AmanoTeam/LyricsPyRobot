@@ -34,17 +34,32 @@ async def letra(c, m):
     hash = hashlib.md5(a['link'].encode()).hexdigest()
     db.add_hash(hash, a)
     uid = m.from_user.id
-    if 'traducao' in a:
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')] +
-            [InlineKeyboardButton(text=a['tr_name'] or 'tradução', callback_data=f'-{uid}|{hash}')]
+    ma = db.theme(m.from_user.id)[2]
+    if not ma:
+        if 'traducao' in a:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')] +
+                [InlineKeyboardButton(text=a['tr_name'] or 'tradução', callback_data=f'-{uid}|{hash}')]
 
-        ])
+            ])
+        else:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
+            ])
+        await m.reply_text(
+            '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("windows-1252",
+                                                                                                    "backslashreplace").decode(
+                "unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
     else:
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
-        ])
-    await m.reply_text(
-        '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("windows-1252",
-                                                                                                 "backslashreplace").decode(
-            "unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
+        if 'traducao' in a:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Texto', callback_data=f'+{uid}|{hash}')] +
+                [InlineKeyboardButton(text=a['tr_name'] or 'tradução', callback_data=f'_-{uid}|{hash}')]
+            ])
+        else:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Texto', callback_data=f'+{uid}|{hash}')]
+            ])
+        await m.reply_text(
+            '{} - {}\n{}'.format(a["musica"], a["autor"], db.get_url(hash)[1]).encode("latin-1", 'backslashreplace').decode(
+                "unicode_escape"), reply_markup=keyboard)
