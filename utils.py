@@ -3,7 +3,7 @@ import os
 from functools import wraps, partial
 from io import BytesIO
 from time import time
-from typing import Coroutine, Callable, Union
+from typing import Coroutine, Callable, Union, List
 
 import requests
 import spotipy
@@ -32,20 +32,16 @@ def aiowrap(fn: Callable) -> Coroutine:
 
 @aiowrap
 def get_song_art(webdriver: Union[ChromeWebDriver, FirefoxWebDriver],
-                 spotify_dict: dict,
+                 song_name: str,
+                 artist: str,
+                 album_url: str,
+                 duration: int = 0,
+                 progress: int = 0,
                  color: str = "dark",
                  blur: bool = False) -> BytesIO:
 
-    album_url = spotify_dict['item']['album']['images'][0]['url']
-
-    duration = spotify_dict['item']['duration_ms'] // 1000
-    progress = spotify_dict['progress_ms'] // 1000
-
-    song = spotify_dict['item']['name']
-    artist = spotify_dict['item']['artists'][0]['name']
-
     params = dict(cover=album_url,
-                  track=song,
+                  track=song_name,
                   artist=artist,
                   timenow=progress,
                   timetotal=duration,
@@ -129,7 +125,7 @@ def refresh_token(user_id):
     return b['access_token']
 
 
-def get_current_playing(user_id):
+def get_current_playing(user_id) -> dict:
     tk = db.get(user_id)
     a = spotipy.Spotify(auth=tk[0])
     try:
@@ -140,7 +136,7 @@ def get_current_playing(user_id):
         return a.current_user_playing_track()
 
 
-def get_current(user):
+def get_current(user) -> List[dict]:
     r = requests.get('http://ws.audioscrobbler.com/2.0/', params=dict(
         method='user.getrecenttracks',
         user=user,
