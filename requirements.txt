@@ -3,6 +3,7 @@ pillow
 selenium
 pyrogram==1.0.*
 requests
+httpx[http2]
 spotipy
 telegraph
 tgcrypto

@@ -1,8 +1,13 @@
+import re
+import httpx
 from pyrogram import Client, filters
 
 import db
 from plugins.letra import letra
-from utils import get_current
+from utils import get_current, get_song_art
+
+
+LFM_LINK_RE = re.compile(r'<meta property=\"og:image\" +?content=\"(.+)\"')
 
 
 @Client.on_message(filters.command('lfm'))
@@ -22,6 +27,18 @@ async def lfm(c, m):
             if not a:
                 await m.reply_text('No momento não há nada tocando. Que tal dar um __play__ em sua playlist?')
             else:
-                await m.reply_text(f"🎶 {a[0]['artist']['#text']} - {a[0]['name']}")
+                album_url = a[0]['image'][-1]['#text']
+                if not album_url:
+                    # if not present in api return, try to get album url from page
+                    async with httpx.AsyncClient(http2=True) as hc:
+                        r = await hc.get(a[0]['url'])
+                        album_url = LFM_LINK_RE.findall(r.text)[0]
+
+                album_art = await get_song_art(song_name=a[0]['name'],
+                                               artist=a[0]['artist']['#text'],
+                                               album_url=album_url,
+                                               color="dark" if db.theme(m.from_user.id)[0] else "light",
+                                               blur=db.theme(m.from_user.id)[1])
+                await m.reply_sticker(album_art)
                 m.text = f"/letra {a[0]['artist']['#text']} {a[0]['name']}"
                 await letra(c, m)
