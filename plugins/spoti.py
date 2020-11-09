@@ -1,15 +1,11 @@
-from config import BROWSER
 from selenium import webdriver
 from pyrogram import Client, filters
 from .letra import letra
-from utils import get_token, get_current_playing, get_song_art, build_webdriver_object
+from utils import get_token, get_current_playing, get_song_art
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from time import time
 import db
 import os
-
-
-webdrv = build_webdriver_object(BROWSER)
 
 
 @Client.on_message(filters.command('spoti'))
@@ -38,8 +34,7 @@ async def spoti(c, m):
             if not spotify_json:
                 await m.reply_text('No momento não há nada tocando. Que tal dar um __play__ em seu Spotify?')
             else:
-                album_art = await get_song_art(webdrv,
-                                               song_name=spotify_json['item']['name'],
+                album_art = await get_song_art(song_name=spotify_json['item']['name'],
                                                artist=spotify_json['item']['artists'][0]['name'],
                                                album_url=spotify_json['item']['album']['images'][0]['url'],
                                                duration=spotify_json['item']['duration_ms'] // 1000,

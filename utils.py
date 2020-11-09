@@ -15,7 +15,7 @@ from spotipy.client import SpotifyException
 from yarl import URL
 
 import db
-from config import BASIC, KEY
+from config import BASIC, KEY, BROWSER
 
 loop = asyncio.get_event_loop()
 
@@ -31,8 +31,7 @@ def aiowrap(fn: Callable) -> Coroutine:
 
 
 @aiowrap
-def get_song_art(webdriver: Union[ChromeWebDriver, FirefoxWebDriver],
-                 song_name: str,
+def get_song_art(song_name: str,
                  artist: str,
                  album_url: str,
                  duration: int = 0,
@@ -50,11 +49,11 @@ def get_song_art(webdriver: Union[ChromeWebDriver, FirefoxWebDriver],
 
     url = URL("https://lyricspy.amanoteam.com") / "nowplaying-dom" % params
 
-    webdriver.get(str(url))
+    webdrv.get(str(url))
 
     tmp_filename = f"{time()}.png"
 
-    webdriver.save_screenshot(tmp_filename)
+    webdrv.save_screenshot(tmp_filename)
 
     img = Image.open(tmp_filename)
 
@@ -144,3 +143,6 @@ def get_current(user) -> List[dict]:
         format='json',
         limit=1))
     return r.json()['recenttracks']['track']
+
+
+webdrv = build_webdriver_object(BROWSER)
