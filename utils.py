@@ -74,18 +74,18 @@ def build_webdriver_object(browser_type: str) -> Union[ChromeWebDriver, FirefoxW
         copts.headless = True
         copts.add_argument("--window-size=512,288")
 
-        webdrv = webdriver.Chrome(options=copts)
+        webdrv_ = webdriver.Chrome(options=copts)
     elif browser_type == "firefox":
         fopts = webdriver.FirefoxOptions()
         fopts.headless = True
         fopts.add_argument("--width=512")
         fopts.add_argument("--height=288")
 
-        webdrv = webdriver.Firefox(options=fopts)
+        webdrv_ = webdriver.Firefox(options=fopts)
     else:
         raise TypeError("browser_type must be either 'chrome' or 'firefox'.")
 
-    return webdrv
+    return webdrv_
 
 
 async def get_token(user_id, auth_code):
