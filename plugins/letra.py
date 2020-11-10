@@ -1,14 +1,14 @@
 import hashlib
 import re
 
-from lyricspy.aio import letras, muximatch
+from lyricspy.aio import Letras, Musixmatch
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 import db
 
-mux = muximatch()
-let = letras()
+mux = Musixmatch()
+let = Letras()
 
 # + original, - traduzido, _ telegraph
 

@@ -2,7 +2,7 @@ import re
 from pyrogram import Client, filters
 
 import db
-from plugins.letra import letra
+from .letra import letra
 from utils import get_current, get_song_art, http_pool
 
 
