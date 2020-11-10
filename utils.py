@@ -19,6 +19,8 @@ from config import BASIC, KEY, BROWSER
 
 loop = asyncio.get_event_loop()
 
+http_pool = httpx.AsyncClient(http2=True)
+
 
 def aiowrap(fn: Callable) -> Coroutine:
     @wraps(fn)
@@ -89,17 +91,16 @@ def build_webdriver_object(browser_type: str) -> Union[ChromeWebDriver, FirefoxW
 
 
 async def get_token(user_id, auth_code):
-    async with httpx.AsyncClient(http2=True) as hc:
-        r = await hc.post("https://accounts.spotify.com/api/token",
-                          headers=dict(
-                              Authorization=f"Basic {BASIC}"
-                          ),
-                          data=dict(
-                              grant_type="authorization_code",
-                              code=auth_code,
-                              redirect_uri="https://lyricspy.amanoteam.com/go"
-                          ))
-        b = r.json()
+    r = await http_pool.post("https://accounts.spotify.com/api/token",
+                             headers=dict(
+                                 Authorization=f"Basic {BASIC}"
+                             ),
+                             data=dict(
+                                 grant_type="authorization_code",
+                                 code=auth_code,
+                                 redirect_uri="https://lyricspy.amanoteam.com/go"
+                             ))
+    b = r.json()
     if b.get("error"):
         return False, b['error']
     else:
@@ -112,16 +113,15 @@ async def refresh_token(user_id):
     print('refreh')
     tk = db.get(user_id)
     print(tk[1])
-    async with httpx.AsyncClient(http2=True) as hc:
-        r = await hc.post("https://accounts.spotify.com/api/token",
-                          headers=dict(
-                              Authorization=f"Basic {BASIC}"
-                          ),
-                          data=dict(
-                              grant_type="refresh_token",
-                              refresh_token=tk[1]
-                          ))
-        b = r.json()
+    r = await http_pool.post("https://accounts.spotify.com/api/token",
+                             headers=dict(
+                                 Authorization=f"Basic {BASIC}"
+                             ),
+                             data=dict(
+                                 grant_type="refresh_token",
+                                 refresh_token=tk[1]
+                             ))
+    b = r.json()
 
     print(b)
     db.update_user(user_id, b['access_token'])
@@ -140,14 +140,13 @@ async def get_current_playing(user_id) -> dict:
 
 
 async def get_current(user: str) -> List[dict]:
-    async with httpx.AsyncClient(http2=True) as hc:
-        r = await hc.get('http://ws.audioscrobbler.com/2.0/', params=dict(
+    r = await http_pool.get('http://ws.audioscrobbler.com/2.0/', params=dict(
             method='user.getrecenttracks',
             user=user,
             api_key=KEY,
             format='json',
             limit=1))
-        return r.json()['recenttracks']['track']
+    return r.json()['recenttracks']['track']
 
 
 webdrv = build_webdriver_object(BROWSER)

@@ -1,11 +1,8 @@
-from selenium import webdriver
 from pyrogram import Client, filters
 from .letra import letra
 from utils import get_token, get_current_playing, get_song_art
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from time import time
 import db
-import os
 
 
 @Client.on_message(filters.command('spoti'))

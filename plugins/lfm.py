@@ -1,10 +1,9 @@
 import re
-import httpx
 from pyrogram import Client, filters
 
 import db
 from plugins.letra import letra
-from utils import get_current, get_song_art
+from utils import get_current, get_song_art, http_pool
 
 
 LFM_LINK_RE = re.compile(r'<meta property=\"og:image\" +?content=\"(.+)\"')
@@ -30,13 +29,12 @@ async def lfm(c, m):
                 album_url = a[0]['image'][-1]['#text']
                 if not album_url:
                     # if not present in api return, try to get album url from page
-                    async with httpx.AsyncClient(http2=True) as hc:
-                        r = await hc.get(a[0]['url'].replace('/_/', '/'))
-                        if r.status_code == 200:
-                            album_url = LFM_LINK_RE.findall(r.text)[0]
-                        else:
-                            r2 = await hc.get(a[0]['url'])
-                            album_url = LFM_LINK_RE.findall(r2.text)[0]
+                    r = await http_pool.get(a[0]['url'].replace('/_/', '/'))
+                    if r.status_code == 200:
+                        album_url = LFM_LINK_RE.findall(r.text)[0]
+                    else:
+                        r2 = await http_pool.get(a[0]['url'])
+                        album_url = LFM_LINK_RE.findall(r2.text)[0]
 
                 album_art = await get_song_art(song_name=a[0]['name'],
                                                artist=a[0]['artist']['#text'],
