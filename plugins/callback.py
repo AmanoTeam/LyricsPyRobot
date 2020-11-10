@@ -100,7 +100,7 @@ async def ori(c, m):
             await m.edit_message_text(
                 '[{} - {}]({})\n{}'.format(a["musica"], a["autor"],
                                            a['link'], a['letra']).encode("latin-1", 'backslashreplace')
-                                                                 .decode("unicode_escape")[:4096],
+                    .decode("unicode_escape")[:4096],
                 reply_markup=keyboard, disable_web_page_preview=True)
     else:
         a = await c.get_chat(int(user))
@@ -134,15 +134,17 @@ async def tr(c, m):
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
 
+
 @Client.on_callback_query(filters.regex(r"settings"))
 async def settings(c, m):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Tema", callback_data="theme")]+
-        [InlineKeyboardButton(text="Idioma (SOON)", callback_data='language')]+
+        [InlineKeyboardButton(text="Tema", callback_data="theme")] +
+        [InlineKeyboardButton(text="Idioma (SOON)", callback_data='language')] +
         [InlineKeyboardButton(text="Padrão", callback_data="pattern")]
     ])
     await m.edit_message_text(
         'Você gostaria de configurar o quê?', reply_markup=keyboard)
+
 
 @Client.on_callback_query(filters.regex(r"language"))
 async def lang(c, m):
@@ -152,27 +154,28 @@ async def lang(c, m):
     await m.edit_message_text(
         'Em Breve...', reply_markup=keyboard)
 
+
 @Client.on_callback_query(filters.regex(r"theme"))
 async def theme(c, m):
     a = db.theme(m.from_user.id)
-    if a[0] == None or '_' in m.data and a[0]:
+    if a[0] is None or '_' in m.data and a[0]:
         tid = False
     elif '_' in m.data and not a[0]:
         tid = True
     else:
         tid = a[0]
-    if a[1] == None or '-' in m.data and not a[1]:
+    if a[1] is None or '-' in m.data and not a[1]:
         bid = True
     elif '-' in m.data and a[1]:
         bid = False
     else:
         bid = a[1]
     tname = ['light', 'dark']
-    bname = ['off','on']
+    bname = ['off', 'on']
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='Tema: ', callback_data='none')]+
+        [InlineKeyboardButton(text='Tema: ', callback_data='none')] +
         [InlineKeyboardButton(text=tname[tid], callback_data='theme_')],
-        [InlineKeyboardButton(text='Blur: ', callback_data='none')]+
+        [InlineKeyboardButton(text='Blur: ', callback_data='none')] +
         [InlineKeyboardButton(text=bname[bid], callback_data='theme-')],
         [InlineKeyboardButton(text='Voltar', callback_data="settings")]
     ])
@@ -180,10 +183,11 @@ async def theme(c, m):
     await m.edit_message_text(
         'Escolha em baixo:', reply_markup=keyboard)
 
+
 @Client.on_callback_query(filters.regex(r"pattern"))
 async def pattern(c, m):
     a = db.theme(m.from_user.id)
-    if a[2] == None or '_' in m.data and a[2]:
+    if a[2] is None or '_' in m.data and a[2]:
         pid = False
     elif '_' in m.data and not a[2]:
         pid = True
@@ -194,6 +198,6 @@ async def pattern(c, m):
         [InlineKeyboardButton(text=pname[pid], callback_data='pattern_')],
         [InlineKeyboardButton(text='Voltar', callback_data="settings")]
     ])
-    db.def_theme(m.from_user.id,a[0],a[1],pid)
+    db.def_theme(m.from_user.id, a[0], a[1], pid)
     await m.edit_message_text(
         'Escolha em baixo:', reply_markup=keyboard)
