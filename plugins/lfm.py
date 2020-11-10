@@ -23,7 +23,7 @@ async def lfm(c, m):
             await m.reply_text('Mande seu user do last.fm após o /lfm.\n\n'
                                '**Ex.:** ```/lfm alisson```')
         else:
-            a = get_current(tk[2])
+            a = await get_current(tk[2])
             if not a:
                 await m.reply_text('No momento não há nada tocando. Que tal dar um __play__ em sua playlist?')
             else:

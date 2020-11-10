@@ -24,7 +24,7 @@ async def inline(c, m):
         [InlineKeyboardButton(text='aguarde...', callback_data='a')]
     ])
     if tk[0]:
-        a = get_current_playing(m.from_user.id)
+        a = await get_current_playing(m.from_user.id)
         if a:
             text = f"{a['item']['artists'][0]['name']} {a['item']['name']}"
             print(text)
@@ -45,7 +45,7 @@ async def inline(c, m):
                 ))
                 lm -= 1
     if tk[2]:
-        a = get_current(tk[2])
+        a = await get_current(tk[2])
         if a:
             text = f"{a[0]['artist']['#text']} - {a[0]['name']}"
             print(text)

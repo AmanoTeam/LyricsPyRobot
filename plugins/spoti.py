@@ -16,7 +16,7 @@ async def spoti(c, m):
             access_code = text[1].split('code=')[1]
         else:
             access_code = text[1]
-        res = get_token(m.from_user.id, access_code)
+        res = await get_token(m.from_user.id, access_code)
         if res[0]:
             await m.reply_text('Pronto, pode usar o /spoti agora :)')
         else:
@@ -30,7 +30,7 @@ async def spoti(c, m):
             ])
             await m.reply_text('Use o botão abaixo e faça login. Em copie o comando e mande para mim', reply_markup=kb)
         else:
-            spotify_json = get_current_playing(m.from_user.id)
+            spotify_json = await get_current_playing(m.from_user.id)
             if not spotify_json:
                 await m.reply_text('No momento não há nada tocando. Que tal dar um __play__ em seu Spotify?')
             else:
