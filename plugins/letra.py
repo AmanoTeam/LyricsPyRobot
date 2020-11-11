@@ -47,9 +47,7 @@ async def letra(c, m):
                 [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
             ])
         await m.reply_text(
-            '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode("windows-1252",
-                                                                                                    "backslashreplace").decode(
-                "unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
+            '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)
     else:
         if 'traducao' in a:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -61,5 +59,4 @@ async def letra(c, m):
                 [InlineKeyboardButton(text='Texto', callback_data=f'+{uid}|{hash}')]
             ])
         await m.reply_text(
-            '{} - {}\n{}'.format(a["musica"], a["autor"], db.get_url(hash)[1]).encode("latin-1", 'backslashreplace').decode(
-                "unicode_escape"), reply_markup=keyboard, parse_mode=None)
+            '{} - {}\n{}'.format(a["musica"], a["autor"], db.get_url(hash)[1]), reply_markup=keyboard, parse_mode=None)

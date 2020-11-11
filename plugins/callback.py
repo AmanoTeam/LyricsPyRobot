@@ -39,8 +39,7 @@ async def teor(c, m):
                     [InlineKeyboardButton(text='Texto', callback_data=f'+{user}|{hash}')]
                 ])
             await m.edit_message_text(
-                '{} - {}\n{}'.format(a["musica"], a["autor"], n[1]).encode("latin-1", 'backslashreplace').decode(
-                    "unicode_escape"), reply_markup=keyboard, parse_mode=None)
+                '{} - {}\n{}'.format(a["musica"], a["autor"], n[1]), reply_markup=keyboard, parse_mode=None)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
@@ -66,8 +65,7 @@ async def tetr(c, m):
                 [InlineKeyboardButton(text='Original', callback_data=f'_+{user}|{hash}')]
             ])
             await m.edit_message_text(
-                '{} - {}\n{}'.format(a["musica"], a["autor"], n[2]).encode("latin-1", 'backslashreplace').decode(
-                    "unicode_escape"), reply_markup=keyboard, parse_mode=None)
+                '{} - {}\n{}'.format(a["musica"], a["autor"], n[2]), reply_markup=keyboard, parse_mode=None)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
@@ -99,8 +97,7 @@ async def ori(c, m):
                 ])
             await m.edit_message_text(
                 '[{} - {}]({})\n{}'.format(a["musica"], a["autor"],
-                                           a['link'], a['letra']).encode("latin-1", 'backslashreplace')
-                    .decode("unicode_escape")[:4096],
+                                           a['link'], a['letra'])[:4096],
                 reply_markup=keyboard, disable_web_page_preview=True)
     else:
         a = await c.get_chat(int(user))
@@ -127,9 +124,7 @@ async def tr(c, m):
                 [InlineKeyboardButton(text='Original', callback_data=f'+{user}|{hash}')]
             ])
             await m.edit_message_text(
-                '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['traducao'])[:4096].encode("latin-1",
-                                                                                                            'backslashreplace').decode(
-                    "unicode_escape"), reply_markup=keyboard, disable_web_page_preview=True)
+                '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['traducao'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')

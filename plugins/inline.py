@@ -35,7 +35,7 @@ async def inline(c, m):
                 r.update({hash: i["link"]})
                 articles.append(InlineQueryResultArticle(
                     title='Current in spotify',
-                    description=f'{i["musica"]} - {i["autor"]}'.encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
+                    description=f'{i["musica"]} - {i["autor"]}',
                     id=hash,
                     thumb_url='https://piics.ml/amn/lpy/spoti.png',
                     reply_markup=keyboard,
@@ -56,7 +56,7 @@ async def inline(c, m):
                 r.update({hash: i["link"]})
                 articles.append(InlineQueryResultArticle(
                     title='Current in Last.fm',
-                    description=f'{i["musica"]} - {i["autor"]}'.encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
+                    description=f'{i["musica"]} - {i["autor"]}',
                     id=hash,
                     thumb_url='https://piics.ml/amn/lpy/lastfm.png',
                     reply_markup=keyboard,
@@ -71,7 +71,7 @@ async def inline(c, m):
             hash = hashlib.md5(i["link"].encode()).hexdigest()
             r.update({hash: i["link"]})
             articles.append(InlineQueryResultArticle(
-                title=f'{i["musica"]} - {i["autor"]}'.encode("latin-1", 'ignore').decode("utf-8", 'ignore'),
+                title=f'{i["musica"]} - {i["autor"]}',
                 id=hash,
                 thumb_url='https://piics.ml/i/010.png',
                 reply_markup=keyboard,
@@ -106,6 +106,5 @@ async def choosen(c, m):
         ])
     db.add_hash(hash, a)
     await c.edit_inline_text(m.inline_message_id,
-                             '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096].encode(
-                                 "latin-1", 'ignore').decode("utf-8", 'ignore'), reply_markup=keyboard,
+                             '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096], reply_markup=keyboard,
                              disable_web_page_preview=True)
