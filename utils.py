@@ -46,7 +46,7 @@ def get_song_art(song_name: str,
                   timenow=progress,
                   timetotal=duration,
                   theme=color,
-                  blurbg=int(blur))
+                  blurbg=int(blur if blur is not None else True))
 
     url = URL("https://lyricspy.amanoteam.com") / "nowplaying-dom" % params
 
