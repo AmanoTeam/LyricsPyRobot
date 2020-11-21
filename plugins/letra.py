@@ -30,7 +30,7 @@ async def letra(c, m):
             if not a:
                 await m.reply_text('Letra não encontrada :(')
                 return True
-    a = a[0]
+    a = a[0] if isinstance(a, list) else a
     hash = hashlib.md5(a['link'].encode()).hexdigest()
     db.add_hash(hash, a)
     uid = m.from_user.id
