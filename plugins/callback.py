@@ -42,7 +42,7 @@ async def teor(c, m):
                 '{} - {}\n{}'.format(a["musica"], a["autor"], n[1]), reply_markup=keyboard, parse_mode=None)
     else:
         a = await c.get_chat(int(user))
-        await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
+        await m.answer(f'Você n pode mexer nisso, somente o {a.first_name} pode')
 
 
 @Client.on_callback_query(filters.regex(r"^(_\-)"))
@@ -68,7 +68,7 @@ async def tetr(c, m):
                 '{} - {}\n{}'.format(a["musica"], a["autor"], n[2]), reply_markup=keyboard, parse_mode=None)
     else:
         a = await c.get_chat(int(user))
-        await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
+        await m.answer(f'Você n pode mexer nisso, somente o {a.first_name} pode')
 
 
 @Client.on_callback_query(filters.regex(r"^(\+)"))
@@ -101,7 +101,7 @@ async def ori(c, m):
                 reply_markup=keyboard, disable_web_page_preview=True)
     else:
         a = await c.get_chat(int(user))
-        await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
+        await m.answer(f'Você n pode mexer nisso, somente o {a.first_name} pode')
 
 
 @Client.on_callback_query(filters.regex(r"^(\-)"))
@@ -127,7 +127,7 @@ async def tr(c, m):
                 '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['traducao'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)
     else:
         a = await c.get_chat(int(user))
-        await m.answer(f'Você n pode mecher nisso, somente o {a.first_name} {a.last_name} pode')
+        await m.answer(f'Você n pode mexer nisso, somente o {a.first_name} pode')
 
 
 @Client.on_callback_query(filters.regex(r"settings"))
