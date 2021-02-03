@@ -42,7 +42,7 @@ def add_hash(hash, h):
         a = None
     if not a:
         tl = send_te(h, h['letra'])
-        if 'traducao' in h:
+        if h['traducao']:
             tlt = send_te(h, h['traducao'])
         else:
             tlt = ''

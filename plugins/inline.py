@@ -1,14 +1,15 @@
 import hashlib
 import json
 
-from lyricspy.aio import muximatch
+from lyricspy.aio import Musixmatch
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent
 
 import db
+from config import MUSIXMATCH_KEYS
 from utils import get_current_playing, get_current
 
-mux = muximatch()
+mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 
 # + original, - traduzido, _ telegraph
 
@@ -28,10 +29,10 @@ async def inline(c, m):
         if a:
             text = f"{a['item']['artists'][0]['name']} {a['item']['name']}"
             print(text)
-            i = await mux.auto(text, limit=1)
+            i = await mux.auto(text, limit=1, lang='pt')
             if i:
-                i = i[0]
-                hash = 's' + hashlib.md5(i["link"].encode()).hexdigest()
+                i = mux.parce(i[0])
+                hash = 's' + str(i['id'])
                 r.update({hash: i["link"]})
                 articles.append(InlineQueryResultArticle(
                     title='Current in spotify',
@@ -49,10 +50,10 @@ async def inline(c, m):
         if a:
             text = f"{a[0]['artist']['#text']} - {a[0]['name']}"
             print(text)
-            i = await mux.auto(text, limit=1)
+            i = await mux.auto(text, limit=1, lang='pt')
             if i:
-                i = i[0]
-                hash = 'l' + hashlib.md5(i["link"].encode()).hexdigest()
+                i = mux.parce(i[0])
+                hash = 'l' + str(i['id'])
                 r.update({hash: i["link"]})
                 articles.append(InlineQueryResultArticle(
                     title='Current in Last.fm',
@@ -66,9 +67,10 @@ async def inline(c, m):
                 ))
                 lm -= 1
     if m.query:
-        a = await mux.auto(m.query, limit=2)
+        a = await mux.auto(m.query, limit=2, lang='pt')
         for i in a:
-            hash = hashlib.md5(i["link"].encode()).hexdigest()
+            i = mux.parce(i)
+            hash = str(i['id'])
             r.update({hash: i["link"]})
             articles.append(InlineQueryResultArticle(
                 title=f'{i["musica"]} - {i["autor"]}',
@@ -89,22 +91,34 @@ async def choosen(c, m):
         hash = m.result_id[1:]
     else:
         hash = m.result_id
-    tk = db.tem(m.from_user.id)
-    s = json.loads((tk[0]).replace('\'', '\"'))
-    text = s[m.result_id]
-    a = await mux.letra(text)
+    a = await mux.lyrics(hash)
+    a = mux.parce(a)
     uid = m.from_user.id
-    if 'traducao' in a:
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')] +
-            [InlineKeyboardButton(text=a['tr_name'] or 'tradução', callback_data=f'-{uid}|{hash}')]
+    ma = db.theme(uid)[2]
+    if not ma:
+        if a['traducao']:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')] +
+                [InlineKeyboardButton(text='Português', callback_data=f'-{uid}|{hash}')]
 
-        ])
+            ])
+        else:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
+            ])
+        db.add_hash(hash, a)
+        await c.edit_inline_text(m.inline_message_id,
+                                '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096], reply_markup=keyboard,
+                                disable_web_page_preview=True)
     else:
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
-        ])
-    db.add_hash(hash, a)
-    await c.edit_inline_text(m.inline_message_id,
-                             '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096], reply_markup=keyboard,
-                             disable_web_page_preview=True)
+        if a['traducao']:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Texto', callback_data=f'+{uid}|{hash}')] +
+                [InlineKeyboardButton(text='Português', callback_data=f'_-{uid}|{hash}')]
+            ])
+        else:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Texto', callback_data=f'+{uid}|{hash}')]
+            ])
+        await c.edit_inline_text(m.inline_message_id,
+            '{} - {}\n{}'.format(a["musica"], a["autor"], db.get_url(hash)[1]), reply_markup=keyboard, parse_mode=None)

@@ -1,14 +1,14 @@
 import re
 
-from lyricspy.aio import letras, muximatch
+from lyricspy.aio import Letras, Musixmatch
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 import db
-from config import sudos
+from config import sudos, MUSIXMATCH_KEYS
 
-mux = muximatch()
-let = letras()
+mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
+let = Letras()
 
 
 # + original, - traduzido, _ telegraph
@@ -18,6 +18,7 @@ let = letras()
 async def teor(c, m):
     user, hash = m.data[2:].split('|')
     if m.from_user.id == int(user) or m.from_user.id in sudos:
+        print(hash)
         n = db.get_url(hash)
         if not n:
             await m.answer('Hash não encontrado...\nEssa mensagem pode ser velha', show_alert=True)
@@ -25,14 +26,18 @@ async def teor(c, m):
             if re.match(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+', n[0]):
                 a = await let.letra(n[0])
             elif re.match(r'^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+', n[0]):
-                a = await mux.letra(n[0])
+                a = await mux.lyrics(hash)
             else:
                 await m.answer(f'link inválido:\n{n[0]}', show_alert=True)
                 return True
-            if n[2]:
+            if 'art' in a:
+                a = let.parce(a)
+            else:
+                a = mux.parce(a)
+            if a['traducao']:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
                     [InlineKeyboardButton(text='Texto', callback_data=f'+{user}|{hash}')] +
-                    [InlineKeyboardButton(text=a['tr_name'] or 'tradução', callback_data=f'_-{user}|{hash}')]
+                    [InlineKeyboardButton(text='Portugês', callback_data=f'_-{user}|{hash}')]
                 ])
             else:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -50,16 +55,21 @@ async def tetr(c, m):
     user, hash = m.data[2:].split('|')
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
+        print(hash)
         if not n:
             await m.answer('Hash não encontrado...\nEssa mensagem pode ser velha', show_alert=True)
         else:
             if re.match(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+', n[0]):
                 a = await let.letra(n[0])
             elif re.match(r'^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+', n[0]):
-                a = await mux.letra(n[0])
+                a = await mux.lyrics(hash)
             else:
                 await m.answer(f'link inválido:\n{n[0]}', show_alert=True)
                 return True
+            if 'art' in a:
+                a = let.parce(a)
+            else:
+                a = mux.parce(a)
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Texto', callback_data=f'-{user}|{hash}')] +
                 [InlineKeyboardButton(text='Original', callback_data=f'_+{user}|{hash}')]
@@ -76,20 +86,25 @@ async def ori(c, m):
     user, hash = m.data[1:].split('|')
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
+        print(hash)
         if not n:
             await m.answer('Hash não encontrado...\nEssa mensagem pode ser velha', show_alert=True)
         else:
             if re.match(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+', n[0]):
                 a = await let.letra(n[0])
             elif re.match(r'^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+', n[0]):
-                a = await mux.letra(n[0])
+                a = await mux.lyrics(hash)
             else:
                 await m.answer(f'link inválido:\n{n[0]}', show_alert=True)
                 return True
-            if n[2]:
+            if 'art' in a:
+                a = let.parce(a)
+            else:
+                a = mux.parce(a)
+            if a['traducao']:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
                     [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{user}|{hash}')] +
-                    [InlineKeyboardButton(text=a['tr_name'] or 'traducao', callback_data=f'-{user}|{hash}')]
+                    [InlineKeyboardButton(text='Português', callback_data=f'-{user}|{hash}')]
                 ])
             else:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -109,16 +124,21 @@ async def tr(c, m):
     user, hash = m.data[1:].split('|')
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
+        print(hash)
         if not n:
             await m.answer('Hash não encontrado...\nEssa mensagem pode ser velha', show_alert=True)
         else:
             if re.match(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+', n[0]):
                 a = await let.letra(n[0])
             elif re.match(r'^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+', n[0]):
-                a = await mux.letra(n[0])
+                a = await mux.lyrics(hash)
             else:
                 await m.answer(f'link inválido:\n{n[0]}', show_alert=True)
                 return True
+            if 'art' in a:
+                a = let.parce(a)
+            else:
+                a = mux.parce(a)
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_-{user}|{hash}')] +
                 [InlineKeyboardButton(text='Original', callback_data=f'+{user}|{hash}')]
