@@ -110,7 +110,7 @@ async def ppa(c, m):
             if i['is_active']:
                 device_id = i['id']
                 break
-        if spotify_json['is_playing']:
+        if 'pause' in cmd:
             print('pause')
             sess.pause_playback(device_id)
         else:
