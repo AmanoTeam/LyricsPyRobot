@@ -7,7 +7,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQue
 
 import db
 from config import MUSIXMATCH_KEYS
-from utils import get_current_playing, get_current
+from utils import get_spoti_session, get_current
 
 mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 
@@ -25,7 +25,8 @@ async def inline(c, m):
         [InlineKeyboardButton(text='aguarde...', callback_data='a')]
     ])
     if tk[0]:
-        a = await get_current_playing(m.from_user.id)
+        sess = await get_spoti_session(m.from_user.id)
+        a = sess.current_user_playing_track()
         if a:
             text = f"{a['item']['artists'][0]['name']} {a['item']['name']}"
             print(text)

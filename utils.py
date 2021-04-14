@@ -128,15 +128,15 @@ async def refresh_token(user_id):
     return b['access_token']
 
 
-async def get_current_playing(user_id) -> dict:
+async def get_spoti_session(user_id) -> dict:
     tk = db.get(user_id)
     a = spotipy.Spotify(auth=tk[0])
     try:
-        return a.current_user_playing_track()
+        return a
     except SpotifyException:
         new_token = await refresh_token(user_id)
         a = spotipy.Spotify(auth=new_token)
-        return a.current_user_playing_track()
+        return a
 
 
 async def get_current(user: str) -> List[dict]:
