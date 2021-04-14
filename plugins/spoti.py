@@ -116,10 +116,9 @@ async def ppa(c, m):
         else:
             print('play')
             sess.start_playback(device_id)
-        spotify_json = sess.current_user_playing_track()
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='⏮', callback_data=f'previous|{m.from_user.id}')] +
-            [InlineKeyboardButton(text='⏸' if spotify_json['is_playing'] else '▶️', callback_data=f'pause|{m.from_user.id}' if spotify_json['is_playing'] else f'play|{m.from_user.id}')] +
+            [InlineKeyboardButton(text='⏸' if 'play' in cmd else '▶️', callback_data=f'pause|{m.from_user.id}' if spotify_json['is_playing'] else f'play|{m.from_user.id}')] +
             [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
         ])
         await m.edit_message_reply_markup(reply_markup=kb)
