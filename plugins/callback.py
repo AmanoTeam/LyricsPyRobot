@@ -174,27 +174,35 @@ async def lang(c, m):
 async def theme(c, m):
     a = db.theme(m.from_user.id)
     if a[0] is None or '_' in m.data and a[0]:
-        tid = False
+        tid = 0
     elif '_' in m.data and not a[0]:
-        tid = True
+        tid = 1
     else:
         tid = a[0]
     if a[1] is None or '-' in m.data and not a[1]:
-        bid = True
+        bid = 1
     elif '-' in m.data and a[1]:
-        bid = False
+        bid = 0
     else:
         bid = a[1]
+    if a[3] is None or '+' in m.data and not a[3]:
+        sid = 1
+    elif '+' in m.data and a[1]:
+        sid = 0
+    else:
+        sid = a[3]
     tname = ['light', 'dark']
     bname = ['off', 'on']
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='Sticker: ', callback_data='none')] +
+        [InlineKeyboardButton(text=bname[sid], callback_data='theme+')],
         [InlineKeyboardButton(text='Tema: ', callback_data='none')] +
         [InlineKeyboardButton(text=tname[tid], callback_data='theme_')],
         [InlineKeyboardButton(text='Blur: ', callback_data='none')] +
         [InlineKeyboardButton(text=bname[bid], callback_data='theme-')],
         [InlineKeyboardButton(text='Voltar', callback_data="settings")]
     ])
-    db.def_theme(m.from_user.id, tid, bid, a[2])
+    db.def_theme(m.from_user.id, tid, bid, a[2], sid)
     await m.edit_message_text(
         'Escolha em baixo:', reply_markup=keyboard)
 
@@ -213,6 +221,6 @@ async def pattern(c, m):
         [InlineKeyboardButton(text=pname[pid], callback_data='pattern_')],
         [InlineKeyboardButton(text='Voltar', callback_data="settings")]
     ])
-    db.def_theme(m.from_user.id, a[0], a[1], pid)
+    db.def_theme(m.from_user.id, a[0], a[1], pid, a[3])
     await m.edit_message_text(
         'Escolha em baixo:', reply_markup=keyboard)

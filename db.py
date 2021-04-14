@@ -26,7 +26,8 @@ dbc.execute('''CREATE TABLE IF NOT EXISTS users (user_id INTEGER,
                                                  user,
                                                  color INTEGER,
                                                  blur INTEGER,
-                                                 pattern INTEGER)''')
+                                                 pattern INTEGER,
+                                                 current INTEGER)''')
 
 dbc.execute('''CREATE TABLE IF NOT EXISTS saves (hash,
                                                  url,
@@ -107,13 +108,13 @@ def get(uid):
     except IndexError:
         return None
 
-def def_theme(uid, color, blur, pattern):
-    dbc.execute('UPDATE users SET color = ?, blur = ?, pattern = ? WHERE user_id = ?',
-        (color, blur, pattern, uid))
+def def_theme(uid, color, blur, pattern, current):
+    dbc.execute('UPDATE users SET color = ?, blur = ?, pattern = ?, current = ? WHERE user_id = ?',
+        (color, blur, pattern, current, uid))
     db.commit()
 
 def theme(uid):
-    dbc.execute('SELECT color, blur, pattern FROM users WHERE user_id = (?)', (uid,))
+    dbc.execute('SELECT color, blur, pattern, current FROM users WHERE user_id = (?)', (uid,))
     try:
         return dbc.fetchone()
     except IndexError:
