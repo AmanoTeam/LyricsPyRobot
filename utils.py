@@ -132,6 +132,7 @@ async def get_spoti_session(user_id) -> dict:
     tk = db.get(user_id)
     a = spotipy.Spotify(auth=tk[0])
     try:
+        a.devices()
         return a
     except SpotifyException:
         new_token = await refresh_token(user_id)
