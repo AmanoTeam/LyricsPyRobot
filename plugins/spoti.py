@@ -23,7 +23,10 @@ async def spoti(c, m):
         print(tk)
         if not tk or not tk[0]:
             kb = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Login', url='https://xn--f77h6a.ml/1ec28a')]
+                [InlineKeyboardButton(text='Login', url='https://accounts.spotify.com/authorize?response_type=code&'+
+                                                                                        'client_id=6fa50508cfdc4d1490ce8cf29d12097a&'+
+                                                                                        'scope=user-read-currently-playing+user-modify-playback-state+user-read-playback-state&'+
+                                                                                        'redirect_uri=https://lyricspy.amanoteam.com/go')]
             ])
             await m.reply_text('Use o botão abaixo e faça login. Em copie o comando e mande para mim', reply_markup=kb)
         else:
