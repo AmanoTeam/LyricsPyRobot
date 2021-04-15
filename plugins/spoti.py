@@ -53,12 +53,12 @@ async def spoti(c, m):
                     if stick == None or stick:
                         await m.reply_sticker(album_art, reply_markup=kb)
                     else:
-                        await m.reply(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>{spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}</a>", reply_markup=kb, parse_mode='html')
+                        await m.reply(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
                 else:
                     if stick == None or stick:
                         await m.reply_sticker(album_art)
                     else:
-                        await m.reply(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>{spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}</a>", parse_mode='html')
+                        await m.reply(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", parse_mode='html')
                     m.text = f"/letra {spotify_json['item']['artists'][0]['name']} {spotify_json['item']['name']}"
                     await letra(c, m)
 
@@ -84,7 +84,7 @@ async def previous(c, m):
         ])
         spotify_json = sess.current_user_playing_track()
         if not db.theme(m.from_user.id)[3]:
-            await m.edit_message_text(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>{spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}</a>", reply_markup=kb, parse_mode='html')
+            await m.edit_message_text(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
         else:
             await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
     else:
@@ -113,7 +113,7 @@ async def next(c, m):
         ])
         spotify_json = sess.current_user_playing_track()
         if not db.theme(m.from_user.id)[3]:
-            await m.edit_message_text(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>{spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}</a>", reply_markup=kb, parse_mode='html')
+            await m.edit_message_text(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
         else:
             await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
     else:
@@ -144,7 +144,7 @@ async def ppa(c, m):
         ])
         spotify_json = sess.current_user_playing_track()
         if not db.theme(m.from_user.id)[3]:
-            await m.edit_message_text(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>{spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}</a>", reply_markup=kb, parse_mode='html')
+            await m.edit_message_text(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
         else:
             await m.edit_message_reply_markup(reply_markup=kb)
     else:
