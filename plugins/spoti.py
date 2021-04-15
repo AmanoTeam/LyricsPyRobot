@@ -36,7 +36,7 @@ async def spoti(c, m):
                 await m.reply_text('No momento não há nada tocando. Que tal dar um __play__ em seu Spotify?')
             else:
                 stick = db.theme(m.from_user.id)[3]
-                if stick:
+                if stick == None or stick:
                     album_art = await get_song_art(song_name=spotify_json['item']['name'],
                                                 artist=spotify_json['item']['artists'][0]['name'],
                                                 album_url=spotify_json['item']['album']['images'][0]['url'],
@@ -50,12 +50,12 @@ async def spoti(c, m):
                         [InlineKeyboardButton(text='⏸' if spotify_json['is_playing'] else '▶️', callback_data=f'pause|{m.from_user.id}' if spotify_json['is_playing'] else f'play|{m.from_user.id}')] +
                         [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
                     ])
-                    if stick:
+                    if stick == None or stick:
                         await m.reply_sticker(album_art, reply_markup=kb)
                     else:
                         await m.reply(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb)
                 else:
-                    if stick:
+                    if stick == None or stick:
                         await m.reply_sticker(album_art)
                     else:
                         await m.reply(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
@@ -83,10 +83,10 @@ async def previous(c, m):
             [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
         ])
         spotify_json = sess.current_user_playing_track()
-        if db.theme(m.from_user.id)[3]:
-            await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
-        else:
+        if not db.theme(m.from_user.id)[3]:
             await m.edit_message_text(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb)
+        else:
+            await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mexer nisso, somente o {a.first_name} pode')
@@ -112,10 +112,10 @@ async def next(c, m):
             [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
         ])
         spotify_json = sess.current_user_playing_track()
-        if db.theme(m.from_user.id)[3]:
-            await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
-        else:
+        if not db.theme(m.from_user.id)[3]:
             await m.edit_message_text(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb)
+        else:
+            await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mexer nisso, somente o {a.first_name} pode')
@@ -143,10 +143,10 @@ async def ppa(c, m):
             [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
         ])
         spotify_json = sess.current_user_playing_track()
-        if db.theme(m.from_user.id)[3]:
-            await m.edit_message_reply_markup(reply_markup=kb)
-        else:
+        if not db.theme(m.from_user.id)[3]:
             await m.edit_message_text(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb)
+        else:
+            await m.edit_message_reply_markup(reply_markup=kb)
     else:
         a = await c.get_chat(int(user))
         await m.answer(f'Você n pode mexer nisso, somente o {a.first_name} pode')
