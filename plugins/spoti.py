@@ -82,6 +82,7 @@ async def previous(c, m):
             [InlineKeyboardButton(text='⏸' if spotify_json['is_playing'] else '▶️', callback_data=f'pause|{m.from_user.id}' if spotify_json['is_playing'] else f'play|{m.from_user.id}')] +
             [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
         ])
+        spotify_json = sess.current_user_playing_track()
         if db.theme(m.from_user.id)[3]:
             await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
         else:
@@ -110,6 +111,7 @@ async def next(c, m):
             [InlineKeyboardButton(text='⏸' if spotify_json['is_playing'] else '▶️', callback_data=f'pause|{m.from_user.id}' if spotify_json['is_playing'] else f'play|{m.from_user.id}')] +
             [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
         ])
+        spotify_json = sess.current_user_playing_track()
         if db.theme(m.from_user.id)[3]:
             await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
         else:
@@ -135,12 +137,12 @@ async def ppa(c, m):
         else:
             print('play')
             sess.start_playback(device_id)
-        spotify_json = sess.current_user_playing_track()
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='⏮', callback_data=f'previous|{m.from_user.id}')] +
             [InlineKeyboardButton(text='⏸' if 'play' in cmd else '▶️', callback_data=f'pause|{m.from_user.id}' if 'play' in cmd else f'play|{m.from_user.id}')] +
             [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
         ])
+        spotify_json = sess.current_user_playing_track()
         if db.theme(m.from_user.id)[3]:
             await m.edit_message_reply_markup(reply_markup=kb)
         else:
