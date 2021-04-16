@@ -48,19 +48,31 @@ async def spoti(c, m):
                     kb = InlineKeyboardMarkup(inline_keyboard=[
                         [InlineKeyboardButton(text='⏮', callback_data=f'previous|{m.from_user.id}')] +
                         [InlineKeyboardButton(text='⏸' if spotify_json['is_playing'] else '▶️', callback_data=f'pause|{m.from_user.id}' if spotify_json['is_playing'] else f'play|{m.from_user.id}')] +
-                        [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
+                        [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')],
+                        [InlineKeyboardButton(text='Tocar no meu spotify', callback_data=f'tcs|{spotify_json["item"]["id"]}')]
                     ])
                     if stick == None or stick:
                         await m.reply_sticker(album_art, reply_markup=kb)
                     else:
-                        await m.reply(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
+                        await m.reply(f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
                 else:
                     if stick == None or stick:
                         await m.reply_sticker(album_art)
                     else:
-                        await m.reply(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", parse_mode='html')
+                        await m.reply(f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", parse_mode='html')
                     m.text = f"/letra {spotify_json['item']['artists'][0]['name']} {spotify_json['item']['name']}"
                     await letra(c, m)
+
+@Client.on_callback_query(filters.regex(r'^tcs'))
+async def tcs(c, m):
+    print('tcs')
+    sess = await get_spoti_session(m.from_user.id)
+    devices = sess.devices()
+    for i in devices['devices']:
+        if i['is_active']:
+            device_id = i['id']
+            break
+    sess.start_playback(uris=[f'spotify:track:{m.data.split("|")[1]}'])
 
 @Client.on_callback_query(filters.regex(r'^previous'))
 async def previous(c, m):
@@ -80,11 +92,12 @@ async def previous(c, m):
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='⏮', callback_data=f'previous|{m.from_user.id}')] +
             [InlineKeyboardButton(text='⏸' if spotify_json['is_playing'] else '▶️', callback_data=f'pause|{m.from_user.id}' if spotify_json['is_playing'] else f'play|{m.from_user.id}')] +
-            [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
+            [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')],
+            [InlineKeyboardButton(text='Tocar no meu spotify', callback_data=f'tcs|{spotify_json["item"]["id"]}')]
         ])
         spotify_json = sess.current_user_playing_track()
         if not db.theme(m.from_user.id)[3]:
-            await m.edit_message_text(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
+            await m.edit_message_text(f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
         else:
             await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
     else:
@@ -109,11 +122,12 @@ async def next(c, m):
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='⏮', callback_data=f'previous|{m.from_user.id}')] +
             [InlineKeyboardButton(text='⏸' if spotify_json['is_playing'] else '▶️', callback_data=f'pause|{m.from_user.id}' if spotify_json['is_playing'] else f'play|{m.from_user.id}')] +
-            [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
+            [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')],
+            [InlineKeyboardButton(text='Tocar no meu spotify', callback_data=f'tcs|{spotify_json["item"]["id"]}')]
         ])
         spotify_json = sess.current_user_playing_track()
         if not db.theme(m.from_user.id)[3]:
-            await m.edit_message_text(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
+            await m.edit_message_text(f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
         else:
             await m.answer(f"Tocando: {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}")
     else:
@@ -137,14 +151,15 @@ async def ppa(c, m):
         else:
             print('play')
             sess.start_playback(device_id)
+        spotify_json = sess.current_user_playing_track()
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='⏮', callback_data=f'previous|{m.from_user.id}')] +
             [InlineKeyboardButton(text='⏸' if 'play' in cmd else '▶️', callback_data=f'pause|{m.from_user.id}' if 'play' in cmd else f'play|{m.from_user.id}')] +
-            [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')]
+            [InlineKeyboardButton(text='⏭', callback_data=f'next|{m.from_user.id}')],
+            [InlineKeyboardButton(text='Tocar no meu spotify', callback_data=f'tcs|{spotify_json["item"]["id"]}')]
         ])
-        spotify_json = sess.current_user_playing_track()
         if not db.theme(m.from_user.id)[3]:
-            await m.edit_message_text(f"<a href='{spotify_json['item']['external_urls']['spotify']}'>🎵</a> {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
+            await m.edit_message_text(f"<🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}", reply_markup=kb, parse_mode='html')
         else:
             await m.edit_message_reply_markup(reply_markup=kb)
     else:
