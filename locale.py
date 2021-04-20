@@ -12,6 +12,7 @@ import db
 enabled_locales = [
     "en-US",   # English
     "pt-BR",   # Portuguese (Brazil)
+    "da-DK"    # Danish
 ]
 
 default_language = "en-US"
