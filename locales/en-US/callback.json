@@ -18,5 +18,6 @@
     "dark": "Dark",
     "light": "Light",
     "pattern_settings_text": "Change your default settings below:",
-    "lang_sucess": "Language successfully changed"
+    "lang_sucess": "Language successfully changed",
+    "ch_lang": "Choose a language:"
 }

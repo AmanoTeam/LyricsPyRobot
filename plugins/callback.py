@@ -193,7 +193,7 @@ async def lang(c, m, t):
         [InlineKeyboardButton(text=t('back'), callback_data="settings")]
     ])
     await m.edit_message_text(
-        'Em Breve...', reply_markup=keyboard)
+        t('ch_lang'), reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex(r"theme"))
