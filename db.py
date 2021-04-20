@@ -1,12 +1,9 @@
 import sqlite3
 
-from telegraph import Telegraph
-
-telegraph = Telegraph()
-telegraph.create_account(short_name='LyricsPyRobot', author_name='amn')
-
-
 def send_te(a, b):
+    from telegraph import Telegraph
+    telegraph = Telegraph()
+    telegraph.create_account(short_name='LyricsPyRobot', author_name='amn')
     response = telegraph.create_page(
         a['musica'],
         html_content=b.replace('\n', '<br>'),
@@ -27,7 +24,8 @@ dbc.execute('''CREATE TABLE IF NOT EXISTS users (user_id INTEGER,
                                                  color INTEGER,
                                                  blur INTEGER,
                                                  pattern INTEGER,
-                                                 current INTEGER)''')
+                                                 current INTEGER,
+                                                 lang)''')
 
 dbc.execute('''CREATE TABLE IF NOT EXISTS saves (hash,
                                                  url,
@@ -115,6 +113,21 @@ def def_theme(uid, color, blur, pattern, current):
 
 def theme(uid):
     dbc.execute('SELECT color, blur, pattern, current FROM users WHERE user_id = (?)', (uid,))
+    try:
+        return dbc.fetchone()
+    except IndexError:
+        return None
+
+def db_set_lang(id, user):
+    if db_get_lang(id):
+        dbc.execute('UPDATE users SET lang = ? WHERE user_id = ?', (user, id))
+    else:
+        dbc.execute('INSERT INTO users (user_id, lang) VALUES (?,?)',
+                    (id, user))
+    db.commit()
+
+def db_get_lang(uid):
+    dbc.execute('SELECT lang FROM users WHERE user_id = (?)', (uid,))
     try:
         return dbc.fetchone()
     except IndexError:

@@ -8,6 +8,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InlineQue
 import db
 from config import MUSIXMATCH_KEYS
 from utils import get_spoti_session, get_current
+from locale import use_chat_lang
 
 mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 
@@ -15,14 +16,15 @@ mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 
 
 @Client.on_inline_query()
-async def inline(c, m):
+@use_chat_lang
+async def inline(c, m, t):
     print(m.query)
     tk = db.get(m.from_user.id)
     articles = []
     r = {}
     lm = 4
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='aguarde...', callback_data='a')]
+        [InlineKeyboardButton(text=t('wait'), callback_data='a')]
     ])
     if tk[0]:
         sess = await get_spoti_session(m.from_user.id)
@@ -36,13 +38,13 @@ async def inline(c, m):
                 hash = 's' + str(i['id'])
                 r.update({hash: i["link"]})
                 articles.append(InlineQueryResultArticle(
-                    title='Current in spotify',
+                    title=t('currnt_spotify'),
                     description=f'{i["musica"]} - {i["autor"]}',
                     id=hash,
                     thumb_url='https://piics.ml/amn/lpy/spoti.png',
                     reply_markup=keyboard,
                     input_message_content=InputTextMessageContent(
-                        message_text='aguarde...',
+                        message_text=t('wait'),
                     )
                 ))
                 lm -= 1
@@ -57,13 +59,13 @@ async def inline(c, m):
                 hash = 'l' + str(i['id'])
                 r.update({hash: i["link"]})
                 articles.append(InlineQueryResultArticle(
-                    title='Current in Last.fm',
+                    title=t('currnt_lfm'),
                     description=f'{i["musica"]} - {i["autor"]}',
                     id=hash,
                     thumb_url='https://piics.ml/amn/lpy/lastfm.png',
                     reply_markup=keyboard,
                     input_message_content=InputTextMessageContent(
-                        message_text='aguarde...',
+                        message_text=t('wait'),
                     )
                 ))
                 lm -= 1
@@ -79,7 +81,7 @@ async def inline(c, m):
                 thumb_url='https://piics.ml/i/010.png',
                 reply_markup=keyboard,
                 input_message_content=InputTextMessageContent(
-                    message_text='aguarde...',
+                    message_text=t('wait'),
                 )
             ))
     db.tem(m.from_user.id, r)
@@ -87,7 +89,8 @@ async def inline(c, m):
 
 
 @Client.on_chosen_inline_result()
-async def choosen(c, m):
+@use_chat_lang
+async def choosen(c, m, t):
     if m.result_id[0] == 's' or m.result_id[0] == 'l':
         hash = m.result_id[1:]
     else:
@@ -99,13 +102,13 @@ async def choosen(c, m):
     if not ma:
         if a['traducao']:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')] +
-                [InlineKeyboardButton(text='Português', callback_data=f'-{uid}|{hash}')]
+                [InlineKeyboardButton(text=t('tgph'), callback_data=f'_+{uid}|{hash}')] +
+                [InlineKeyboardButton(text=t('port'), callback_data=f'-{uid}|{hash}')]
 
             ])
         else:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
+                [InlineKeyboardButton(text=t('tgph'), callback_data=f'_+{uid}|{hash}')]
             ])
         db.add_hash(hash, a)
         await c.edit_inline_text(m.inline_message_id,
@@ -114,12 +117,12 @@ async def choosen(c, m):
     else:
         if a['traducao']:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Texto', callback_data=f'+{uid}|{hash}')] +
-                [InlineKeyboardButton(text='Português', callback_data=f'_-{uid}|{hash}')]
+                [InlineKeyboardButton(text=t('text'), callback_data=f'+{uid}|{hash}')] +
+                [InlineKeyboardButton(text=t('port'), callback_data=f'_-{uid}|{hash}')]
             ])
         else:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Texto', callback_data=f'+{uid}|{hash}')]
+                [InlineKeyboardButton(text=t('text'), callback_data=f'+{uid}|{hash}')]
             ])
         await c.edit_inline_text(m.inline_message_id,
             '{} - {}\n{}'.format(a["musica"], a["autor"], db.get_url(hash)[1]), reply_markup=keyboard, parse_mode=None)

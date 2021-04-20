@@ -4,27 +4,28 @@ from pyrogram import Client, filters
 import db
 from .letra import letra
 from utils import get_current, get_song_art, http_pool
+from locale import use_chat_lang
 
 
 LFM_LINK_RE = re.compile(r'<meta property=\"og:image\" +?content=\"(.+)\"')
 
 
 @Client.on_message(filters.command('lfm'))
-async def lfm(c, m):
+@use_chat_lang()
+async def lfm(c, m, t):
     text = m.text.split(' ', 1)
     print(text)
     if len(text) == 2:
         db.add_user_last(m.from_user.id, text[1])
-        await m.reply_text('Pronto, pode usar o /lfm agora :)')
+        await m.reply_text(t('done'))
     else:
         tk = db.get(m.from_user.id)
         if not tk or not tk[2]:
-            await m.reply_text('Mande seu user do last.fm após o /lfm.\n\n'
-                               '**Ex.:** ```/lfm alisson```')
+            await m.reply_text(t('example'))
         else:
             a = await get_current(tk[2])
             if not a:
-                await m.reply_text('No momento não há nada tocando. Que tal dar um __play__ em sua playlist?')
+                await m.reply_text(t('play_playlist'))
             else:
                 album_url = a[0]['image'][-1]['#text']
                 if not album_url:

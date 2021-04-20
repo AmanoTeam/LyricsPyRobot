@@ -4,6 +4,7 @@ import re
 from lyricspy.aio import Letras, Musixmatch
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from locale import use_chat_lang
 
 import db
 from config import MUSIXMATCH_KEYS
@@ -15,10 +16,11 @@ let = Letras()
 
 
 @Client.on_message(filters.command("letra"))
-async def letra(c, m):
+@use_chat_lang()
+async def letra(c, m, t):
     text = m.text.split(' ', 1)[1]
     if not text:
-        await m.reply_text('**Uso:** /letra <nome da música>')
+        await m.reply_text(t('use'))
     elif re.match(r'^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+', text):
         a = await let.letra(text)
     elif re.match(r'^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+', text):
@@ -28,7 +30,7 @@ async def letra(c, m):
         if not a:
             a = await let.auto(text, limit=1)
             if not a:
-                await m.reply_text('Letra não encontrada :(')
+                await m.reply_text(t('lyrics_nf'))
                 return True
     a = a[0] if isinstance(a, list) else a
     if 'art' in a:
@@ -42,25 +44,25 @@ async def letra(c, m):
     if not ma:
         if a['traducao']:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')] +
-                [InlineKeyboardButton(text='Português', callback_data=f'-{uid}|{hash}')]
+                [InlineKeyboardButton(text=t('tgph'), callback_data=f'_+{uid}|{hash}')] +
+                [InlineKeyboardButton(text=t('port'), callback_data=f'-{uid}|{hash}')]
 
             ])
         else:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Telegra.ph', callback_data=f'_+{uid}|{hash}')]
+                [InlineKeyboardButton(text=t('tgph'), callback_data=f'_+{uid}|{hash}')]
             ])
         await m.reply_text(
             '[{} - {}]({})\n{}'.format(a["musica"], a["autor"], a['link'], a['letra'])[:4096], reply_markup=keyboard, disable_web_page_preview=True)
     else:
         if a['traducao']:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Texto', callback_data=f'+{uid}|{hash}')] +
-                [InlineKeyboardButton(text='Português', callback_data=f'_-{uid}|{hash}')]
+                [InlineKeyboardButton(text=t('text'), callback_data=f'+{uid}|{hash}')] +
+                [InlineKeyboardButton(text=t('port'), callback_data=f'_-{uid}|{hash}')]
             ])
         else:
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Texto', callback_data=f'+{uid}|{hash}')]
+                [InlineKeyboardButton(text=t('text'), callback_data=f'+{uid}|{hash}')]
             ])
         await m.reply_text(
             '{} - {}\n{}'.format(a["musica"], a["autor"], db.get_url(hash)[1]), reply_markup=keyboard, parse_mode=None)
