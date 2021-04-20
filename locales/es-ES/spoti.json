@@ -1,9 +1,9 @@
 {
-    "done": "Done, you can now use /spoti or /np :)",
-    "error": "An error has occurred:\n{error}",
-    "login": "Login",
-    "login_txt": "Use the button below and login. Then copy the command and send it here.",
-    "play": "There is nothing playing right now. How about giving your Spotify a <i>play</i>?",
-    "play_in_sp": "Play on my Spotify",
-    "not_allowed": "You can't use this, only {first_name} can"
+    "done": "Hecho, ahora puedes usar /spoti o /np :)",
+    "error": "Ha ocurrido un error:\n{error}",
+    "login": "Ingresar",
+    "login_txt": "Use el botón de abajo e inicie sesión. Luego copie el comando y envíelo aquí.",
+    "play": "No hay nada tocando en este momento. ¿Qué tal si le damos a tu Spotify un <i>play</i>?",
+    "play_in_sp": "Tocar en mi Spotify",
+    "not_allowed": "No puedes usar esto, solo {first_name} puede"
 }

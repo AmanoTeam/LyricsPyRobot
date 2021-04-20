@@ -1,8 +1,8 @@
 {
-    "wait": "Please wait...",
-    "current_spotify": "Now playing on Spotify",
-    "current_lfm": "Now playing on Last.fm",
-    "text": "Text",
+    "wait": "Por favor espere...",
+    "current_spotify": "Reproduciendo en Spotify",
+    "current_lfm": "Reproduciendo en Last.fm",
+    "text": "Texto",
     "tgph": "Telegra.ph",
-    "port": "Portuguese"
+    "port": "Portugués"
 }
