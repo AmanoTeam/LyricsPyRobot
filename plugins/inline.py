@@ -137,9 +137,7 @@ async def choosen(c, m, t):
         db.add_hash(hash, a)
         await c.edit_inline_text(
             m.inline_message_id,
-            "[{} - {}]({})\n{}".format(a["musica"], a["autor"], a["link"], a["letra"])[
-                :4096
-            ],
+            f"[{a['musica']} - {a['autor']}]({a['link']})\n{a['letra']}"[:4096],
             reply_markup=keyboard,
             disable_web_page_preview=True,
         )

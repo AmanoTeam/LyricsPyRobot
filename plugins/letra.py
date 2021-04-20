@@ -70,9 +70,7 @@ async def letra(c, m, t):
                 ]
             )
         await m.reply_text(
-            "[{} - {}]({})\n{}".format(a["musica"], a["autor"], a["link"], a["letra"])[
-                :4096
-            ],
+            f"[{a['musica']} - {a['autor']}]({a['link']})\n{a['letra']}"[:4096],
             reply_markup=keyboard,
             disable_web_page_preview=True,
         )
