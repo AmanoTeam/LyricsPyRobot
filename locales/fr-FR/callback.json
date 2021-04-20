@@ -5,7 +5,7 @@
     "tgph": "Telegra.ph",
     "port": "Portuguese",
     "original": "Original",
-    "not_allowed": "You can't use this, just {first_name} can",
+    "not_allowed": "You can't use this, only {first_name} can",
     "settings_txt": "What would you like to configure?",
     "np_settings": "Now Playing settings",
     "language": "Language settings",

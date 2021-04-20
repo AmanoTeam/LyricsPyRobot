@@ -1,6 +1,6 @@
 {
     "inline_btn": "Pesquisar letra",
     "settings_btn": "Configurações",
-    "start": "Pesquise por letras de músicas direto do Telegram :D\n\n   - <i>Para mais informaçoes, use</i> /help\n\nVamos iniciar? Comece navegue pelo botão abxo:",
-    "help": "Este bot exibe letra de músicas de acordo com sua pesquisa, utilizando o musixmatch.com.\n\nVocê pode pesquisar atravez do modo inline (@lyricspyrobot <música>), ou até mesmo ver a letra da música que está tocando em seu Spotify atravez do spoti (necessita login) :D\n\nOs seguintes comandos estão disponiveis:\n   • /letra <música> (pesquisa determinada letra)\n   • /spoti (mostra a música atual tocando ~não necessita premium~)\n   • /np (um player do spotify ~necessita premium~)\n\nEm caso de dúvida, entre em contato pelo @AmanoSupport ou por nosso chat @AmanoChat.\n- Novidades e atualizações serão postadas no canal @AmanoTeam."
+    "start": "Pesquise por letras de músicas direto do Telegram :D\n\n   - <i>Para mais informações, use</i> /help\n\nVamos iniciar? Comece navegue pelo botão abaixo:",
+    "help": "Este bot exibe letra de músicas de acordo com sua pesquisa, utilizando o musixmatch.com.\n\nVocê pode pesquisar através do modo inline (@lyricspyrobot &lt;música&gt;), ou até mesmo ver a letra da música que está tocando em seu Spotify através do spoti (necessita login) :D\n\nOs seguintes comandos estão disponíveis:\n   • /letra &lt;música&gt; (pesquisa determinada letra)\n   • /spoti (mostra a música atual tocando ~não necessita premium~)\n   • /np (um player do spotify ~necessita premium~)\n\nEm caso de dúvida, entre em contato pelo @AmanoSupport ou por nosso chat @AmanoChat.\n- Novidades e atualizações serão postadas no canal @AmanoTeam."
 }

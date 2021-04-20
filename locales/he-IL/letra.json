@@ -1,7 +1,7 @@
 {
-    "use": "<b>Usage:</b> /letra <music name>",
-    "lyrics_nf": "Lyrics not found :(",
-    "text": "Text",
+    "use": "<b>שימוש:</b> /letra <music name>",
+    "lyrics_nf": "המילים לא נמצאו :(",
+    "text": "טקסט",
     "tgph": "Telegra.ph",
-    "port": "Portuguese"
+    "port": "פורטוגזית"
 }
