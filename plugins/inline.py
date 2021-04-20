@@ -117,12 +117,10 @@ async def choosen(c, m, t):
                     [
                         InlineKeyboardButton(
                             text=t("tgph"), callback_data=f"_+{uid}|{hash}"
-                        )
-                    ]
-                    + [
+                        ),
                         InlineKeyboardButton(
                             text=t("port"), callback_data=f"-{uid}|{hash}"
-                        )
+                        ),
                     ]
                 ]
             )
@@ -152,12 +150,10 @@ async def choosen(c, m, t):
                     [
                         InlineKeyboardButton(
                             text=t("text"), callback_data=f"+{uid}|{hash}"
-                        )
-                    ]
-                    + [
+                        ),
                         InlineKeyboardButton(
                             text=t("port"), callback_data=f"_-{uid}|{hash}"
-                        )
+                        ),
                     ]
                 ]
             )

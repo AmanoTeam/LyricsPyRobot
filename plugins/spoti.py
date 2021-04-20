@@ -61,20 +61,16 @@ async def spoti(c, m, t):
                             [
                                 InlineKeyboardButton(
                                     text="⏮", callback_data=f"previous|{m.from_user.id}"
-                                )
-                            ]
-                            + [
+                                ),
                                 InlineKeyboardButton(
                                     text="⏸" if spotify_json["is_playing"] else "▶️",
                                     callback_data=f"pause|{m.from_user.id}"
                                     if spotify_json["is_playing"]
                                     else f"play|{m.from_user.id}",
-                                )
-                            ]
-                            + [
+                                ),
                                 InlineKeyboardButton(
                                     text="⏭", callback_data=f"next|{m.from_user.id}"
-                                )
+                                ),
                             ],
                             [
                                 InlineKeyboardButton(
@@ -129,20 +125,16 @@ async def previous(c, m, t):
                 [
                     InlineKeyboardButton(
                         text="⏮", callback_data=f"previous|{m.from_user.id}"
-                    )
-                ]
-                + [
+                    ),
                     InlineKeyboardButton(
                         text="⏸" if spotify_json["is_playing"] else "▶️",
                         callback_data=f"pause|{m.from_user.id}"
                         if spotify_json["is_playing"]
                         else f"play|{m.from_user.id}",
-                    )
-                ]
-                + [
+                    ),
                     InlineKeyboardButton(
                         text="⏭", callback_data=f"next|{m.from_user.id}"
-                    )
+                    ),
                 ],
                 [
                     InlineKeyboardButton(
@@ -187,20 +179,16 @@ async def next(c, m, t):
                 [
                     InlineKeyboardButton(
                         text="⏮", callback_data=f"previous|{m.from_user.id}"
-                    )
-                ]
-                + [
+                    ),
                     InlineKeyboardButton(
                         text="⏸" if spotify_json["is_playing"] else "▶️",
                         callback_data=f"pause|{m.from_user.id}"
                         if spotify_json["is_playing"]
                         else f"play|{m.from_user.id}",
-                    )
-                ]
-                + [
+                    ),
                     InlineKeyboardButton(
                         text="⏭", callback_data=f"next|{m.from_user.id}"
-                    )
+                    ),
                 ],
                 [
                     InlineKeyboardButton(
@@ -247,20 +235,16 @@ async def ppa(c, m, t):
                 [
                     InlineKeyboardButton(
                         text="⏮", callback_data=f"previous|{m.from_user.id}"
-                    )
-                ]
-                + [
+                    ),
                     InlineKeyboardButton(
                         text="⏸" if "play" in cmd else "▶️",
                         callback_data=f"pause|{m.from_user.id}"
                         if "play" in cmd
                         else f"play|{m.from_user.id}",
-                    )
-                ]
-                + [
+                    ),
                     InlineKeyboardButton(
                         text="⏭", callback_data=f"next|{m.from_user.id}"
-                    )
+                    ),
                 ],
                 [
                     InlineKeyboardButton(

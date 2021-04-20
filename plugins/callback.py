@@ -72,12 +72,10 @@ async def teor(c, m, t):
                         [
                             InlineKeyboardButton(
                                 text=t("text"), callback_data=f"+{user}|{hash}"
-                            )
-                        ]
-                        + [
+                            ),
                             InlineKeyboardButton(
                                 text=t("port"), callback_data=f"_-{user}|{hash}"
-                            )
+                            ),
                         ]
                     ]
                 )
@@ -131,12 +129,10 @@ async def tetr(c, m, t):
                     [
                         InlineKeyboardButton(
                             text=t("text"), callback_data=f"-{user}|{hash}"
-                        )
-                    ]
-                    + [
+                        ),
                         InlineKeyboardButton(
                             text=t("original"), callback_data=f"_+{user}|{hash}"
-                        )
+                        ),
                     ]
                 ]
             )
@@ -181,12 +177,10 @@ async def ori(c, m, t):
                         [
                             InlineKeyboardButton(
                                 text=t("tgph"), callback_data=f"_+{user}|{hash}"
-                            )
-                        ]
-                        + [
+                            ),
                             InlineKeyboardButton(
                                 text=t("por"), callback_data=f"-{user}|{hash}"
-                            )
+                            ),
                         ]
                     ]
                 )
@@ -242,12 +236,10 @@ async def tr(c, m, t):
                     [
                         InlineKeyboardButton(
                             text=t("tgph"), callback_data=f"_-{user}|{hash}"
-                        )
-                    ]
-                    + [
+                        ),
                         InlineKeyboardButton(
                             text=t("original"), callback_data=f"+{user}|{hash}"
-                        )
+                        ),
                     ]
                 ]
             )
@@ -314,12 +306,18 @@ async def theme(c, m, t):
     bname = ["☑️", "✅"]
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=t("sticker"), callback_data="none")]
-            + [InlineKeyboardButton(text=bname[sid], callback_data="theme+")],
-            [InlineKeyboardButton(text=t("theme"), callback_data="none")]
-            + [InlineKeyboardButton(text=tname[tid], callback_data="theme_")],
-            [InlineKeyboardButton(text=t("blur"), callback_data="none")]
-            + [InlineKeyboardButton(text=bname[bid], callback_data="theme-")],
+            [
+                InlineKeyboardButton(text=t("sticker"), callback_data="none"),
+                InlineKeyboardButton(text=bname[sid], callback_data="theme+"),
+            ],
+            [
+                InlineKeyboardButton(text=t("theme"), callback_data="none"),
+                InlineKeyboardButton(text=tname[tid], callback_data="theme_"),
+            ],
+            [
+                InlineKeyboardButton(text=t("blur"), callback_data="none"),
+                InlineKeyboardButton(text=bname[bid], callback_data="theme-"),
+            ],
             [InlineKeyboardButton(text=t("back"), callback_data="settings")],
         ]
     )

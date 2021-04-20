@@ -11,9 +11,9 @@ async def start(c, m, t):
             [
                 InlineKeyboardButton(
                     text=t("inline_btn"), switch_inline_query_current_chat=""
-                )
+                ),
+                InlineKeyboardButton(text=t("settings_btn"), callback_data="settings"),
             ]
-            + [InlineKeyboardButton(text=t("settings_btn"), callback_data="settings")]
         ]
     )
     await m.reply_text(t("start"), reply_markup=keyboard)

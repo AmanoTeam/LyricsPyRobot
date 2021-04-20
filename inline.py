@@ -108,12 +108,10 @@ async def choosen(c, m):
                 [
                     InlineKeyboardButton(
                         text="Telegra.ph", callback_data=f"_+{uid}|{hash}"
-                    )
-                ]
-                + [
+                    ),
                     InlineKeyboardButton(
                         text=a["tr_name"] or "tradução", callback_data=f"-{uid}|{hash}"
-                    )
+                    ),
                 ]
             ]
         )
