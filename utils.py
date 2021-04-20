@@ -33,20 +33,24 @@ def aiowrap(fn: Callable) -> Coroutine:
 
 
 @aiowrap
-def get_song_art(song_name: str,
-                 artist: str,
-                 album_url: str,
-                 duration: int = 0,
-                 progress: int = 0,
-                 color: str = "dark",
-                 blur: bool = False) -> BytesIO:
-    params = dict(cover=album_url,
-                  track=song_name,
-                  artist=artist,
-                  timenow=progress,
-                  timetotal=duration,
-                  theme=color,
-                  blurbg=int(blur if blur is not None else True))
+def get_song_art(
+    song_name: str,
+    artist: str,
+    album_url: str,
+    duration: int = 0,
+    progress: int = 0,
+    color: str = "dark",
+    blur: bool = False,
+) -> BytesIO:
+    params = dict(
+        cover=album_url,
+        track=song_name,
+        artist=artist,
+        timenow=progress,
+        timetotal=duration,
+        theme=color,
+        blurbg=int(blur if blur is not None else True),
+    )
 
     url = URL("https://lyricspy.amanoteam.com") / "nowplaying-dom" % params
 
@@ -68,7 +72,9 @@ def get_song_art(song_name: str,
     return bio
 
 
-def build_webdriver_object(browser_type: str) -> Union[ChromeWebDriver, FirefoxWebDriver]:
+def build_webdriver_object(
+    browser_type: str,
+) -> Union[ChromeWebDriver, FirefoxWebDriver]:
     browser_type = browser_type.lower()
 
     if browser_type == "chrome":
@@ -91,41 +97,38 @@ def build_webdriver_object(browser_type: str) -> Union[ChromeWebDriver, FirefoxW
 
 
 async def get_token(user_id, auth_code):
-    r = await http_pool.post("https://accounts.spotify.com/api/token",
-                             headers=dict(
-                                 Authorization=f"Basic {BASIC}"
-                             ),
-                             data=dict(
-                                 grant_type="authorization_code",
-                                 code=auth_code,
-                                 redirect_uri="https://lyricspy.amanoteam.com/go"
-                             ))
+    r = await http_pool.post(
+        "https://accounts.spotify.com/api/token",
+        headers=dict(Authorization=f"Basic {BASIC}"),
+        data=dict(
+            grant_type="authorization_code",
+            code=auth_code,
+            redirect_uri="https://lyricspy.amanoteam.com/go",
+        ),
+    )
     b = r.json()
     if b.get("error"):
-        return False, b['error']
+        return False, b["error"]
     else:
         print(b)
-        db.add_user(user_id, b['refresh_token'], b['access_token'])
-        return True, b['access_token']
+        db.add_user(user_id, b["refresh_token"], b["access_token"])
+        return True, b["access_token"]
 
 
 async def refresh_token(user_id):
-    print('refreh')
+    print("refreh")
     tk = db.get(user_id)
     print(tk[1])
-    r = await http_pool.post("https://accounts.spotify.com/api/token",
-                             headers=dict(
-                                 Authorization=f"Basic {BASIC}"
-                             ),
-                             data=dict(
-                                 grant_type="refresh_token",
-                                 refresh_token=tk[1]
-                             ))
+    r = await http_pool.post(
+        "https://accounts.spotify.com/api/token",
+        headers=dict(Authorization=f"Basic {BASIC}"),
+        data=dict(grant_type="refresh_token", refresh_token=tk[1]),
+    )
     b = r.json()
 
     print(b)
-    db.update_user(user_id, b['access_token'])
-    return b['access_token']
+    db.update_user(user_id, b["access_token"])
+    return b["access_token"]
 
 
 async def get_spoti_session(user_id) -> dict:
@@ -141,13 +144,17 @@ async def get_spoti_session(user_id) -> dict:
 
 
 async def get_current(user: str) -> List[dict]:
-    r = await http_pool.get('http://ws.audioscrobbler.com/2.0/', params=dict(
-            method='user.getrecenttracks',
+    r = await http_pool.get(
+        "http://ws.audioscrobbler.com/2.0/",
+        params=dict(
+            method="user.getrecenttracks",
             user=user,
             api_key=KEY,
-            format='json',
-            limit=1))
-    return r.json()['recenttracks']['track']
+            format="json",
+            limit=1,
+        ),
+    )
+    return r.json()["recenttracks"]["track"]
 
 
 webdrv = build_webdriver_object(BROWSER)

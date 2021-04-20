@@ -10,13 +10,14 @@ import db
 
 
 enabled_locales = [
-    "en-US",   # English
-    "pt-BR",   # Portuguese (Brazil)
-    "he-IL",   # Hebrew
-    "es-ES"    # Spanish
+    "en-US",  # English
+    "pt-BR",  # Portuguese (Brazil)
+    "he-IL",  # Hebrew
+    "es-ES",  # Spanish
 ]
 
 default_language = "en-US"
+
 
 def cache_localizations(files: List[str]) -> Dict[str, Dict[str, Dict[str, str]]]:
     ldict = {lang: {} for lang in enabled_locales}
@@ -37,11 +38,15 @@ for locale in enabled_locales:
 langdict = cache_localizations(jsons)
 
 
-def get_locale_string(dic: dict, language: str, default_context: str, key: str, context: str = None) -> str:
+def get_locale_string(
+    dic: dict, language: str, default_context: str, key: str, context: str = None
+) -> str:
     if context:
         default_context = context
         dic = langdict[language].get(context, langdict[default_language][context])
-    res: str = dic.get(key) or langdict[default_language][default_context].get(key) or key
+    res: str = (
+        dic.get(key) or langdict[default_language][default_context].get(key) or key
+    )
     return res
 
 
@@ -83,4 +88,5 @@ def use_chat_lang(context=None):
             return await func(client, message, lfunc)
 
         return wrapper
+
     return decorator
