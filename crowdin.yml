@@ -1,4 +1,4 @@
 
 files:
-  - source: /locales/pt-BR/*.json
+  - source: /locales/en-US/*.json
     translation: /locales/%locale%/%original_file_name%
