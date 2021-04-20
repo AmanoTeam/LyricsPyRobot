@@ -257,7 +257,7 @@ async def pattern(c, m, t):
 @use_chat_lang()
 async def set_user_lang(c, m, f):
     lang = m.data.split()[1]
-    db.db_set_lang(m.message.chat.id, lang)
+    db.db_set_lang(m.from_user.id, lang)
     strings = partial(get_locale_string,
                       langdict[lang].get("callback", langdict[default_language]["callback"]),
                       lang, "callback")
