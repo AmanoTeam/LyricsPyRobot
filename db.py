@@ -20,22 +20,22 @@ dbc = db.cursor()
 
 dbc.execute(
     """CREATE TABLE IF NOT EXISTS users (user_id INTEGER,
-                                                 access_token,
-                                                 refresh_token,
-                                                 inline_results,
-                                                 user,
-                                                 color INTEGER,
-                                                 blur INTEGER,
-                                                 pattern INTEGER,
-                                                 current INTEGER,
-                                                 lang)"""
+                                         access_token,
+                                         refresh_token,
+                                         inline_results,
+                                         user,
+                                         color INTEGER,
+                                         blur INTEGER,
+                                         pattern INTEGER,
+                                         current INTEGER,
+                                         lang)"""
 )
 
 dbc.execute(
     """CREATE TABLE IF NOT EXISTS saves (hash,
-                                                 url,
-                                                 tl,
-                                                 tlt)"""
+                                         url,
+                                         tl,
+                                         tlt)"""
 )
 
 
