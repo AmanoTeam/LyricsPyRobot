@@ -1,6 +1,6 @@
 {
-    "inline_btn": "Search lyrics",
-    "settings_btn": "Settings",
-    "start": "Search for lyrics directly from Telegram :D\n\n    - <i>For more info, use</i> /help\n\nLet's start? Browse with the keyboard below:",
-    "help": "This bot show music lyrics according to your search using musixmatch.com.\n\nYou can search using the inline mode (@lyricspyrobot &lt;music&gt;), or even see the music lyrics of the music playing right now on your Spotify using spoti (needs login) :D\n\nThe following commands are available:\n   • /letra &lt;music&gt; (Search the provided music lyrics)\n   • /spoti (show the music playing right now ~does not need premium~)\n   • /np (A Spotify player ~needs premium~)\n\nIf you have any questions, contact us at @AmanoSupport or in our chat @AmanoChat.\n- News and updates will be posted in the @AmanoTeam channel."
+    "inline_btn": "Buscar letras",
+    "settings_btn": "Ajustes",
+    "start": "Buscar letras directamente desde Telegram :D\n\n    - <i>Para más información, usa</i> /help\n\n¿Empecemos? Navega con el teclado de abajo:",
+    "help": "Este bot muestra letras de música de acuerdo a tu búsqueda usando musixmatch.com.\n\nPuedes buscar usando el modo en línea (@lyricspyrobot &lt;music&gt;), o incluso ver la letra de la música que se está reproduciendo en tu Spotify usando spoti (necesita iniciar sesión) :D\n\nLos siguientes comandos están disponibles:\n   • /letra &lt;music&gt; (Ver la letra de la música proporcionada)\n   • /spoti (mostrar la música que se está reproduciendo ahora mismo ~no necesita premium~)\n   • /np (Un reproductor de Spotify ~ necesita premium~)\n\nSi tienes alguna pregunta, contáctenos a @AmanoSupport o en nuestro chat @AmanoChat.\n- Las noticias y las actualizaciones serán publicadas en el canal @AmanoTeam."
 }
