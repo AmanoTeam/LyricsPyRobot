@@ -1,7 +1,6 @@
 {
-    "use": "<b>Usage:</b> /letra <music name>",
-    "lyrics_nf": "Lyrics not found :(",
-    "text": "Text",
+    "lyrics_nf": "Letras no encontradas :(",
+    "text": "Texto",
     "tgph": "Telegra.ph",
-    "port": "Portuguese"
+    "port": "Portugués"
 }
