@@ -1,6 +1,5 @@
 {
     "inline_btn": "Buscar letras",
     "settings_btn": "Ajustes",
-    "start": "Buscar letras directamente desde Telegram :D\n\n    - <i>Para más información, usa</i> /help\n\n¿Empecemos? Navega con el teclado de abajo:",
-    "help": "Este bot muestra letras de música de acuerdo a tu búsqueda usando musixmatch.com.\n\nPuedes buscar usando el modo en línea (@lyricspyrobot &lt;music&gt;), o incluso ver la letra de la música que se está reproduciendo en tu Spotify usando spoti (necesita iniciar sesión) :D\n\nLos siguientes comandos están disponibles:\n   • /letra &lt;music&gt; (Ver la letra de la música proporcionada)\n   • /spoti (mostrar la música que se está reproduciendo ahora mismo ~no necesita premium~)\n   • /np (Un reproductor de Spotify ~ necesita premium~)\n\nSi tienes alguna pregunta, contáctenos a @AmanoSupport o en nuestro chat @AmanoChat.\n- Las noticias y las actualizaciones serán publicadas en el canal @AmanoTeam."
+    "start": "Buscar letras directamente desde Telegram :D\n\n    - <i>Para más información, usa</i> /help\n\n¿Empecemos? Navega con el teclado de abajo:"
 }
