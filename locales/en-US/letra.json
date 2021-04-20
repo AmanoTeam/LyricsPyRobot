@@ -1,5 +1,5 @@
 {
-    "use": "<b>Usage:</b> /letra <music name>",
+    "use": "<b>Usage:</b> /lyrics &lt;music name&gt;",
     "lyrics_nf": "Lyrics not found :(",
     "text": "Text",
     "tgph": "Telegra.ph",

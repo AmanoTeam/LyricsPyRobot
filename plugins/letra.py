@@ -15,7 +15,7 @@ let = Letras()
 # + original, - traduzido, _ telegraph
 
 
-@Client.on_message(filters.command("letra"))
+@Client.on_message(filters.command(["lyrics", "letra"]))
 @use_chat_lang()
 async def letra(c, m, t):
     text = m.text.split(' ', 1)[1]
