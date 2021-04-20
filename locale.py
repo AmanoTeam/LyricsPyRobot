@@ -51,7 +51,7 @@ def get_lang(message) -> str:
 
     lang = db.db_get_lang(chat.id)
 
-    lang = lang[0] if lang[0] else default_language
+    lang = lang[0] if lang and lang[0] else default_language
 
     if len(lang.split("-")) == 1:
         # Try to find a language that starts with the provided language_code
