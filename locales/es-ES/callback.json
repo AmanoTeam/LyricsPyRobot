@@ -11,12 +11,13 @@
     "language": "Ajustes de idioma",
     "pattern": "Ajustes por defecto",
     "back": "Volver",
-    "sticker": "Pegatina: ",
+    "sticker": "Sticker: ",
     "theme": "Tema: ",
     "blur": "Blur: ",
     "np_settings_txt": "Configure su now playing a continuación:",
     "dark": "Oscuro",
     "light": "Claro",
     "pattern_settings_text": "Cambia tu configuración predeterminada a continuación:",
-    "lang_sucess": "Idioma cambiado correctamente"
+    "lang_sucess": "Idioma cambiado correctamente",
+    "ch_lang": "Elija un idioma:"
 }
