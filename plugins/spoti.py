@@ -103,7 +103,7 @@ async def spoti(c, m, t):
 @Client.on_callback_query(filters.regex(r"^tcs"))
 async def tcs(c, m):
     sess = await get_spoti_session(m.from_user.id)
-    sess.start_playback(uris=[f'spotify:track:{m.data.split("|")[1]}'])
+    sess.add_to_queue(uri=f'spotify:track:{m.data.split("|")[1]}')
 
 
 @Client.on_callback_query(filters.regex(r"^previous"))
