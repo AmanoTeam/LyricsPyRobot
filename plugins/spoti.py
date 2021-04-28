@@ -76,6 +76,10 @@ async def spoti(c, m, t):
                                 InlineKeyboardButton(
                                     text=t("play_in_sp"),
                                     callback_data=f'tcs|{spotify_json["item"]["id"]}',
+                                ),
+                                InlineKeyboardButton(
+                                    text=t("search_lyric"),
+                                    callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}'
                                 )
                             ],
                         ]
@@ -98,6 +102,19 @@ async def spoti(c, m, t):
                         )
                     m.text = f"/letra {spotify_json['item']['artists'][0]['name']} {spotify_json['item']['name']}"
                     await letra(c, m)
+
+
+@Client.on_callback_query(filters.regex(r"^sp_s"))
+async def sp_search(c, m):
+    track, uid = m.data.split("|")[1:]
+    if m.from_user.id == int(uid):
+        sess = await get_spoti_session(m.from_user.id)
+        om = m.message
+        om.from_user = m.from_user
+        spotify_json = sess.track(track)
+        om.text = f"/letra {spotify_json['artists'][0]['name']} {spotify_json['name']}"
+        print(m)
+        await letra(c, om)
 
 
 @Client.on_callback_query(filters.regex(r"^tcs"))
@@ -140,6 +157,10 @@ async def previous(c, m, t):
                     InlineKeyboardButton(
                         text=t("play_in_sp"),
                         callback_data=f'tcs|{spotify_json["item"]["id"]}',
+                    ),
+                    InlineKeyboardButton(
+                        text=t("search_lyric"),
+                         callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}'
                     )
                 ],
             ]
@@ -194,6 +215,10 @@ async def next(c, m, t):
                     InlineKeyboardButton(
                         text=t("play_in_sp"),
                         callback_data=f'tcs|{spotify_json["item"]["id"]}',
+                    ),
+                    InlineKeyboardButton(
+                        text=t("search_lyric"),
+                         callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}'
                     )
                 ],
             ]
@@ -250,6 +275,10 @@ async def ppa(c, m, t):
                     InlineKeyboardButton(
                         text=t("play_in_sp"),
                         callback_data=f'tcs|{spotify_json["item"]["id"]}',
+                    ),
+                    InlineKeyboardButton(
+                        text=t("search_lyric"),
+                         callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}'
                     )
                 ],
             ]
