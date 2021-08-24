@@ -6,5 +6,5 @@
     "play": "There is nothing playing right now. How about giving your Spotify a <i>play</i>?",
     "play_in_sp": "Add to Queue",
     "not_allowed": "You can't use this, only {first_name} can",
-    "search_lyric": "Search the music lyrics"
+    "search_lyric": "Search lyrics"
 }
