@@ -80,18 +80,18 @@ def build_webdriver_object(
     if browser_type == "chrome":
         copts = webdriver.ChromeOptions()
         copts.headless = True
-        copts.add_argument("--window-size=512,288")
 
         webdrv_ = webdriver.Chrome(options=copts)
     elif browser_type == "firefox":
         fopts = webdriver.FirefoxOptions()
         fopts.headless = True
-        fopts.add_argument("--width=512")
-        fopts.add_argument("--height=288")
+        fopts.add_argument("--kiosk")
 
         webdrv_ = webdriver.Firefox(options=fopts)
     else:
         raise TypeError("browser_type must be either 'chrome' or 'firefox'.")
+
+    webdrv_.set_window_size(512, 288)
 
     return webdrv_
 
