@@ -1,13 +1,13 @@
 import re
+from functools import partial
 
 from lyricspy.aio import Letras, Musixmatch
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 import db
-from config import sudos, MUSIXMATCH_KEYS
-from functools import partial
-from locale import use_chat_lang, langdict, get_locale_string, default_language
+from config import MUSIXMATCH_KEYS, sudos
+from locales import default_language, get_locale_string, langdict, use_chat_lang
 
 mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 let = Letras()

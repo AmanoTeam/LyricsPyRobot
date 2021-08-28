@@ -4,16 +4,16 @@ import json
 from lyricspy.aio import Musixmatch
 from pyrogram import Client
 from pyrogram.types import (
-    InlineKeyboardMarkup,
     InlineKeyboardButton,
+    InlineKeyboardMarkup,
     InlineQueryResultArticle,
     InputTextMessageContent,
 )
 
 import db
 from config import MUSIXMATCH_KEYS
-from utils import get_spoti_session, get_current
-from locale import use_chat_lang
+from locales import use_chat_lang
+from utils import get_current, get_spoti_session
 
 mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 

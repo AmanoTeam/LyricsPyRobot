@@ -1,6 +1,7 @@
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from locale import use_chat_lang
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+from locales import use_chat_lang
 
 
 @Client.on_message(filters.command("start"))

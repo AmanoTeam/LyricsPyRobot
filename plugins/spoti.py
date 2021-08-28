@@ -1,9 +1,11 @@
 from pyrogram import Client, filters
-from .letra import letra
-from utils import get_token, get_spoti_session, get_song_art
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 import db
-from locale import use_chat_lang
+from locales import use_chat_lang
+from utils import get_song_art, get_spoti_session, get_token
+
+from .letra import letra
 
 
 @Client.on_message(filters.command("spoti") | filters.command("np"))

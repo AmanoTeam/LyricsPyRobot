@@ -3,11 +3,11 @@ import re
 
 from lyricspy.aio import Letras, Musixmatch
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from locale import use_chat_lang
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 import db
 from config import MUSIXMATCH_KEYS
+from locales import use_chat_lang
 
 mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 let = Letras()

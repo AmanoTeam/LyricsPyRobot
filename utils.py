@@ -1,9 +1,9 @@
 import asyncio
 import os
-from functools import wraps, partial
+from functools import partial, wraps
 from io import BytesIO
 from time import time
-from typing import Coroutine, Callable, Union, List
+from typing import Callable, Coroutine, List, Union
 
 import httpx
 import spotipy
@@ -15,7 +15,7 @@ from spotipy.client import SpotifyException
 from yarl import URL
 
 import db
-from config import BASIC, KEY, BROWSER
+from config import BASIC, BROWSER, KEY
 
 loop = asyncio.get_event_loop()
 

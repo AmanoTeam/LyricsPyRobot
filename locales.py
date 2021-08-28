@@ -1,13 +1,13 @@
 import inspect
 import json
 import os.path
-from functools import wraps, partial
+from functools import partial, wraps
 from glob import glob
-from typing import List, Dict
+from typing import Dict, List
 
 from pyrogram.types import CallbackQuery
-import db
 
+import db
 
 enabled_locales = [
     "en-US",  # English

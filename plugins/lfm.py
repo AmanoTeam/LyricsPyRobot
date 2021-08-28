@@ -1,11 +1,12 @@
 import re
+
 from pyrogram import Client, filters
 
 import db
-from .letra import letra
+from locales import use_chat_lang
 from utils import get_current, get_song_art, http_pool
-from locale import use_chat_lang
 
+from .letra import letra
 
 LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
