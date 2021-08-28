@@ -1,11 +1,17 @@
 import asyncio
 from config import TOKEN, API_HASH, API_ID
 from pyrogram import Client, idle
+from utils import http_pool, webdrv
 
 
 async def main():
     await client.start()
+
     await idle()
+
+    await client.stop()
+    await http_pool.aclose()
+    webdrv.close()
 
 
 client = Client("bot", API_ID, API_HASH, bot_token=TOKEN, plugins=dict(root="plugins"))

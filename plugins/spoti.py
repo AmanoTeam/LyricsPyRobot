@@ -79,8 +79,8 @@ async def spoti(c, m, t):
                                 ),
                                 InlineKeyboardButton(
                                     text=t("search_lyric"),
-                                    callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}'
-                                )
+                                    callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}',
+                                ),
                             ],
                         ]
                     )
@@ -160,8 +160,8 @@ async def previous(c, m, t):
                     ),
                     InlineKeyboardButton(
                         text=t("search_lyric"),
-                         callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}'
-                    )
+                        callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}',
+                    ),
                 ],
             ]
         )
@@ -218,8 +218,8 @@ async def next(c, m, t):
                     ),
                     InlineKeyboardButton(
                         text=t("search_lyric"),
-                         callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}'
-                    )
+                        callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}',
+                    ),
                 ],
             ]
         )
@@ -278,8 +278,8 @@ async def ppa(c, m, t):
                     ),
                     InlineKeyboardButton(
                         text=t("search_lyric"),
-                         callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}'
-                    )
+                        callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}',
+                    ),
                 ],
             ]
         )
