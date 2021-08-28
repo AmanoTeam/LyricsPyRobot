@@ -1,7 +1,3 @@
-import hashlib
-import json
-
-from lyricspy.aio import Musixmatch
 from pyrogram import Client
 from pyrogram.types import (
     InlineKeyboardButton,
@@ -11,11 +7,8 @@ from pyrogram.types import (
 )
 
 import db
-from config import MUSIXMATCH_KEYS
 from locales import use_chat_lang
-from utils import get_current, get_spoti_session
-
-mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
+from utils import get_current, get_spoti_session, musixmatch
 
 # + original, - traduzido, _ telegraph
 
@@ -37,9 +30,9 @@ async def inline(c, m, t):
         if a:
             text = f"{a['item']['artists'][0]['name']} {a['item']['name']}"
             print(text)
-            i = await mux.auto(text, limit=1, lang="pt")
+            i = await musixmatch.auto(text, limit=1, lang="pt")
             if i:
-                i = mux.parce(i[0])
+                i = musixmatch.parce(i[0])
                 hash = "s" + str(i["id"])
                 r.update({hash: i["link"]})
                 articles.append(
@@ -60,9 +53,9 @@ async def inline(c, m, t):
         if a:
             text = f"{a[0]['artist']['#text']} - {a[0]['name']}"
             print(text)
-            i = await mux.auto(text, limit=1, lang="pt")
+            i = await musixmatch.auto(text, limit=1, lang="pt")
             if i:
-                i = mux.parce(i[0])
+                i = musixmatch.parce(i[0])
                 hash = "l" + str(i["id"])
                 r.update({hash: i["link"]})
                 articles.append(
@@ -79,9 +72,9 @@ async def inline(c, m, t):
                 )
                 lm -= 1
     if m.query:
-        a = await mux.auto(m.query, limit=2, lang="pt")
+        a = await musixmatch.auto(m.query, limit=2, lang="pt")
         for i in a:
-            i = mux.parce(i)
+            i = musixmatch.parce(i)
             hash = str(i["id"])
             r.update({hash: i["link"]})
             articles.append(
@@ -106,8 +99,8 @@ async def choosen(c, m, t):
         hash = m.result_id[1:]
     else:
         hash = m.result_id
-    a = await mux.lyrics(hash)
-    a = mux.parce(a)
+    a = await musixmatch.lyrics(hash)
+    a = musixmatch.parce(a)
     uid = m.from_user.id
     ma = db.theme(uid)[2]
     if not ma:

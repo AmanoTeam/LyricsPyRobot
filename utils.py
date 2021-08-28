@@ -7,6 +7,7 @@ from typing import Callable, Coroutine, List, Union
 
 import httpx
 import spotipy
+from lyricspy.aio import Letras, Musixmatch
 from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
@@ -15,7 +16,7 @@ from spotipy.client import SpotifyException
 from yarl import URL
 
 import db
-from config import BASIC, BROWSER, KEY
+from config import BASIC, BROWSER, KEY, MUSIXMATCH_KEYS
 
 loop = asyncio.get_event_loop()
 
@@ -158,3 +159,7 @@ async def get_current(user: str) -> List[dict]:
 
 
 webdrv = build_webdriver_object(BROWSER)
+
+musixmatch = Musixmatch(usertoken=MUSIXMATCH_KEYS)
+
+letras = Letras()

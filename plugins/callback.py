@@ -1,17 +1,13 @@
 import re
 from functools import partial
 
-from lyricspy.aio import Letras, Musixmatch
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 import db
-from config import MUSIXMATCH_KEYS, sudos
+from config import sudos
 from locales import default_language, get_locale_string, langdict, use_chat_lang
-
-mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
-let = Letras()
-
+from utils import letras, musixmatch
 
 # + original, - traduzido, _ telegraph
 
@@ -54,18 +50,18 @@ async def teor(c, m, t):
             if re.match(
                 r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", n[0]
             ):
-                a = await let.letra(n[0])
+                a = await letras.letra(n[0])
             elif re.match(
                 r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
             ):
-                a = await mux.lyrics(hash)
+                a = await musixmatch.lyrics(hash)
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
             if "art" in a:
-                a = let.parce(a)
+                a = letras.parce(a)
             else:
-                a = mux.parce(a)
+                a = musixmatch.parce(a)
             if a["traducao"]:
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
@@ -112,18 +108,18 @@ async def tetr(c, m, t):
             if re.match(
                 r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", n[0]
             ):
-                a = await let.letra(n[0])
+                a = await letras.letra(n[0])
             elif re.match(
                 r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
             ):
-                a = await mux.lyrics(hash)
+                a = await musixmatch.lyrics(hash)
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
             if "art" in a:
-                a = let.parce(a)
+                a = letras.parce(a)
             else:
-                a = mux.parce(a)
+                a = musixmatch.parce(a)
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -159,18 +155,18 @@ async def ori(c, m, t):
             if re.match(
                 r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", n[0]
             ):
-                a = await let.letra(n[0])
+                a = await letras.letra(n[0])
             elif re.match(
                 r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
             ):
-                a = await mux.lyrics(hash)
+                a = await musixmatch.lyrics(hash)
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
             if "art" in a:
-                a = let.parce(a)
+                a = letras.parce(a)
             else:
-                a = mux.parce(a)
+                a = musixmatch.parce(a)
             if a["traducao"]:
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
@@ -219,18 +215,18 @@ async def tr(c, m, t):
             if re.match(
                 r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", n[0]
             ):
-                a = await let.letra(n[0])
+                a = await letras.letra(n[0])
             elif re.match(
                 r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
             ):
-                a = await mux.lyrics(hash)
+                a = await musixmatch.lyrics(hash)
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
             if "art" in a:
-                a = let.parce(a)
+                a = letras.parce(a)
             else:
-                a = mux.parce(a)
+                a = musixmatch.parce(a)
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [

@@ -1,16 +1,11 @@
-import hashlib
 import re
 
-from lyricspy.aio import Letras, Musixmatch
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 import db
-from config import MUSIXMATCH_KEYS
 from locales import use_chat_lang
-
-mux = Musixmatch(usertoken=MUSIXMATCH_KEYS)
-let = Letras()
+from utils import letras, musixmatch
 
 # + original, - traduzido, _ telegraph
 
@@ -24,23 +19,23 @@ async def letra(c, m, t):
     elif re.match(
         r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", text
     ):
-        a = await let.letra(text)
+        a = await letras.letra(text)
     elif re.match(
         r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", text
     ):
-        a = await mux.lyrics(text)
+        a = await musixmatch.lyrics(text)
     else:
-        a = await mux.auto(text, limit=1, lang="pt")
+        a = await musixmatch.auto(text, limit=1, lang="pt")
         if not a:
-            a = await let.auto(text, limit=1)
+            a = await letras.auto(text, limit=1)
             if not a:
                 await m.reply_text(t("lyrics_nf"))
                 return True
     a = a[0] if isinstance(a, list) else a
     if "art" in a:
-        a = let.parce(a)
+        a = letras.parce(a)
     else:
-        a = mux.parce(a)
+        a = musixmatch.parce(a)
     hash = str(a["id"])
     db.add_hash(hash, a)
     uid = m.from_user.id
