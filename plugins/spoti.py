@@ -103,12 +103,11 @@ async def spoti(c, m, t):
                             parse_mode="html",
                         )
                     m.text = f"/letra {spotify_json['item']['artists'][0]['name']} {spotify_json['item']['name']}"
-                    await letra(c, m, t)
+                    await letra(c, m)
 
 
 @Client.on_callback_query(filters.regex(r"^sp_s"))
-@use_chat_lang()
-async def sp_search(c, m, t):
+async def sp_search(c, m):
     track, uid = m.data.split("|")[1:]
     if m.from_user.id == int(uid):
         sess = await get_spoti_session(m.from_user.id)
@@ -117,7 +116,7 @@ async def sp_search(c, m, t):
         spotify_json = sess.track(track)
         om.text = f"/letra {spotify_json['artists'][0]['name']} {spotify_json['name']}"
         print(m)
-        await letra(c, om, t)
+        await letra(c, om)
 
 
 @Client.on_callback_query(filters.regex(r"^tcs"))

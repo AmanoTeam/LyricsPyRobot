@@ -47,4 +47,4 @@ async def lfm(c, m, t):
                 )
                 await m.reply_sticker(album_art)
                 m.text = f"/letra {a[0]['artist']['#text']} {a[0]['name']}"
-                await letra(c, m, t)
+                await letra(c, m)
