@@ -45,6 +45,7 @@ async def lfm(c, m, t):
                     color="dark" if db.theme(m.from_user.id)[0] else "light",
                     blur=db.theme(m.from_user.id)[1],
                 )
-                await m.reply_sticker(album_art)
+                mtext = f"🎵 {a[0]['artist']['#text']} - {a[0]['name']}"
+                await m.reply_document(album_art, caption=mtext)
                 m.text = f"/letra {a[0]['artist']['#text']} {a[0]['name']}"
                 await letra(c, m)

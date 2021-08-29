@@ -57,6 +57,7 @@ async def spoti(c, m, t):
                         color="dark" if db.theme(m.from_user.id)[0] else "light",
                         blur=db.theme(m.from_user.id)[1],
                     )
+                mtext = f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}"
                 if "np" in text[0]:
                     kb = InlineKeyboardMarkup(
                         inline_keyboard=[
@@ -87,19 +88,19 @@ async def spoti(c, m, t):
                         ]
                     )
                     if stick == None or stick:
-                        await m.reply_sticker(album_art, reply_markup=kb)
+                        await m.reply_document(album_art, reply_markup=kb, caption=mtext)
                     else:
                         await m.reply(
-                            f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}",
+                            mtext,
                             reply_markup=kb,
                             parse_mode="html",
                         )
                 else:
                     if stick == None or stick:
-                        await m.reply_sticker(album_art)
+                        await m.reply_document(album_art, caption=mtext)
                     else:
                         await m.reply(
-                            f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}",
+                            mtext,
                             parse_mode="html",
                         )
                     m.text = f"/letra {spotify_json['item']['artists'][0]['name']} {spotify_json['item']['name']}"
