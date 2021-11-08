@@ -1,12 +1,24 @@
-from config import bot, loop, plgns
-from amanobot.aio.loop import MessageLoop
+import asyncio
 
-for i in plgns:
-    exec('from plugins.{0} import {0}'.format(i))
+from pyrogram import Client, idle
 
-if __name__ == '__main__':
-    loop.create_task(MessageLoop(bot, dict(chat=handle,
-                      callback_query=callback,
-                      inline_query=inline,
-                      chosen_inline_result=chosen)).run_forever())
-    loop.run_forever()
+from config import API_HASH, API_ID, TOKEN
+from utils import http_pool, letras, musixmatch, webdrv
+
+
+async def main():
+    await client.start()
+
+    await idle()
+
+    await client.stop()
+    await http_pool.aclose()
+    await letras.http.aclose()
+    await musixmatch.http.aclose()
+    webdrv.quit()
+
+
+client = Client("bot", API_ID, API_HASH, bot_token=TOKEN, plugins=dict(root="plugins"))
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())

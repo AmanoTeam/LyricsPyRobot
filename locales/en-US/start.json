@@ -1,0 +1,6 @@
+{
+    "inline_btn": "Search lyrics",
+    "settings_btn": "Settings",
+    "start": "Search for lyrics directly from Telegram :D\n\n    - <i>For more info, use</i> /help\n\nLet's start? Browse with the keyboard below:",
+    "help": "This bot show music lyrics according to your search using musixmatch.com.\n\nYou can search using the inline mode (@lyricspyrobot &lt;music&gt;), or even see the music lyrics of the music playing right now on your Spotify using spoti (needs login) :D\n\nThe following commands are available:\n   • /lyrics &lt;music&gt; (Search the provided music lyrics)\n   • /spoti (show the music playing right now ~does not need premium~)\n   • /np (A Spotify player ~needs premium~)\n\nIf you have any questions, contact us at @AmanoSupport or in our chat @AmanoChat.\n- News and updates will be posted in the @AmanoTeam channel."
+}

@@ -1,3 +1,10 @@
+.idea/
+.vscode/
+.venv/
 __pycache__/
-db.json
 config.py
+*.session
+*.db
+*.session-journal
+*.db-journal
+*.log

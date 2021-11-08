@@ -1,0 +1,5 @@
+{
+    "done": "Done, you can use /lfm now :)",
+    "example": "Please send your last.fm username after /lfm.\n\n<b>E.g.:</b> <pre>/lfm alisson</pre>",
+    "play_playlist": "There is nothing playing right now. How about giving your playlist a <i>play</i>?"
+}
