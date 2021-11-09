@@ -1,4 +1,3 @@
-from logging import root
 from pyrogram import Client, idle
 from config import BOT_CONFIG
 import asyncio
