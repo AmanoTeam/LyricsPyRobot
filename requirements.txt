@@ -1,9 +1,0 @@
-git+https://github.com/AmanoTeam/lyricspy
-pillow
-selenium
-git+https://github.com/AmanoTeam/pyrogram
-httpx[http2]
-spotipy
-telegraph
-tgcrypto
-yarl
