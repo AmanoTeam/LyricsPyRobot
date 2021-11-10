@@ -3,3 +3,4 @@ config.py
 *.session-journal
 plugins/__pycache__/*
 __pycache__/*
+users.db
