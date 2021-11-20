@@ -5,6 +5,7 @@ dbc = db.cursor()
 
 dbc.execute(
     """CREATE TABLE IF NOT EXISTS users (user_id INTEGER,
-                                         test INTEGER)""")
+                                         test INTEGER,
+                                         lang)""")
 
 db.commit()

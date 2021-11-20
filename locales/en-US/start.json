@@ -1,0 +1,9 @@
+{
+    "config":"Settings",
+    "start":"Search for lyrics directly from Telegram :D\n\n    - <i>For more info, use</i> /help\n\nLet's start? Browse with the keyboard below:",
+    "lang_c":"Language:",
+    "select_lang":"Choose a language:",
+    "lang_sucess":"Language successfully changed",
+    "config_text": "What would you like to configure?",
+    "back":"back"
+}
