@@ -1,1 +1,9 @@
-{}
+{
+    "config": "Ajustes",
+    "start": "Buscar letras directamente desde Telegram :D\\n\\n    - <i>Para más información, usa</i> /help\\n\\n¿Empecemos? Navega con el teclado de abajo:",
+    "lang_c": "Idioma:",
+    "select_lang": "Ajustes de idioma:",
+    "lang_sucess": "Idioma cambiado correctamente",
+    "config_text": "¿Qué te gustaría configurar?",
+    "back": "Volver"
+}
