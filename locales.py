@@ -26,7 +26,8 @@ def db_get_lang(id):
 
 enabled_locales = [
                     "en-US",
-                    "pt-BR"
+                    "pt-BR",
+                    "es-ES"
                   ]
 
 default_language = "en-US"
