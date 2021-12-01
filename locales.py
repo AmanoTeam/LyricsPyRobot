@@ -51,10 +51,7 @@ def get_locale_string(
 
 
 def get_lang(message) -> str:
-    if isinstance(message, CallbackQuery):
-        chat = message.message.chat
-    else:
-        chat = message.from_user
+    chat = message.from_user
 
     lang = db.db_get_lang(chat.id)
 
