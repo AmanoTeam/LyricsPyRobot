@@ -1,4 +1,5 @@
 {
+    "se_val":"select the amount for donation (BRL)",
     "donation_title": "Donation",
     "donation_desc": "Send a donation (only BRL for now) to help the bot",
     "donation_label": "Send donation"
