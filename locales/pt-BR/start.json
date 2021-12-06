@@ -4,6 +4,9 @@
     "lang_c": "Idioma:",
     "select_lang": "Escolha seu idioma:",
     "lang_sucess": "Idioma modificado com sucesso!",
+    "lm_c": "Configurações do Last.fm",
+    "sp_c": "Configurações do Spotify",
+    "oth_c": "Outras configurações",
     "config_text": "Você gostaria de configurar o quê?",
     "back": "Voltar"
 }
