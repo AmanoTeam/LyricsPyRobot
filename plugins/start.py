@@ -41,6 +41,23 @@ async def start(c: Client, m: Message, t):
 
 @Client.on_callback_query(filters.regex(r"config"))
 @use_chat_lang()
+async def config(c: Client, q: CallbackQuery, t):
+    keyb = [
+        [
+            ("Spotify settings", "sp_config"),
+        ],
+        [
+            ("Last.fm settings", "lm_config"),
+        ]
+        [
+            ("Another settings", "config_o")
+        ]
+    ]
+
+    await q.edit_message_text(t("config_text"), reply_markup=ikb(keyb))
+
+@Client.on_callback_query(filters.regex(r"config_o"))
+@use_chat_lang()
 async def settings(c: Client, q: CallbackQuery, t):
     if "_" in q.data:
         toggle = q.data.split("_")[1]
@@ -61,6 +78,9 @@ async def settings(c: Client, q: CallbackQuery, t):
         [
             (t("lang_c"), "lang_conf"),
             (strings("language_flag")+" "+strings("language_name"), "lang_conf")
+        ],
+        [
+            (t("back"), "config")
         ]
     ]
     await q.edit_message_text(t("config_text"), reply_markup=ikb(keyb))
@@ -68,7 +88,7 @@ async def settings(c: Client, q: CallbackQuery, t):
 @Client.on_callback_query(filters.regex(r"lang_conf"))
 @use_chat_lang()
 async def lang_conf(c: Client, q: CallbackQuery, t):
-    keyb = [*gen_lang_keyboard(), [(t("back"), "config")]]
+    keyb = [*gen_lang_keyboard(), [(t("back"), "config_o")]]
     await q.edit_message_text(t("select_lang"), reply_markup=ikb(keyb))
 
 @Client.on_callback_query(filters.regex("^set_lang "))
@@ -82,5 +102,5 @@ async def set_user_lang(c, m):
         "start",
     )
 
-    keyboard = [[(strings("back"), "config")]]
+    keyboard = [[(strings("back"), "config_o")]]
     await m.message.edit_text(strings("lang_sucess"), reply_markup=ikb(keyboard))
