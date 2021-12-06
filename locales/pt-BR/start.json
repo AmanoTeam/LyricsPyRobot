@@ -1,12 +1,4 @@
 {
     "config": "Configurações",
-    "start": "Pesquise por letras de músicas direto do Telegram :D\n\n   - <i>Para mais informações, use</i> /help\n\nVamos iniciar? Comece navegue pelo botão abaixo:",
-    "lang_c": "Idioma:",
-    "select_lang": "Escolha seu idioma:",
-    "lang_sucess": "Idioma modificado com sucesso!",
-    "lm_c": "Configurações do Last.fm",
-    "sp_c": "Configurações do Spotify",
-    "oth_c": "Outras configurações",
-    "config_text": "Você gostaria de configurar o quê?",
-    "back": "Voltar"
+    "start": "Pesquise por letras de músicas direto do Telegram :D\n\n   - <i>Para mais informações, use</i> /help\n\nVamos iniciar? Comece navegue pelo botão abaixo:"
 }
