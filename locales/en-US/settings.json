@@ -1,0 +1,10 @@
+{
+    "lang_c":"Language:",
+    "select_lang":"Choose a language:",
+    "lang_sucess":"Language successfully changed",
+    "lm_c": "Last.fm settings",
+    "sp_c": "Spotify config",
+    "oth_c": "other settings",
+    "config_text": "What would you like to configure?",
+    "back":"back"
+}
