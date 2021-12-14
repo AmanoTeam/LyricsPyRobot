@@ -1,0 +1,7 @@
+{
+    "title": "<b>Spotify settings.</b>\n\n",
+    "not_logged": "You are not logged in.\nLog in below:",
+    "logged": "You are logged in with: {name}\n\n",
+    "login_done": "Hello {name}\n\nYou can now use /spoti or /np :)",
+    "login_error": "An error has occurred:\n{error}"
+}

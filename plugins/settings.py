@@ -33,19 +33,19 @@ async def config(c: Client, q: CallbackQuery, t):
     print("bot_used")
     keyb = [
         [
-            ("Spotify settings", "sp_config")
+            (t("sp_c"), "sp_config main")
         ],
         [
-            ("Last.fm settings", "lm_config")
+            (t("lm_c"), "lm_config")
         ],
         [
-            ("Another settings", "config")
+            (t("oth_c"), "config")
         ]
     ]
 
     await q.edit_message_text(t("config_text"), reply_markup=ikb(keyb))
 
-@Client.on_callback_query(filters.regex(r"config"))
+@Client.on_callback_query(filters.regex(r"^config"))
 @use_chat_lang()
 async def settings(c: Client, q: CallbackQuery, t):
     if "_" in q.data:

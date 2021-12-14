@@ -7,6 +7,7 @@ dbc.execute(
     """CREATE TABLE IF NOT EXISTS users (user_id INTEGER,
                                          test INTEGER,
                                          lang,
-                                         pro INTEGER)""")
+                                         pro INTEGER,
+                                         spotify)""")
 
 db.commit()

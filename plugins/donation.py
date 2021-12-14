@@ -45,7 +45,7 @@ async def donate(c: Client, q:CallbackQuery, t):
                     currency="BRL",
                     # prices needs to be a list, even for a single item
                     prices=[LabeledPrice(label=t("donation_label"), amount=int(q.data.split("_")[1]))],
-                    test=False,
+                    test=True,
                 ),
                 payload=b"payment",
                 provider=BOT_CONFIG["STRIPE_TOKEN"],
@@ -59,7 +59,6 @@ async def donate(c: Client, q:CallbackQuery, t):
 
 @Client.on_raw_update(group=10)
 async def raw_update(c: Client, update: Update, users: dict, chats: dict):
-    print("eu")
     if isinstance(update, UpdateBotPrecheckoutQuery):
         # This is to tell Telegram that everything is okay with this order.
         await c.send(SetBotPrecheckoutResults(query_id=update.query_id, success=True))
@@ -70,7 +69,6 @@ async def raw_update(c: Client, update: Update, users: dict, chats: dict):
         and isinstance(update.message.action, MessageActionPaymentSentMe)
     ):
         # Sending a message confirming the order (additional to TGs service message)
-        print(update)
         user = users[update.message.peer_id.user_id]
         await c.send_message(user.id, 'Order "confirmed".')
         print(user.id, user.first_name, "order confirmed")
