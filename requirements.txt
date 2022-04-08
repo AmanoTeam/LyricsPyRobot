@@ -1,3 +1,7 @@
 pyrogram
 pyromod
 tgcrypto
+spotipy
+httpx[http2]
+git+https://github.com/AmanoTeam/LyricsPy.git
+bs4

@@ -11,17 +11,23 @@ http = httpx.AsyncClient(http2=True)
 
 def get_user(user):
     dbc.execute(
-        "SELECT spotify FROM users WHERE user_id = (?)", (user,)
+        "SELECT access_token, refresh_token FROM spotify WHERE user_id = (?)", (user,)
     )
     try:
         return dbc.fetchone()
     except IndexError:
         return None
 
-def set_user(user, sp):
-    db.execute(
-        "UPDATE users SET spotify = ? WHERE user_id = ?", (str(sp), user)
-    )
+def set_user(user, access_token, refresh_token):
+    if not get_user(user):
+        dbc.execute(
+            "INSERT INTO spotify (user_id, access_token, refresh_token) VALUES (?, ?, ?)",
+            (user, access_token, refresh_token),
+        )
+    else:
+        db.execute(
+            "UPDATE spotify SET access_token = ?, refresh_token = ? WHERE user_id = ?", (access_token, refresh_token, user)
+        )
     db.commit()
 
 def gen_lang_keyboard():
@@ -52,20 +58,17 @@ async def gen_spotify_token(user_id, token):
             redirect_uri="https://lyricspy.amanoteam.com/go",
         ),
     )
-    temp = {}
     b = r.json()
     if b.get("error"):
         return False, b["error"]
     else:
-        temp["token"] = b["access_token"]
-        temp["refresh"] = b["refresh_token"]
-        set_user(user_id, temp)
+        print(b["access_token"], b["refresh_token"])
+        set_user(user_id, b["access_token"], b["refresh_token"])
         return True, b["access_token"]
 
 async def get_spoti_session(user_id):
-    usr = (get_user(user_id)[0]).replace("'", '"')
-    sp = loads(usr)
-    a = spotipy.Spotify(auth=sp["token"])
+    usr = get_user(user_id)[0]
+    a = spotipy.Spotify(auth=usr)
     try:
         a.devices()
         return a
@@ -75,14 +78,13 @@ async def get_spoti_session(user_id):
         return a
 
 async def refresh_token(user_id):
-    usr = (get_user(user_id)[0]).replace("'", '"')
-    sp = loads(usr)
+    usr = get_user(user_id)[1]
     r = await http.post(
         "https://accounts.spotify.com/api/token",
         headers=dict(Authorization=f"Basic {SPOTFY_CONFIG['BASIC']}"),
-        data=dict(grant_type="refresh_token", refresh_token=sp["refresh"]),
+        data=dict(grant_type="refresh_token", refresh_token=usr),
     )
     b = r.json()
-    sp["token"] = b["access_token"]
-    set_user(user_id, sp)
+    print(b)
+    set_user(user_id, b["access_token"], usr)
     return b["access_token"]

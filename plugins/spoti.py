@@ -6,7 +6,7 @@ from config import MUSIXMATCH_CONFIG
 from pyrogram import Client, filters
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from locales import use_chat_lang
-from utils import get_spoti_session, gen_spotify_token
+from utils import get_spoti_session, gen_spotify_token, get_user
 
 mux = Musixmatch(MUSIXMATCH_CONFIG)
 
@@ -15,19 +15,10 @@ login_url = ("https://accounts.spotify.com/authorize?response_type=code&"
             + "scope=user-read-currently-playing+user-modify-playback-state+user-read-playback-state&"
             + "redirect_uri=https://lyricspy.amanoteam.com/go")
 
-def get_user(user_id):
-    dbc.execute(
-        "SELECT spotify FROM users WHERE user_id = (?)", (user_id,)
-    )
-    try:
-        return dbc.fetchone()
-    except IndexError:
-        return None
-
 @Client.on_callback_query(filters.regex(r"^sp_config main"))
 @use_chat_lang()
 async def sp_config(c:Client, q:CallbackQuery, t):
-    usr = get_user(q.from_user.id)[0]
+    usr = get_user(q.from_user.id)
     text = t("title")
     if not usr:
         login_kb = InlineKeyboardMarkup(
@@ -59,7 +50,7 @@ async def spoti(c: Client, m: Message, t):
         else:
             await m.reply(t("login_error").format(error=get[1]))
     else:
-        usr = get_user(m.from_user.id)[0]
+        usr = get_user(m.from_user.id)
         if not usr:
             login_kb = InlineKeyboardMarkup(
                 inline_keyboard=[[
