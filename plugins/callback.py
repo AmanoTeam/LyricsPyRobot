@@ -62,7 +62,7 @@ async def teor(c, m, t):
                 a = letras.parce(a)
             else:
                 a = musixmatch.parce(a)
-            if a["traducao"]:
+            if musixmatch.translation(hash, 'pt', None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
                         [
@@ -167,7 +167,7 @@ async def ori(c, m, t):
                 a = letras.parce(a)
             else:
                 a = musixmatch.parce(a)
-            if a["traducao"]:
+            if musixmatch.translation(hash, 'pt', None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
                         [
@@ -175,7 +175,7 @@ async def ori(c, m, t):
                                 text=t("tgph"), callback_data=f"_+{user}|{hash}"
                             ),
                             InlineKeyboardButton(
-                                text=t("por"), callback_data=f"-{user}|{hash}"
+                                text=t("port"), callback_data=f"-{user}|{hash}"
                             ),
                         ]
                     ]
@@ -239,9 +239,11 @@ async def tr(c, m, t):
                     ]
                 ]
             )
+            trad = await musixmatch.translation(hash, 'pt', a["letra"])
+            print(trad)
             await m.edit_message_text(
                 "[{} - {}]({})\n{}".format(
-                    a["musica"], a["autor"], a["link"], a["traducao"]
+                    a["musica"], a["autor"], a["link"], trad
                 )[:4096],
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
