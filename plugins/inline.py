@@ -14,7 +14,7 @@ from utils import get_current, get_spoti_session, musixmatch
 
 
 @Client.on_inline_query()
-@use_chat_lang
+@use_chat_lang()
 async def inline(c, m, t):
     print(m.query)
     tk = db.get(m.from_user.id)
@@ -24,7 +24,7 @@ async def inline(c, m, t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(text=t("wait"), callback_data="a")]]
     )
-    if tk[0]:
+    if tk and tk[0]:
         sess = await get_spoti_session(m.from_user.id)
         a = sess.current_user_playing_track()
         if a:
@@ -48,7 +48,7 @@ async def inline(c, m, t):
                     )
                 )
                 lm -= 1
-    if tk[2]:
+    if tk and tk[2]:
         a = await get_current(tk[2])
         if a:
             text = f"{a[0]['artist']['#text']} - {a[0]['name']}"
@@ -73,27 +73,28 @@ async def inline(c, m, t):
                 lm -= 1
     if m.query:
         a = await musixmatch.auto(m.query, limit=2, lang="pt")
-        for i in a:
-            i = musixmatch.parce(i)
-            hash = str(i["id"])
-            r.update({hash: i["link"]})
-            articles.append(
-                InlineQueryResultArticle(
-                    title=f'{i["musica"]} - {i["autor"]}',
-                    id=hash,
-                    thumb_url="https://piics.ml/i/010.png",
-                    reply_markup=keyboard,
-                    input_message_content=InputTextMessageContent(
-                        message_text=t("wait"),
-                    ),
+        if a:
+            for i in a:
+                i = musixmatch.parce(i)
+                hash = str(i["id"])
+                r.update({hash: i["link"]})
+                articles.append(
+                    InlineQueryResultArticle(
+                        title=f'{i["musica"]} - {i["autor"]}',
+                        id=hash,
+                        thumb_url="https://piics.ml/i/010.png",
+                        reply_markup=keyboard,
+                        input_message_content=InputTextMessageContent(
+                            message_text=t("wait"),
+                        ),
+                    )
                 )
-            )
     db.tem(m.from_user.id, r)
     await m.answer(articles)
 
 
 @Client.on_chosen_inline_result()
-@use_chat_lang
+@use_chat_lang()
 async def choosen(c, m, t):
     if m.result_id[0] == "s" or m.result_id[0] == "l":
         hash = m.result_id[1:]
