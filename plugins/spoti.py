@@ -88,7 +88,9 @@ async def spoti(c, m, t):
                         ]
                     )
                     if stick == None or stick:
-                        await m.reply_document(album_art, reply_markup=kb, caption=mtext)
+                        await m.reply_document(
+                            album_art, reply_markup=kb, caption=mtext
+                        )
                     else:
                         await m.reply(
                             mtext,

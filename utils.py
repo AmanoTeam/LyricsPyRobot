@@ -40,6 +40,7 @@ def get_song_art(
     album_url: str,
     duration: int = 0,
     progress: int = 0,
+    scrobbles: int = 0,
     color: str = "dark",
     blur: bool = False,
 ) -> BytesIO:
@@ -49,6 +50,7 @@ def get_song_art(
         artist=artist,
         timenow=progress,
         timetotal=duration,
+        scrobbles=scrobbles,
         theme=color,
         blurbg=int(blur if blur is not None else True),
     )
@@ -156,6 +158,21 @@ async def get_current(user: str) -> List[dict]:
         ),
     )
     return r.json()["recenttracks"]["track"]
+
+
+async def get_track_info(user: str, artist: str, track: str):
+    r = await http_pool.get(
+        "http://ws.audioscrobbler.com/2.0/",
+        params=dict(
+            method="track.getInfo",
+            user=user,
+            api_key=KEY,
+            format="json",
+            artist=artist,
+            track=track,
+        ),
+    )
+    return r.json()
 
 
 webdrv = build_webdriver_object(BROWSER)

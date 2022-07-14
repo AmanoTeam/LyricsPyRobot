@@ -62,7 +62,7 @@ async def teor(c, m, t):
                 a = letras.parce(a)
             else:
                 a = musixmatch.parce(a)
-            if musixmatch.translation(hash, 'pt', None):
+            if musixmatch.translation(hash, "pt", None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
                         [
@@ -167,7 +167,7 @@ async def ori(c, m, t):
                 a = letras.parce(a)
             else:
                 a = musixmatch.parce(a)
-            if musixmatch.translation(hash, 'pt', None):
+            if musixmatch.translation(hash, "pt", None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
                         [
@@ -239,7 +239,7 @@ async def tr(c, m, t):
                     ]
                 ]
             )
-            trad = await musixmatch.translation(hash, 'pt', a["letra"])
+            trad = await musixmatch.translation(hash, "pt", a["letra"])
             print(trad)
             await m.edit_message_text(
                 "[{} - {}]({})\n{}".format(
