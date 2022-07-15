@@ -37,7 +37,7 @@ async def inline(c, m, t):
                 r.update({hash: i["link"]})
                 articles.append(
                     InlineQueryResultArticle(
-                        title=t("currnt_spotify"),
+                        title=t("current_spotify"),
                         description=f'{i["musica"]} - {i["autor"]}',
                         id=hash,
                         thumb_url="https://piics.ml/amn/lpy/spoti.png",
@@ -60,7 +60,7 @@ async def inline(c, m, t):
                 r.update({hash: i["link"]})
                 articles.append(
                     InlineQueryResultArticle(
-                        title=t("currnt_lfm"),
+                        title=t("current_lfm"),
                         description=f'{i["musica"]} - {i["autor"]}',
                         id=hash,
                         thumb_url="https://piics.ml/amn/lpy/lastfm.png",
