@@ -258,9 +258,10 @@ async def tr(c, m, t):
 async def settings(c, m, t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=t("np_settings"), callback_data="theme")],
+            [InlineKeyboardButton(text=t("np_settings"), callback_data="theme")]+
             [InlineKeyboardButton(text=t("language"), callback_data="language")],
-            [InlineKeyboardButton(text=t("pattern"), callback_data="pattern")],
+            [InlineKeyboardButton(text=t("pattern"), callback_data="pattern")]+
+            [InlineKeyboardButton(text=t("back"), callback_data="start_back")]
         ]
     )
     await m.edit_message_text(t("settings_txt"), reply_markup=keyboard)

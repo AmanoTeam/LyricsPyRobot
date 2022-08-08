@@ -7,3 +7,4 @@ spotipy
 telegraph
 tgcrypto
 yarl
+beautifulsoup4

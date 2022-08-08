@@ -1,0 +1,25 @@
+#bot config
+
+TOKEN = ''
+API_ID = ''
+API_HASH = ''
+
+sudos = [
+    652890017,
+    123892996,
+    200097591
+]
+
+#Musixmatch config
+
+MUSIXMATCH_KEYS = []
+
+#spoti config
+
+BASIC = ''
+
+#lfm config
+
+KEY = ''
+
+BROWSER = 'firefox'

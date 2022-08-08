@@ -5,6 +5,7 @@ from locales import use_chat_lang
 
 
 @Client.on_message(filters.command("start"))
+@Client.on_callback_query(filters.regex(r"start_back"))
 @use_chat_lang()
 async def start(c, m, t):
     keyboard = InlineKeyboardMarkup(
@@ -17,7 +18,10 @@ async def start(c, m, t):
             ]
         ]
     )
-    await m.reply_text(t("start"), reply_markup=keyboard)
+    if isinstance(m, filters.CallbackQuery):
+        await m.edit_message_text(text=t("start"), reply_markup=keyboard)
+    else:
+        await m.reply_text(t("start"), reply_markup=keyboard)
 
 
 @Client.on_message(filters.command("help"))
