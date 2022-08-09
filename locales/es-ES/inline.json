@@ -1,1 +1,7 @@
-{}
+{
+    "wait": "Por favor espere...",
+    "current_spotify": "Reproduciendo en Spotify",
+    "current_lfm": "Reproduciendo en Last.fm",
+    "text": "Texto",
+    "port": "Portugués"
+}
