@@ -1,1 +1,19 @@
-{}
+{
+    "hash_nf": "Hash no encontrado...\nEste mensaje puede ser antiguo.",
+    "url_nf": "Enlace invalido:\n{text}",
+    "text": "Texto",
+    "port": "Portugués",
+    "not_allowed": "No puedes usar esto, solo {first_name} puede",
+    "settings_txt": "¿Qué te gustaría configurar?",
+    "np_settings": "Configuración del Now Playing",
+    "language": "Ajustes de idioma",
+    "pattern": "Ajustes por defecto",
+    "back": "Volver",
+    "theme": "Tema: ",
+    "np_settings_txt": "Configure su now playing a continuación:",
+    "dark": "Oscuro",
+    "light": "Claro",
+    "pattern_settings_text": "Cambia tu configuración predeterminada a continuación:",
+    "lang_sucess": "Idioma cambiado correctamente",
+    "ch_lang": "Elija un idioma:"
+}
