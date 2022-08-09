@@ -5,9 +5,9 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 import db
-from config import sudos
+from config import sudos, login_url
 from locales import default_language, get_locale_string, langdict, use_chat_lang
-from utils import letras, musixmatch
+from utils import letras, musixmatch, get_spoti_session
 
 # + original, - traduzido, _ telegraph
 
@@ -260,7 +260,7 @@ async def settings(c, m, t):
         inline_keyboard=[
             [InlineKeyboardButton(text=t("np_settings"), callback_data="theme")]+
             [InlineKeyboardButton(text=t("language"), callback_data="language")],
-            [InlineKeyboardButton(text=t("pattern"), callback_data="pattern")]+
+            [InlineKeyboardButton(text=t("spotify"), callback_data="spotify_st")]+
             [InlineKeyboardButton(text=t("back"), callback_data="start_back")]
         ]
     )
@@ -279,10 +279,11 @@ async def lang(c, m, t):
     await m.edit_message_text(t("ch_lang"), reply_markup=keyboard)
 
 
-@Client.on_callback_query(filters.regex(r"theme"))
+@Client.on_callback_query(filters.regex(r"theme|pattern"))
 @use_chat_lang()
 async def theme(c, m, t):
     a = db.theme(m.from_user.id)
+    print(a)
     if a[0] is None or "_" in m.data and a[0]:
         tid = 0
     elif "_" in m.data and not a[0]:
@@ -295,14 +296,26 @@ async def theme(c, m, t):
         bid = 0
     else:
         bid = a[1]
+    if a[2] is None or "=" in m.data and a[2]:
+        pid = False
+    elif "=" in m.data and not a[2]:
+        pid = True
+    else:
+        pid = a[2]
+    print(m.data)
     if a[3] is None or "+" in m.data and not a[3]:
         sid = 1
-    elif "+" in m.data and a[1]:
+        print(4)
+    elif "+" in m.data and a[3]:
         sid = 0
+        print(5)
     else:
         sid = a[3]
+        print(6)
     tname = [t("light"), t("dark")]
     bname = ["☑️", "✅"]
+    pname = [t("text"), t("tgph")]
+    print(sid)
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -317,33 +330,37 @@ async def theme(c, m, t):
                 InlineKeyboardButton(text=t("blur"), callback_data="none"),
                 InlineKeyboardButton(text=bname[bid], callback_data="theme-"),
             ],
+            [
+                InlineKeyboardButton(text=t("pattern"), callback_data="none"),
+                InlineKeyboardButton(text=pname[pid], callback_data="theme="),
+            ],
             [InlineKeyboardButton(text=t("back"), callback_data="settings")],
         ]
     )
-    db.def_theme(m.from_user.id, tid, bid, a[2], sid)
+    db.def_theme(m.from_user.id, tid, bid, pid, sid)
     await m.edit_message_text(t("np_settings_txt"), reply_markup=keyboard)
 
-
-@Client.on_callback_query(filters.regex(r"pattern"))
+@Client.on_callback_query(filters.regex(r"spotify_st"))
 @use_chat_lang()
-async def pattern(c, m, t):
-    a = db.theme(m.from_user.id)
-    if a[2] is None or "_" in m.data and a[2]:
-        pid = False
-    elif "_" in m.data and not a[2]:
-        pid = True
+async def spotify_st(c, m, t):
+    text = t('spotify')+'\n\n'
+    
+    tk = db.get(m.from_user.id)
+    if not tk or not tk[0]:
+        text += t('nologged')
     else:
-        pid = a[2]
-    pname = [t("text"), t("tgph")]
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text=pname[pid], callback_data="pattern_")],
-            [InlineKeyboardButton(text=t("back"), callback_data="settings")],
-        ]
-    )
-    db.def_theme(m.from_user.id, a[0], a[1], pid, a[3])
-    await m.edit_message_text(t("pattern_settings_text"), reply_markup=keyboard)
-
+        sp = await get_spoti_session(m.from_user.id)
+        profile = sp.current_user()
+        text += t('logged').format(name=profile["display_name"])
+    
+    kb = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [InlineKeyboardButton(text=t("login"),url=login_url)],
+                    [InlineKeyboardButton(text=t("back"), callback_data="settings")]
+                ]
+            )
+    
+    await m.edit_message_text(text, reply_markup=kb)
 
 @Client.on_callback_query(filters.regex("^set_lang "))
 @use_chat_lang()

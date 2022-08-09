@@ -1,9 +1,11 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.enums.parse_mode import ParseMode
 
 import db
 from locales import use_chat_lang
 from utils import get_song_art, get_spoti_session, get_token
+from config import login_url
 
 from .letra import letra
 
@@ -31,10 +33,7 @@ async def spoti(c, m, t):
                     [
                         InlineKeyboardButton(
                             text=t("login"),
-                            url="https://accounts.spotify.com/authorize?response_type=code&"
-                            + "client_id=6fa50508cfdc4d1490ce8cf29d12097a&"
-                            + "scope=user-read-currently-playing+user-modify-playback-state+user-read-playback-state&"
-                            + "redirect_uri=https://lyricspy.amanoteam.com/go",
+                            url=login_url,
                         )
                     ]
                 ]
@@ -95,7 +94,7 @@ async def spoti(c, m, t):
                         await m.reply(
                             mtext,
                             reply_markup=kb,
-                            parse_mode="html",
+                            parse_mode=ParseMode.HTML,
                         )
                 else:
                     if stick == None or stick:
@@ -103,7 +102,7 @@ async def spoti(c, m, t):
                     else:
                         await m.reply(
                             mtext,
-                            parse_mode="html",
+                            parse_mode=ParseMode.HTML,
                         )
                     m.text = f"/letra {spotify_json['item']['artists'][0]['name']} {spotify_json['item']['name']}"
                     await letra(c, m)
@@ -175,7 +174,7 @@ async def previous(c, m, t):
             await m.edit_message_text(
                 f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}",
                 reply_markup=kb,
-                parse_mode="html",
+                parse_mode=ParseMode.HTML,
             )
         else:
             await m.answer(
@@ -233,7 +232,7 @@ async def next(c, m, t):
             await m.edit_message_text(
                 f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}",
                 reply_markup=kb,
-                parse_mode="html",
+                parse_mode=ParseMode.HTML,
             )
         else:
             await m.answer(
@@ -292,7 +291,7 @@ async def ppa(c, m, t):
             await m.edit_message_text(
                 f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}",
                 reply_markup=kb,
-                parse_mode="html",
+                parse_mode=ParseMode.HTML,
             )
         else:
             await m.edit_message_reply_markup(reply_markup=kb)
