@@ -122,9 +122,11 @@ async def sp_search(c, m):
 
 
 @Client.on_callback_query(filters.regex(r"^tcs"))
-async def tcs(c, m):
+@use_chat_lang()
+async def tcs(c, m, t):
     sess = await get_spoti_session(m.from_user.id)
     sess.add_to_queue(uri=f'spotify:track:{m.data.split("|")[1]}')
+    await m.answer(t("song_added"))
 
 
 @Client.on_callback_query(filters.regex(r"^previous"))

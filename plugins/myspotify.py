@@ -49,7 +49,7 @@ async def my_spotify(c, m):
                 f"sppause|{m.from_user.id}" if spotify_json["is_playing"] else f"spplay|{m.from_user.id}")]+
                 [InlineKeyboardButton('⏭', f"spnext|{m.from_user.id}")]+
                 [InlineKeyboardButton(emoji, call)],
-                [InlineKeyboardButton(f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}')],
+                [InlineKeyboardButton(f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}')],
                 [InlineKeyboardButton('Top Played', f'top|{m.from_user.id}')]+
                 [InlineKeyboardButton('Recently Played', f'recently|{m.from_user.id}')],
             ]
@@ -109,7 +109,7 @@ async def previous(c: Client, m):
             (emoji, call)
         ],
         [
-            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}')
+            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}')
         ],
         [
             ('Top Played', f'top|{m.from_user.id}'),
@@ -160,7 +160,7 @@ async def next(c: Client, m):
             (emoji, call)
         ],
         [
-            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}')
+            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}')
         ],
         [
             ('Top Played', f'top|{m.from_user.id}'),
@@ -217,7 +217,7 @@ async def pauseplay(c: Client, m):
             (emoji, callb)
         ],
         [
-            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}')
+            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}')
         ],
         [
             ('Top Played', f'top|{m.from_user.id}'),
@@ -270,7 +270,7 @@ async def recently(c: Client, m):
             (emoji, call)
         ],
         [
-            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}')
+            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}')
         ],
         [
             ('Top Played', f'top|{m.from_user.id}'),
@@ -282,7 +282,9 @@ async def recently(c: Client, m):
 @Client.on_callback_query(filters.regex("^sppause|^spplay|^spmain"))
 async def pauseplay(c: Client, m):
     if m.data.split("|")[1] != str(m.from_user.id):
-        return await m.answer("You can't do this.")
+        sess = await get_spoti_session(m.from_user.id)
+        sess.add_to_queue(uri=f'spotify:track:{m.data.split("|")[2]}')
+        return await m.answer("Added to queue.")
     sp = await get_spoti_session(m.from_user.id)
     if not 'premium' in sp.current_user()["product"]:
         return await m.answer("Exclusive spotify premium function")
@@ -323,7 +325,7 @@ async def pauseplay(c: Client, m):
             (emoji, call)
         ],
         [
-            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}')
+            (f'{spotify_json["item"]["name"]} - {publi}', f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}')
         ],
         [
             ('Top Played', f'top|{m.from_user.id}'),
