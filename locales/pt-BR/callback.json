@@ -19,5 +19,9 @@
     "light": "Claro",
     "pattern_settings_text": "Alterne as configurações de padrão a baixo:",
     "lang_sucess": "Idioma modificado com sucesso",
-    "ch_lang": "Escolha seu idioma:"
+    "ch_lang": "Escolha seu idioma:",
+    "Spotify": "Configurações do Spotify",
+    "nologged": "Você não está logado no Spotify\nUse o botão abaixo para entrar. Em seguida, copie o comando e envie aqui.",
+    "logged": "Você está logado com: {name}\n\nAltere suas configurações de login abaixo:",
+    "login": "Login"
 }
