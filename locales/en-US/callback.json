@@ -19,5 +19,9 @@
     "light": "Light",
     "pattern_settings_text": "Change your default settings below:",
     "lang_sucess": "Language successfully changed",
-    "ch_lang": "Choose a language:"
+    "ch_lang": "Choose a language:",
+    "Spotify": "Spotify settings",
+    "nologged": "You are not logged in to Spotify\nUse the button below and login. Then copy the command and send it here.",
+    "logged": "You are logged in with: {name}\n\nChange your login settings bellow:",
+    "login": "Login"
 }
