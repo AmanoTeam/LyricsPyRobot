@@ -26,7 +26,6 @@ async def spoti(c, m, t):
             await m.reply_text(t("error").format(error=res[1]))
     else:
         tk = db.get(m.from_user.id)
-        print(tk)
         if not tk or not tk[0]:
             kb = InlineKeyboardMarkup(
                 inline_keyboard=[
@@ -51,7 +50,6 @@ async def spoti(c, m, t):
                 else:
                     publi = spotify_json["item"]["show"]["name"]
                 if stick == None or stick:
-                    print(spotify_json)
                     album_art = await get_song_art(
                         song_name=spotify_json["item"]["name"],
                         artist=publi,
@@ -122,7 +120,6 @@ async def sp_search(c, m):
         om.from_user = m.from_user
         spotify_json = sess.track(track)
         om.text = f"/letra {spotify_json['artists'][0]['name']} {spotify_json['name']}"
-        print(m)
         await letra(c, om)
 
 
@@ -145,7 +142,6 @@ async def previous(c, m, t):
             if i["is_active"]:
                 device_id = i["id"]
                 break
-        print(dir(m))
         sess.previous_track(device_id)
         spotify_json = sess.current_playback(additional_types="episode,track")
         kb = InlineKeyboardMarkup(
@@ -207,7 +203,6 @@ async def next(c, m, t):
             if i["is_active"]:
                 device_id = i["id"]
                 break
-        print(dir(m))
         sess.next_track(device_id)
         spotify_json = sess.current_playback(additional_types="episode,track")
         kb = InlineKeyboardMarkup(
