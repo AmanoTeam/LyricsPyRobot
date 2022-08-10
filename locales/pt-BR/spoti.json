@@ -6,5 +6,6 @@
     "play": "No momento não há nada tocando. Que tal dar um <i>play</i> em seu Spotify?",
     "play_in_sp": "Adicionar à Fila",
     "not_allowed": "Você n pode mexer nisso, somente o {first_name} pode",
-    "search_lyric": "Pesquisar letra"
+    "search_lyric": "Pesquisar letra",
+    "song_added": "Música adicionada à fila"
 }
