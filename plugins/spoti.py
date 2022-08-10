@@ -41,22 +41,27 @@ async def spoti(c, m, t):
             await m.reply_text(t("login_txt"), reply_markup=kb)
         else:
             sess = await get_spoti_session(m.from_user.id)
-            spotify_json = sess.current_user_playing_track()
+            spotify_json = sess.current_playback(additional_types="episode,track")
             if not spotify_json:
                 await m.reply_text(t("play"))
             else:
                 stick = db.theme(m.from_user.id)[3]
+                if "artists" in spotify_json["item"]:
+                    publi = spotify_json["item"]["artists"][0]["name"]
+                else:
+                    publi = spotify_json["item"]["show"]["name"]
                 if stick == None or stick:
+                    print(spotify_json)
                     album_art = await get_song_art(
                         song_name=spotify_json["item"]["name"],
-                        artist=spotify_json["item"]["artists"][0]["name"],
-                        album_url=spotify_json["item"]["album"]["images"][0]["url"],
+                        artist=publi,
+                        album_url=spotify_json["item"]["album"]["images"][0]["url"] if "album" in spotify_json["item"] else spotify_json["item"]["images"][0]["url"],
                         duration=spotify_json["item"]["duration_ms"] // 1000,
                         progress=spotify_json["progress_ms"] // 1000,
                         color="dark" if db.theme(m.from_user.id)[0] else "light",
                         blur=db.theme(m.from_user.id)[1],
                     )
-                mtext = f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}"
+                mtext = f"🎵 {publi} - {spotify_json['item']['name']}"
                 if "np" in text[0]:
                     kb = InlineKeyboardMarkup(
                         inline_keyboard=[
@@ -142,7 +147,7 @@ async def previous(c, m, t):
                 break
         print(dir(m))
         sess.previous_track(device_id)
-        spotify_json = sess.current_user_playing_track()
+        spotify_json = sess.current_playback(additional_types="episode,track")
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -171,16 +176,20 @@ async def previous(c, m, t):
                 ],
             ]
         )
-        spotify_json = sess.current_user_playing_track()
+        if "artists" in spotify_json["item"]:
+            publi = spotify_json["item"]["artists"][0]["name"]
+        else:
+            publi = spotify_json["item"]["show"]["name"]
+        spotify_json = sess.current_playback(additional_types="episode,track")
         if not db.theme(m.from_user.id)[3]:
             await m.edit_message_text(
-                f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}",
+                f"🎵 {publi} - {spotify_json['item']['name']}",
                 reply_markup=kb,
                 parse_mode=ParseMode.HTML,
             )
         else:
             await m.answer(
-                f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}"
+                f"🎵 {publi} - {spotify_json['item']['name']}"
             )
     else:
         a = await c.get_chat(int(user))
@@ -200,7 +209,7 @@ async def next(c, m, t):
                 break
         print(dir(m))
         sess.next_track(device_id)
-        spotify_json = sess.current_user_playing_track()
+        spotify_json = sess.current_playback(additional_types="episode,track")
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -229,16 +238,21 @@ async def next(c, m, t):
                 ],
             ]
         )
-        spotify_json = sess.current_user_playing_track()
+        
+        if "artists" in spotify_json["item"]:
+            publi = spotify_json["item"]["artists"][0]["name"]
+        else:
+            publi = spotify_json["item"]["show"]["name"]
+        spotify_json = sess.current_playback(additional_types="episode,track")
         if not db.theme(m.from_user.id)[3]:
             await m.edit_message_text(
-                f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}",
+                f"🎵 {publi} - {spotify_json['item']['name']}",
                 reply_markup=kb,
                 parse_mode=ParseMode.HTML,
             )
         else:
             await m.answer(
-                f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}"
+                f"🎵 {publi} - {spotify_json['item']['name']}"
             )
     else:
         a = await c.get_chat(int(user))
@@ -260,7 +274,7 @@ async def ppa(c, m, t):
             sess.pause_playback(device_id)
         else:
             sess.start_playback(device_id)
-        spotify_json = sess.current_user_playing_track()
+        spotify_json = sess.current_playback(additional_types="episode,track")
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -289,9 +303,14 @@ async def ppa(c, m, t):
                 ],
             ]
         )
+        
+        if "artists" in spotify_json["item"]:
+            publi = spotify_json["item"]["artists"][0]["name"]
+        else:
+            publi = spotify_json["item"]["show"]["name"]
         if not db.theme(m.from_user.id)[3]:
             await m.edit_message_text(
-                f"🎵 {spotify_json['item']['artists'][0]['name']} - {spotify_json['item']['name']}",
+                f"🎵 {publi} - {spotify_json['item']['name']}",
                 reply_markup=kb,
                 parse_mode=ParseMode.HTML,
             )
