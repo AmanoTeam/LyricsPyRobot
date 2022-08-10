@@ -1,0 +1,12 @@
+{
+    "my_spotify": "Spotify player",
+    "no_playng": "Não há nenhuma música tocando",
+    "play": "No momento não há nada tocando. Que tal dar um <i>play</i> em seu Spotify?",
+    "top_button": "Mais Tocada",
+    "top_text": "Musicas mais tocadas por {name}\n\n",
+    "recent_button": "Tocado recentemente",
+    "recent_text": "Reproduzido recentemente por {name}\n\n",
+    "not_allowed": "Você não pode mexer nisso, somente o {first_name} pode",
+    "premium_only": "Função exclusiva para Spotify Premium",
+    "song_added": "Música adicionada à fila"
+}
