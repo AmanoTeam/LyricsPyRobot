@@ -2,7 +2,7 @@
     "my_spotify": "Spotify player",
     "no_playng": "Não há nenhuma música tocando",
     "play": "No momento não há nada tocando. Que tal dar um <i>play</i> em seu Spotify?",
-    "top_button": "Mais Tocada",
+    "top_button": "Mais Tocadas",
     "top_text": "Musicas mais tocadas por {name}\n\n",
     "recent_button": "Tocado recentemente",
     "recent_text": "Reproduzido recentemente por {name}\n\n",
