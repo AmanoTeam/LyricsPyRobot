@@ -36,7 +36,7 @@ async def inline(c: Client, m: InlineQuery, t):
             if i:
                 i = musixmatch.parce(i[0])
                 hash = "s" + str(i["id"])
-                r.update({hash: i["link"]})
+                r[hash] = i["link"]
                 articles.append(
                     InlineQueryResultArticle(
                         title=t("current_spotify"),
@@ -59,7 +59,7 @@ async def inline(c: Client, m: InlineQuery, t):
             if i:
                 i = musixmatch.parce(i[0])
                 hash = "l" + str(i["id"])
-                r.update({hash: i["link"]})
+                r[hash] = i["link"]
                 articles.append(
                     InlineQueryResultArticle(
                         title=t("current_lfm"),
@@ -79,7 +79,7 @@ async def inline(c: Client, m: InlineQuery, t):
             for i in a:
                 i = musixmatch.parce(i)
                 hash = str(i["id"])
-                r.update({hash: i["link"]})
+                r[hash] = i["link"]
                 articles.append(
                     InlineQueryResultArticle(
                         title=f'{i["musica"]} - {i["autor"]}',
@@ -100,10 +100,7 @@ async def inline(c: Client, m: InlineQuery, t):
 async def choosen(c: Client, m: ChosenInlineResult, t):
     if m.result_id == "MySpotify":
         return
-    if m.result_id[0] == "s" or m.result_id[0] == "l":
-        hash = m.result_id[1:]
-    else:
-        hash = m.result_id
+    hash = m.result_id[1:] if m.result_id[0] in ["s", "l"] else m.result_id
     a = await musixmatch.lyrics(hash)
     a = musixmatch.parce(a)
     uid = m.from_user.id
@@ -165,7 +162,7 @@ async def choosen(c: Client, m: ChosenInlineResult, t):
             )
         await c.edit_inline_text(
             m.inline_message_id,
-            "{} - {}\n{}".format(a["musica"], a["autor"], db.get_url(hash)[1]),
+            f'{a["musica"]} - {a["autor"]}\n{db.get_url(hash)[1]}',
             reply_markup=keyboard,
             parse_mode=None,
         )

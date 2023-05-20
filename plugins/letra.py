@@ -25,17 +25,14 @@ async def letra(c: Client, m: Message, t):
     ):
         a = await musixmatch.lyrics(text)
     else:
-        a = await musixmatch.auto(text, limit=1, lang="pt")
+        a = await musixmatch.auto(text, limit=1, lang="pt") or await letras.auto(
+            text, limit=1
+        )
         if not a:
-            a = await letras.auto(text, limit=1)
-            if not a:
-                await m.reply_text(t("lyrics_nf"))
-                return True
+            await m.reply_text(t("lyrics_nf"))
+            return True
     a = a[0] if isinstance(a, list) else a
-    if "art" in a:
-        a = letras.parce(a)
-    else:
-        a = musixmatch.parce(a)
+    a = letras.parce(a) if "art" in a else musixmatch.parce(a)
     hash = str(a["id"])
     db.add_hash(hash, a)
     uid = m.from_user.id
@@ -94,7 +91,7 @@ async def letra(c: Client, m: Message, t):
                 ]
             )
         await m.reply_text(
-            "{} - {}\n{}".format(a["musica"], a["autor"], db.get_url(hash)[1]),
+            f'{a["musica"]} - {a["autor"]}\n{db.get_url(hash)[1]}',
             reply_markup=keyboard,
             parse_mode=None,
         )

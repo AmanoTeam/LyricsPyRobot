@@ -112,10 +112,9 @@ async def get_token(user_id, auth_code):
     b = r.json()
     if b.get("error"):
         return False, b["error"]
-    else:
-        print(b)
-        db.add_user(user_id, b["refresh_token"], b["access_token"])
-        return True, b["access_token"]
+    print(b)
+    db.add_user(user_id, b["refresh_token"], b["access_token"])
+    return True, b["access_token"]
 
 
 async def refresh_token(user_id):

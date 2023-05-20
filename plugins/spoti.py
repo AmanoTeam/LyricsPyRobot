@@ -20,10 +20,7 @@ from .letra import letra
 async def spoti(c: Client, m: Message, t):
     text = m.text.split(" ", 1)
     if len(text) == 2:
-        if "code=" in text[1]:
-            access_code = text[1].split("code=")[1]
-        else:
-            access_code = text[1]
+        access_code = text[1].split("code=")[1] if "code=" in text[1] else text[1]
         res = await get_token(m.from_user.id, access_code)
         if res[0]:
             await m.reply_text(t("done"))

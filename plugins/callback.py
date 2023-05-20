@@ -20,7 +20,7 @@ def gen_langs_kb():
         a = [
             InlineKeyboardButton(
                 f"{lang['language_flag']} {lang['language_name']}",
-                callback_data="set_lang " + langs[0],
+                callback_data=f"set_lang {langs[0]}",
             )
         ]
         langs.pop(0)
@@ -29,7 +29,7 @@ def gen_langs_kb():
             a.append(
                 InlineKeyboardButton(
                     f"{lang['language_flag']} {lang['language_name']}",
-                    callback_data="set_lang " + langs[0],
+                    callback_data=f"set_lang {langs[0]}",
                 )
             )
             langs.pop(0)
@@ -58,10 +58,7 @@ async def teor(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            if "art" in a:
-                a = letras.parce(a)
-            else:
-                a = musixmatch.parce(a)
+            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
             if musixmatch.translation(hash, "pt", None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
@@ -86,7 +83,7 @@ async def teor(c: Client, m: CallbackQuery, t):
                     ]
                 )
             await m.edit_message_text(
-                "{} - {}\n{}".format(a["musica"], a["autor"], n[1]),
+                f'{a["musica"]} - {a["autor"]}\n{n[1]}',
                 reply_markup=keyboard,
                 parse_mode=None,
             )
@@ -116,10 +113,7 @@ async def tetr(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            if "art" in a:
-                a = letras.parce(a)
-            else:
-                a = musixmatch.parce(a)
+            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -133,7 +127,7 @@ async def tetr(c: Client, m: CallbackQuery, t):
                 ]
             )
             await m.edit_message_text(
-                "{} - {}\n{}".format(a["musica"], a["autor"], n[2]),
+                f'{a["musica"]} - {a["autor"]}\n{n[2]}',
                 reply_markup=keyboard,
                 parse_mode=None,
             )
@@ -163,10 +157,7 @@ async def ori(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            if "art" in a:
-                a = letras.parce(a)
-            else:
-                a = musixmatch.parce(a)
+            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
             if musixmatch.translation(hash, "pt", None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
@@ -191,9 +182,7 @@ async def ori(c: Client, m: CallbackQuery, t):
                     ]
                 )
             await m.edit_message_text(
-                "[{} - {}]({})\n{}".format(
-                    a["musica"], a["autor"], a["link"], a["letra"]
-                )[:4096],
+                f'[{a["musica"]} - {a["autor"]}]({a["link"]})\n{a["letra"]}'[:4096],
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
@@ -223,10 +212,7 @@ async def tr(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            if "art" in a:
-                a = letras.parce(a)
-            else:
-                a = musixmatch.parce(a)
+            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -242,9 +228,7 @@ async def tr(c: Client, m: CallbackQuery, t):
             trad = await musixmatch.translation(hash, "pt", a["letra"])
             print(trad)
             await m.edit_message_text(
-                "[{} - {}]({})\n{}".format(a["musica"], a["autor"], a["link"], trad)[
-                    :4096
-                ],
+                f'[{a["musica"]} - {a["autor"]}]({a["link"]})\n{trad}'[:4096],
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
@@ -290,19 +274,19 @@ async def theme(c: Client, m: CallbackQuery, t):
     print(a)
     if a[0] is None or "_" in m.data and a[0]:
         tid = 0
-    elif "_" in m.data and not a[0]:
+    elif "_" in m.data:
         tid = 1
     else:
         tid = a[0]
     if a[1] is None or "-" in m.data and not a[1]:
         bid = 1
-    elif "-" in m.data and a[1]:
+    elif "-" in m.data:
         bid = 0
     else:
         bid = a[1]
     if a[2] is None or "=" in m.data and a[2]:
         pid = False
-    elif "=" in m.data and not a[2]:
+    elif "=" in m.data:
         pid = True
     else:
         pid = a[2]
@@ -310,7 +294,7 @@ async def theme(c: Client, m: CallbackQuery, t):
     if a[3] is None or "+" in m.data and not a[3]:
         sid = 1
         print(4)
-    elif "+" in m.data and a[3]:
+    elif "+" in m.data:
         sid = 0
         print(5)
     else:

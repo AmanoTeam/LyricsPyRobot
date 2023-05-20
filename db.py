@@ -47,10 +47,7 @@ def add_hash(hash, h):
         a = None
     if not a:
         tl = send_te(h, h["letra"])
-        if h["traducao"]:
-            tlt = send_te(h, h["traducao"])
-        else:
-            tlt = ""
+        tlt = send_te(h, h["traducao"]) if h["traducao"] else ""
         dbc.execute(
             "INSERT INTO saves (hash, url, tl, tlt) VALUES (?,?,?,?)",
             (hash, h["link"], tl, tlt),
