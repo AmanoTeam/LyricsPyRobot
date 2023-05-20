@@ -1,7 +1,9 @@
-from pyrogram import Client, filters
+from pyrogram import Client
 from pyrogram.types import (
+    ChosenInlineResult,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    InlineQuery,
     InlineQueryResultArticle,
     InputTextMessageContent,
 )
@@ -15,7 +17,7 @@ from utils import get_current, get_spoti_session, musixmatch
 
 @Client.on_inline_query(group=1)
 @use_chat_lang()
-async def inline(c, m, t):
+async def inline(c: Client, m: InlineQuery, t):
     print(m.query)
     tk = db.get(m.from_user.id)
     articles = []
@@ -95,7 +97,7 @@ async def inline(c, m, t):
 
 @Client.on_chosen_inline_result()
 @use_chat_lang()
-async def choosen(c, m, t):
+async def choosen(c: Client, m: ChosenInlineResult, t):
     if m.result_id == "MySpotify":
         return
     if m.result_id[0] == "s" or m.result_id[0] == "l":

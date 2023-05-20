@@ -1,5 +1,12 @@
+from typing import Union
+
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import (
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
 
 from locales import use_chat_lang
 
@@ -7,7 +14,7 @@ from locales import use_chat_lang
 @Client.on_message(filters.command("start"))
 @Client.on_callback_query(filters.regex(r"start_back"))
 @use_chat_lang()
-async def start(c, m, t):
+async def start(c: Client, m: Union[CallbackQuery, Message], t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -18,7 +25,7 @@ async def start(c, m, t):
             ]
         ]
     )
-    if isinstance(m, filters.CallbackQuery):
+    if isinstance(m, CallbackQuery):
         await m.edit_message_text(text=t("start"), reply_markup=keyboard)
     else:
         await m.reply_text(t("start"), reply_markup=keyboard)
@@ -26,5 +33,5 @@ async def start(c, m, t):
 
 @Client.on_message(filters.command("help"))
 @use_chat_lang()
-async def help(c, m, t):
+async def help(c: Client, m: Message, t):
     await m.reply_text(t("help"))

@@ -2,12 +2,12 @@ import re
 from functools import partial
 
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
 import db
-from config import sudos, login_url
+from config import login_url, sudos
 from locales import default_language, get_locale_string, langdict, use_chat_lang
-from utils import letras, musixmatch, get_spoti_session
+from utils import get_spoti_session, letras, musixmatch
 
 # + original, - traduzido, _ telegraph
 
@@ -39,7 +39,7 @@ def gen_langs_kb():
 
 @Client.on_callback_query(filters.regex(r"^(_\+)"))
 @use_chat_lang()
-async def teor(c, m, t):
+async def teor(c: Client, m: CallbackQuery, t):
     user, hash = m.data[2:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         print(hash)
@@ -97,7 +97,7 @@ async def teor(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"^(_\-)"))
 @use_chat_lang()
-async def tetr(c, m, t):
+async def tetr(c: Client, m: CallbackQuery, t):
     user, hash = m.data[2:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
@@ -144,7 +144,7 @@ async def tetr(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"^(\+)"))
 @use_chat_lang()
-async def ori(c, m, t):
+async def ori(c: Client, m: CallbackQuery, t):
     user, hash = m.data[1:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
@@ -204,7 +204,7 @@ async def ori(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"^(\-)"))
 @use_chat_lang()
-async def tr(c, m, t):
+async def tr(c: Client, m: CallbackQuery, t):
     user, hash = m.data[1:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
@@ -242,9 +242,9 @@ async def tr(c, m, t):
             trad = await musixmatch.translation(hash, "pt", a["letra"])
             print(trad)
             await m.edit_message_text(
-                "[{} - {}]({})\n{}".format(
-                    a["musica"], a["autor"], a["link"], trad
-                )[:4096],
+                "[{} - {}]({})\n{}".format(a["musica"], a["autor"], a["link"], trad)[
+                    :4096
+                ],
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
@@ -255,13 +255,17 @@ async def tr(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"settings"))
 @use_chat_lang()
-async def settings(c, m, t):
+async def settings(c: Client, m: CallbackQuery, t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=t("np_settings"), callback_data="theme")]+
-            [InlineKeyboardButton(text=t("language"), callback_data="language")],
-            [InlineKeyboardButton(text=t("spotify"), callback_data="spotify_st")]+
-            [InlineKeyboardButton(text=t("back"), callback_data="start_back")]
+            [
+                InlineKeyboardButton(text=t("np_settings"), callback_data="theme"),
+                InlineKeyboardButton(text=t("language"), callback_data="language"),
+            ],
+            [
+                InlineKeyboardButton(text=t("spotify"), callback_data="spotify_st"),
+                InlineKeyboardButton(text=t("back"), callback_data="start_back"),
+            ],
         ]
     )
     await m.edit_message_text(t("settings_txt"), reply_markup=keyboard)
@@ -269,7 +273,7 @@ async def settings(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"language"))
 @use_chat_lang()
-async def lang(c, m, t):
+async def lang(c: Client, m: CallbackQuery, t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             *gen_langs_kb(),
@@ -281,7 +285,7 @@ async def lang(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"theme|pattern"))
 @use_chat_lang()
-async def theme(c, m, t):
+async def theme(c: Client, m: CallbackQuery, t):
     a = db.theme(m.from_user.id)
     print(a)
     if a[0] is None or "_" in m.data and a[0]:
@@ -340,31 +344,33 @@ async def theme(c, m, t):
     db.def_theme(m.from_user.id, tid, bid, pid, sid)
     await m.edit_message_text(t("np_settings_txt"), reply_markup=keyboard)
 
+
 @Client.on_callback_query(filters.regex(r"spotify_st"))
 @use_chat_lang()
-async def spotify_st(c, m, t):
-    text = t('spotify')+'\n\n'
-    
+async def spotify_st(c: Client, m: CallbackQuery, t):
+    text = t("spotify") + "\n\n"
+
     tk = db.get(m.from_user.id)
     if not tk or not tk[0]:
-        text += t('nologged')
+        text += t("nologged")
     else:
         sp = await get_spoti_session(m.from_user.id)
         profile = sp.current_user()
-        text += t('logged').format(name=profile["display_name"])
-    
+        text += t("logged").format(name=profile["display_name"])
+
     kb = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [InlineKeyboardButton(text=t("login"),url=login_url)],
-                    [InlineKeyboardButton(text=t("back"), callback_data="settings")]
-                ]
-            )
-    
+        inline_keyboard=[
+            [InlineKeyboardButton(text=t("login"), url=login_url)],
+            [InlineKeyboardButton(text=t("back"), callback_data="settings")],
+        ]
+    )
+
     await m.edit_message_text(text, reply_markup=kb)
+
 
 @Client.on_callback_query(filters.regex("^set_lang "))
 @use_chat_lang()
-async def set_user_lang(c, m, f):
+async def set_user_lang(c: Client, m: CallbackQuery, f):
     lang = m.data.split()[1]
     db.db_set_lang(m.from_user.id, lang)
     strings = partial(

@@ -5,8 +5,6 @@ from functools import partial, wraps
 from glob import glob
 from typing import Dict, List
 
-from pyrogram.types import CallbackQuery
-
 import db
 
 enabled_locales = [

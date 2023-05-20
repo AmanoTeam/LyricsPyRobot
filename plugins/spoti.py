@@ -1,18 +1,23 @@
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.enums.parse_mode import ParseMode
+from pyrogram.types import (
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
 
 import db
+from config import login_url
 from locales import use_chat_lang
 from utils import get_song_art, get_spoti_session, get_token
-from config import login_url
 
 from .letra import letra
 
 
 @Client.on_message(filters.command("spoti") | filters.command("np"))
 @use_chat_lang()
-async def spoti(c, m, t):
+async def spoti(c: Client, m: Message, t):
     text = m.text.split(" ", 1)
     if len(text) == 2:
         if "code=" in text[1]:
@@ -49,11 +54,13 @@ async def spoti(c, m, t):
                     publi = spotify_json["item"]["artists"][0]["name"]
                 else:
                     publi = spotify_json["item"]["show"]["name"]
-                if stick == None or stick:
+                if stick is None or stick:
                     album_art = await get_song_art(
                         song_name=spotify_json["item"]["name"],
                         artist=publi,
-                        album_url=spotify_json["item"]["album"]["images"][0]["url"] if "album" in spotify_json["item"] else spotify_json["item"]["images"][0]["url"],
+                        album_url=spotify_json["item"]["album"]["images"][0]["url"]
+                        if "album" in spotify_json["item"]
+                        else spotify_json["item"]["images"][0]["url"],
                         duration=spotify_json["item"]["duration_ms"] // 1000,
                         progress=spotify_json["progress_ms"] // 1000,
                         color="dark" if db.theme(m.from_user.id)[0] else "light",
@@ -89,7 +96,7 @@ async def spoti(c, m, t):
                             ],
                         ]
                     )
-                    if stick == None or stick:
+                    if stick is None or stick:
                         await m.reply_document(
                             album_art, reply_markup=kb, caption=mtext
                         )
@@ -100,7 +107,7 @@ async def spoti(c, m, t):
                             parse_mode=ParseMode.HTML,
                         )
                 else:
-                    if stick == None or stick:
+                    if stick is None or stick:
                         await m.reply_document(album_art, caption=mtext)
                     else:
                         await m.reply(
@@ -112,7 +119,7 @@ async def spoti(c, m, t):
 
 
 @Client.on_callback_query(filters.regex(r"^sp_s"))
-async def sp_search(c, m):
+async def sp_search(c: Client, m: CallbackQuery):
     track, uid = m.data.split("|")[1:]
     if m.from_user.id == int(uid):
         sess = await get_spoti_session(m.from_user.id)
@@ -125,7 +132,7 @@ async def sp_search(c, m):
 
 @Client.on_callback_query(filters.regex(r"^tcs"))
 @use_chat_lang()
-async def tcs(c, m, t):
+async def tcs(c: Client, m: CallbackQuery, t):
     sess = await get_spoti_session(m.from_user.id)
     sess.add_to_queue(uri=f'spotify:track:{m.data.split("|")[1]}')
     await m.answer(t("song_added"))
@@ -133,7 +140,7 @@ async def tcs(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"^previous"))
 @use_chat_lang()
-async def previous(c, m, t):
+async def previous(c: Client, m: CallbackQuery, t):
     user = m.data.split("|")[1]
     if m.from_user.id == int(user):
         sess = await get_spoti_session(m.from_user.id)
@@ -184,9 +191,7 @@ async def previous(c, m, t):
                 parse_mode=ParseMode.HTML,
             )
         else:
-            await m.answer(
-                f"🎵 {publi} - {spotify_json['item']['name']}"
-            )
+            await m.answer(f"🎵 {publi} - {spotify_json['item']['name']}")
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
@@ -194,7 +199,7 @@ async def previous(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"^next"))
 @use_chat_lang()
-async def next(c, m, t):
+async def next(c: Client, m: CallbackQuery, t):
     user = m.data.split("|")[1]
     if m.from_user.id == int(user):
         sess = await get_spoti_session(m.from_user.id)
@@ -233,7 +238,7 @@ async def next(c, m, t):
                 ],
             ]
         )
-        
+
         if "artists" in spotify_json["item"]:
             publi = spotify_json["item"]["artists"][0]["name"]
         else:
@@ -246,9 +251,7 @@ async def next(c, m, t):
                 parse_mode=ParseMode.HTML,
             )
         else:
-            await m.answer(
-                f"🎵 {publi} - {spotify_json['item']['name']}"
-            )
+            await m.answer(f"🎵 {publi} - {spotify_json['item']['name']}")
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
@@ -256,7 +259,7 @@ async def next(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"^(pause|play)"))
 @use_chat_lang()
-async def ppa(c, m, t):
+async def ppa(c: Client, m: CallbackQuery, t):
     cmd, user = m.data.split("|")
     if m.from_user.id == int(user):
         sess = await get_spoti_session(m.from_user.id)
@@ -298,7 +301,7 @@ async def ppa(c, m, t):
                 ],
             ]
         )
-        
+
         if "artists" in spotify_json["item"]:
             publi = spotify_json["item"]["artists"][0]["name"]
         else:

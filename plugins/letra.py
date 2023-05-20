@@ -1,7 +1,7 @@
 import re
 
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 import db
 from locales import use_chat_lang
@@ -12,7 +12,7 @@ from utils import letras, musixmatch
 
 @Client.on_message(filters.command(["lyrics", "letra"]))
 @use_chat_lang()
-async def letra(c, m, t):
+async def letra(c: Client, m: Message, t):
     text = m.text.split(" ", 1)[1]
     if not text:
         await m.reply_text(t("use"))

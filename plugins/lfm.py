@@ -1,6 +1,7 @@
 import re
 
 from pyrogram import Client, filters
+from pyrogram.types import Message
 
 import db
 from locales import use_chat_lang
@@ -13,7 +14,7 @@ LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
 @Client.on_message(filters.command("lfm"))
 @use_chat_lang()
-async def lfm(c, m, t):
+async def lfm(c: Client, m: Message, t):
     text = m.text.split(" ", 1)
     print(text)
     if len(text) == 2:
@@ -34,7 +35,7 @@ async def lfm(c, m, t):
 
                 stick = db.theme(m.from_user.id)[3]
                 mtext = f"🎵 {a[0]['artist']['#text']} - {a[0]['name']}"
-                if stick == None or stick:
+                if stick is None or stick:
                     album_url = a[0]["image"][-1]["#text"]
                     if not album_url:
                         # if not present in api return, try to get album url from page
