@@ -33,6 +33,7 @@ async def spoti(c, m, t):
             print(usr.type)
             if usr.id == m.from_user.id or (usr.type == ChatType.PRIVATE and xm and xm[0] == 1):
                 tk = db.get(usr.id)
+                m.from_user.id = usr.id
             elif usr.type == ChatType.PRIVATE and xm and xm[0] == 0:
                 return await m.reply_text(t("not_aproved"))
             else:
