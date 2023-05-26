@@ -143,10 +143,12 @@ async def spoti(c, m, t):
 async def aprova(c, m):
     uid = m.data.split("|")[1]
     db.add_aproved(m.from_user.id, uid, True)
+    await c.send_message(uid, f"O {m.from_user.first_name} aprovou seu acesso")
     await m.edit_message_text("Aprovado com sucesso")
 
 @Client.on_callback_query(filters.regex(r"^negar"))
 async def negar(c, m):
+    await c.send_message(m.data.split("|")[1], f"O {m.from_user.first_name} negou seu acesso")
     await m.edit_message_text("Negado com sucesso")
 
 @Client.on_callback_query(filters.regex(r"^sp_s"))
