@@ -38,6 +38,25 @@ dbc.execute(
                                          tlt)"""
 )
 
+dbc.execute(
+    """CREATE TABLE IF NOT EXISTS aproved (user_id INTEGER,
+                                           user INTEGER,
+                                           aproved INTEGER)"""
+)
+
+def add_aproved(user_id, user, aproved):
+    if get_aproved(user_id, user):
+        dbc.execute("UPDATE aproved SET aproved = ? WHERE user_id = ? AND user = ?", (aproved, user_id, user))
+    else:
+        dbc.execute("INSERT INTO aproved (user_id, user, aproved) VALUES (?,?,?)", (user_id, user, aproved))
+    db.commit()
+
+def get_aproved(user_id, user):
+    dbc.execute("SELECT aproved FROM aproved WHERE user_id = (?) AND user = (?)", (user_id, user))
+    try:
+        return dbc.fetchone()
+    except IndexError:
+        return None
 
 def add_hash(hash, h):
     dbc.execute("SELECT url FROM saves WHERE hash = (?)", (hash,))

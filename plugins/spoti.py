@@ -1,6 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.enums.parse_mode import ParseMode
+from pyrogram.enums import ChatType
 
 import db
 from locales import use_chat_lang
@@ -14,7 +15,7 @@ from .letra import letra
 @use_chat_lang()
 async def spoti(c, m, t):
     text = m.text.split(" ", 1)
-    if len(text) == 2:
+    if len(text) == 2 and text[0] == "/spoti":
         if "code=" in text[1]:
             access_code = text[1].split("code=")[1]
         else:
@@ -25,7 +26,35 @@ async def spoti(c, m, t):
         else:
             await m.reply_text(t("error").format(error=res[1]))
     else:
-        tk = db.get(m.from_user.id)
+        if len(text) == 2:
+            usr = await c.get_chat(text[1])
+            print(usr.id, m.from_user.id)
+            xm = db.get_aproved(usr.id, m.from_user.id)
+            print(usr.type)
+            if usr.id == m.from_user.id or (usr.type == ChatType.PRIVATE and xm and xm[0] == 1):
+                tk = db.get(usr.id)
+            elif usr.type == ChatType.PRIVATE and xm and xm[0] == 0:
+                return await m.reply_text(t("not_aproved"))
+            else:
+                kb = InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [
+                            InlineKeyboardButton(
+                                text="Aprovar acesso",
+                                callback_data=f"aprova|{m.from_user.id}",
+                            ),
+                            InlineKeyboardButton(
+                                text="Negar acesso",
+                                callback_data=f"negar|{m.from_user.id}",
+                            ),
+                        ]
+                    ]
+                )
+                db.add_aproved(usr.id, m.from_user.id, False)
+                await m.reply(f"Olá, o {m.from_user.first_name} quer acessar seu spotify", reply_markup=kb)
+                return await m.reply(f"Você não foi aprovado, pedindo para {usr.first_name} aprovar...")
+        else:
+            tk = db.get(m.from_user.id)
         if not tk or not tk[0]:
             kb = InlineKeyboardMarkup(
                 inline_keyboard=[
@@ -110,6 +139,15 @@ async def spoti(c, m, t):
                     m.text = f"/letra {spotify_json['item']['artists'][0]['name']} {spotify_json['item']['name']}"
                     await letra(c, m)
 
+@Client.on_callback_query(filters.regex(r"^aprova"))
+async def aprova(c, m):
+    uid = m.data.split("|")[1]
+    db.add_aproved(m.from_user.id, uid, True)
+    await m.edit_message_text("Aprovado com sucesso")
+
+@Client.on_callback_query(filters.regex(r"^negar"))
+async def negar(c, m):
+    await m.edit_message_text("Negado com sucesso")
 
 @Client.on_callback_query(filters.regex(r"^sp_s"))
 async def sp_search(c, m):
