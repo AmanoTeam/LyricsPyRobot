@@ -51,7 +51,7 @@ async def spoti(c, m, t):
                     ]
                 )
                 db.add_aproved(usr.id, m.from_user.id, False)
-                await m.reply(f"Olá, o {m.from_user.first_name} quer acessar seu spotify", reply_markup=kb)
+                await c.send_message(usr.id, f"Olá, o {m.from_user.first_name} quer acessar seu spotify", reply_markup=kb)
                 return await m.reply(f"Você não foi aprovado, pedindo para {usr.first_name} aprovar...")
         else:
             tk = db.get(m.from_user.id)
