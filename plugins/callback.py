@@ -317,7 +317,7 @@ async def np_apvu(c, m, t):
     pg = pg.split("pg")[1]
     app = db.get_aproved(m.from_user.id, id)
     if app:
-        appv = "1" if app[0] == 0 or app[0] == 3 else "2"
+        appv = "1" if app[0] == 0 or app[0] == 2 else "2"
         db.add_aproved(m.from_user.id, id, appv)
         m.data = f"np_apv_pg{pg}"
         await np_apv(c, m)
