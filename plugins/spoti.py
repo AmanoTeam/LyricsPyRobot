@@ -36,6 +36,8 @@ async def spoti(c, m, t):
                 m.from_user.id = usr.id
             elif usr.type == ChatType.PRIVATE and xm and xm[0] == 0:
                 return await m.reply_text(t("not_aproved"))
+            elif usr.type == ChatType.PRIVATE and xm and xm[0] == 2:
+                return await m.reply_text(t("blocked"))
             else:
                 kb = InlineKeyboardMarkup(
                     inline_keyboard=[
