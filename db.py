@@ -58,6 +58,13 @@ def get_aproved(user_id, user):
     except IndexError:
         return None
 
+def get_all_aproved(user_id):
+    dbc.execute("SELECT *, aproved FROM aproved WHERE user_id = (?)", (user_id,))
+    try:
+        return dbc.fetchall()
+    except IndexError:
+        return None
+
 def add_hash(hash, h):
     dbc.execute("SELECT url FROM saves WHERE hash = (?)", (hash,))
     try:

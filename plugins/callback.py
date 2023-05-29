@@ -3,6 +3,7 @@ from functools import partial
 
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyromod.helpers import ikb
 
 import db
 from config import sudos, login_url
@@ -261,11 +262,65 @@ async def settings(c, m, t):
             [InlineKeyboardButton(text=t("np_settings"), callback_data="theme")]+
             [InlineKeyboardButton(text=t("language"), callback_data="language")],
             [InlineKeyboardButton(text=t("spotify"), callback_data="spotify_st")]+
+            [InlineKeyboardButton(text=t("np_apv"), callback_data="np_apv_pg0")],
             [InlineKeyboardButton(text=t("back"), callback_data="start_back")]
         ]
     )
     await m.edit_message_text(t("settings_txt"), reply_markup=keyboard)
 
+@Client.on_callback_query(filters.regex(r"np_apv_pg"))
+@use_chat_lang()
+async def np_apv(c, m, t):
+    pg = m.data.split("pg")[1]
+    ids = db.get_all_aproved(m.from_user.id)
+    table = []
+    row = []
+    for i, id in enumerate(ids):
+        if i % 3 == 0 and i != 0:
+            table.append(row)
+            row = []
+        usr = await c.get_chat(id[1])
+        if id[2] == 1:
+            emoji = "✅"
+        elif id[2] == 0:
+            emoji = "❓"
+        else:
+            emoji = "❌"
+        row.append(usr.first_name + emoji, f"np_apvu_{id[1]}_pg{pg}")
+    table.append(row)
+    
+    tabela = []
+    for i in range(0, len(table), 3):
+        tabela.append(table[i:i+3])
+
+    extra = []
+
+    if int(pg) != 0:
+        extra.append(("back", f"np_apv_pg{int(pg)-1}"))
+    
+    extra.append(("close", "settings"))
+
+    if len(tabela)-int(pg) > 1:
+        extra.append(("next", f"np_apv_pg{int(pg)+1}"))
+    
+    keyb = tabela[int(pg)]
+    keyb.append(extra)
+
+    print(keyb)
+
+    await m.edit_message_text(t("np_apv_txt"), reply_markup = ikb(keyb))
+
+@Client.on_callback_query(filters.regex(r"np_apvu"))
+@use_chat_lang()
+async def np_apvu(c, m, t):
+    id, pg = m.data.split("_")[2:]
+    pg = pg.split("pg")[1]
+    app = db.get_aproved(m.from_user.id, id)
+    if app:
+        appv = "1" if app[0] == 0 or app[0] == 3 else "2"
+        db.add_aproved(m.from_user.id, id, appv)
+        m.data = f"np_apv_pg{pg}"
+        await np_apv(c, m)
 
 @Client.on_callback_query(filters.regex(r"language"))
 @use_chat_lang()
