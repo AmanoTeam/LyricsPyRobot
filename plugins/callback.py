@@ -286,7 +286,7 @@ async def np_apv(c, m, t):
             emoji = "❓"
         else:
             emoji = "❌"
-        row.append(usr.first_name + emoji, f"np_apvu_{id[1]}_pg{pg}")
+        row.append((usr.first_name + emoji, f"np_apvu_{id[1]}_pg{pg}"))
     table.append(row)
     
     tabela = []
