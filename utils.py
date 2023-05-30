@@ -134,8 +134,10 @@ async def refresh_token(user_id):
     return b["access_token"]
 
 
-async def get_spoti_session(user_id) -> dict:
+async def get_spoti_session(user_id) -> Union[spotipy.Spotify, bool]:
     tk = db.get(user_id)
+    if not tk:
+        return False
     a = spotipy.Spotify(auth=tk[0])
     try:
         a.devices()
