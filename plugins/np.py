@@ -151,6 +151,7 @@ async def aprova(c, m, t):
 @use_chat_lang()
 async def negar(c, m, t):
     uid = m.data.split("|")[1]
+    db.add_aproved(m.from_user.id, uid, 2)
     usr = await c.get_users(uid)
     ut = use_user_lang(usr.id)
     await c.send_message(uid, ut("denied").format(first_name=m.from_user.first_name))
