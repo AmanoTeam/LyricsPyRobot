@@ -77,7 +77,7 @@ async def np(c, m, t):
         else:
             return await m.reply(
                 mtext,
-                parse_mode="html",
+                parse_mode=ParseMode.HTML,
             )
 
     spotify_json = sess.current_playback(additional_types="episode,track")
