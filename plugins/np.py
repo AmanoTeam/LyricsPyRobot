@@ -38,9 +38,9 @@ async def np(c, m, t):
                 ]
             )
             db.add_aproved(usr.id, m.from_user.id, False)
-            await c.send_message(usr.id, t("aprrovedu").format(user=m.from_user.first_name),
+            await c.send_message(usr.id, t("aprrovedu").format(name=m.from_user.first_name),
                                  reply_markup=kb)
-            return await m.reply(t("approvedr").format(user=usr.first_name))
+            return await m.reply(t("approvedr").format(name=usr.first_name))
     sess = await get_spoti_session(m.from_user.id)
     if not sess or sess.current_playback() == None:
         tk = db.get(m.from_user.id)
