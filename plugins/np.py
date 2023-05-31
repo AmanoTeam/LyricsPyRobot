@@ -4,7 +4,7 @@ from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.enums import ChatType
 
 import db
-from locales import use_chat_lang
+from locales import use_chat_lang, use_user_lang
 from utils import get_song_art, get_spoti_session, get_current, get_track_info, http_pool
 
 from .letra import letra
@@ -16,29 +16,32 @@ async def np(c, m, t):
     if len(text) == 2:
         usr = await c.get_chat(text[1])
         xm = db.get_aproved(usr.id, m.from_user.id)
-        if usr.id == m.from_user.id or (usr.type == ChatType.PRIVATE and xm and xm[0] == 1):
+        if usr.type != ChatType.PRIVATE:
+            return await m.reply_text(t("only_users"))
+        if usr.id == m.from_user.id or (xm and xm[0] == 1):
             m.from_user.id = usr.id
-        elif usr.type == ChatType.PRIVATE and xm and xm[0] == 0:
+        elif xm and xm[0] == 0:
             return await m.reply_text(t("not_aproved").format(first_name=usr.first_name))
-        elif usr.type == ChatType.PRIVATE and xm and xm[0] == 2:
+        elif xm and xm[0] == 2:
             return await m.reply_text(t("blocked").format(first_name=usr.first_name))
         else:
+            ut = use_user_lang(usr.id)
             kb = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text="Aprovar acesso",
+                            text=ut("aprove"),
                             callback_data=f"aprova|{m.from_user.id}",
                         ),
                         InlineKeyboardButton(
-                            text="Negar acesso",
+                            text=ut("deny"),
                             callback_data=f"negar|{m.from_user.id}",
                         ),
                     ]
                 ]
             )
             db.add_aproved(usr.id, m.from_user.id, False)
-            await c.send_message(usr.id, t("aprrovedu").format(name=m.from_user.first_name),
+            await c.send_message(usr.id, ut("aprrovedu").format(name=m.from_user.first_name),
                                  reply_markup=kb)
             return await m.reply(t("approvedr").format(name=usr.first_name))
     sess = await get_spoti_session(m.from_user.id)
@@ -140,7 +143,8 @@ async def aprova(c, m, t):
     uid = m.data.split("|")[1]
     db.add_aproved(m.from_user.id, uid, True)
     usr = await c.get_users(uid)
-    await c.send_message(uid, t("aproved").format(first_name=m.from_user.first_name))
+    ut = use_user_lang(usr.id)
+    await c.send_message(uid, ut("aproved").format(first_name=m.from_user.first_name))
     await m.edit_message_text(t("saproved").format(first_name=usr.first_name))
 
 @Client.on_callback_query(filters.regex(r"^negar"))
@@ -148,7 +152,8 @@ async def aprova(c, m, t):
 async def negar(c, m, t):
     uid = m.data.split("|")[1]
     usr = await c.get_users(uid)
-    await c.send_message(uid, t("denied").format(first_name=m.from_user.first_name))
+    ut = use_user_lang(usr.id)
+    await c.send_message(uid, ut("denied").format(first_name=m.from_user.first_name))
     await m.edit_message_text(t("sdenied").format(first_name=usr.first_name))
 
 @Client.on_callback_query(filters.regex(r"^sp_s"))

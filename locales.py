@@ -50,10 +50,9 @@ def get_locale_string(
     return res
 
 
-def get_lang(message) -> str:
-    chat = message.from_user
+def get_lang(cid) -> str:
 
-    lang = db.db_get_lang(chat.id)
+    lang = db.db_get_lang(cid)
 
     lang = lang[0] if lang and lang[0] else default_language
 
@@ -77,7 +76,8 @@ def use_chat_lang(context=None):
     def decorator(func):
         @wraps(func)
         async def wrapper(client, message):
-            lang = get_lang(message)
+            cid = message.from_user.id
+            lang = get_lang(cid)
 
             dic = langdict.get(lang, langdict[default_language])
 
@@ -87,3 +87,14 @@ def use_chat_lang(context=None):
         return wrapper
 
     return decorator
+
+def use_user_lang(cid, context=None):
+    lang = get_lang(cid)
+    
+    if not context:
+        frame = inspect.stack()[1]
+        context = frame[0].f_code.co_filename.split(os.path.sep)[-1].split(".")[0]
+
+    dic = langdict.get(lang, langdict[default_language])
+    lf = partial(get_locale_string, dic.get(context, {}), lang, context)
+    return lf
