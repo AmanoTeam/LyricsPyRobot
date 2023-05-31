@@ -23,5 +23,7 @@
     "Spotify": "Configurações do Spotify",
     "nologged": "Você não está logado no Spotify\nUse o botão abaixo para entrar. Em seguida, copie o comando e envie aqui.",
     "logged": "Você está logado com: {name}\n\nAltere suas configurações de login abaixo:",
-    "login": "Login"
+    "login": "Login",
+    "np_apv": "\"Aprovações do NP",
+    "np_apv_txt": "Escolha os usuários aprovados para seu Now Playing:"
 }
