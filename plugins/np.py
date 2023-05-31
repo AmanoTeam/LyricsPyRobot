@@ -140,15 +140,16 @@ async def aprova(c, m, t):
     uid = m.data.split("|")[1]
     db.add_aproved(m.from_user.id, uid, True)
     usr = await c.get_users(uid)
-    await c.send_message(uid, t("aproved").format(m.from_user.first_name))
-    await m.edit_message_text(t("saproved").format(usr.first_name))
+    await c.send_message(uid, t("aproved").format(first_name=m.from_user.first_name))
+    await m.edit_message_text(t("saproved").format(first_name=usr.first_name))
 
 @Client.on_callback_query(filters.regex(r"^negar"))
-async def negar(c, m):
+@use_chat_lang()
+async def negar(c, m, t):
     uid = m.data.split("|")[1]
     usr = await c.get_users(uid)
-    await c.send_message(uid, t("denied").format(m.from_user.first_name))
-    await m.edit_message_text(t("sdenied").format(usr.first_name))
+    await c.send_message(uid, t("denied").format(first_name=m.from_user.first_name))
+    await m.edit_message_text(t("sdenied").format(first_name=usr.first_name))
 
 @Client.on_callback_query(filters.regex(r"^sp_s"))
 async def sp_search(c, m):
