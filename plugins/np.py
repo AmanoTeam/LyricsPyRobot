@@ -13,12 +13,14 @@ from .letra import letra
 @use_chat_lang()
 async def np(c, m, t):
     text = m.text.split(" ", 1)
+    duid = m.from_user.id
     if len(text) == 2:
         usr = await c.get_chat(text[1])
         xm = db.get_aproved(usr.id, m.from_user.id)
         if usr.type != ChatType.PRIVATE:
             return await m.reply_text(t("only_users"))
         if usr.id == m.from_user.id or (xm and xm[0] == 1):
+            duid = m.from_user.id
             m.from_user.id = usr.id
         elif xm and xm[0] == 0:
             return await m.reply_text(t("not_aproved").format(first_name=usr.first_name))
@@ -53,7 +55,7 @@ async def np(c, m, t):
         if not a:
             return await m.reply_text(t("not_playing"))
         track_info = await get_track_info(tk[2], a[0]["artist"]["#text"], a[0]["name"])
-        stick = db.theme(m.from_user.id)[3]
+        stick = db.theme(duid)[3]
         mtext = f"🎵 {a[0]['artist']['#text']} - {a[0]['name']}"
         if stick == None or stick:
             album_url = a[0]["image"][-1]["#text"]
@@ -69,8 +71,8 @@ async def np(c, m, t):
                 song_name=a[0]["name"],
                 artist=a[0]["artist"]["#text"],
                 album_url=album_url,
-                color="dark" if db.theme(m.from_user.id)[0] else "light",
-                blur=db.theme(m.from_user.id)[1],
+                color="dark" if db.theme(duid)[0] else "light",
+                blur=db.theme(duid)[1],
                 scrobbles=track_info["track"]["userplaycount"],
             )
             return await m.reply_document(album_art, caption=mtext)
@@ -81,7 +83,7 @@ async def np(c, m, t):
             )
 
     spotify_json = sess.current_playback(additional_types="episode,track")
-    stick = db.theme(m.from_user.id)[3]
+    stick = db.theme(duid)[3]
     if "artists" in spotify_json["item"]:
         publi = spotify_json["item"]["artists"][0]["name"]
     else:
@@ -93,8 +95,8 @@ async def np(c, m, t):
             album_url=spotify_json["item"]["album"]["images"][0]["url"] if "album" in spotify_json["item"] else spotify_json["item"]["images"][0]["url"],
             duration=spotify_json["item"]["duration_ms"] // 1000,
             progress=spotify_json["progress_ms"] // 1000,
-            color="dark" if db.theme(m.from_user.id)[0] else "light",
-            blur=db.theme(m.from_user.id)[1],
+            color="dark" if db.theme(duid)[0] else "light",
+            blur=db.theme(duid)[1],
         )
     mtext = f"🎵 {publi} - {spotify_json['item']['name']}"
     kb = InlineKeyboardMarkup(
@@ -130,8 +132,12 @@ async def np(c, m, t):
             album_art, reply_markup=kb, caption=mtext
         )
     else:
+        time = "\n⏳ {t1} – {t1}".format(
+            t1=spotify_json["progress_ms"] // 1000,
+            t2=spotify_json["item"]["duration_ms"] // 1000
+        )
         await m.reply(
-            mtext,
+            mtext+time,
             reply_markup=kb,
             parse_mode=ParseMode.HTML,
         )
