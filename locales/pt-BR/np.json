@@ -1,1 +1,6 @@
-{}
+{
+    "play_in_sp": "Adicionar à Fila.",
+    "search_lyric": "Pesquisar letra.",
+    "song_added": "Música adicionada à fila.",
+    "not_allowed": "Você não pode mexer nisso, somente o {first_name} pode."
+}
