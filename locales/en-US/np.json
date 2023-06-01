@@ -12,5 +12,8 @@
     "song_added": "Song added to queue",
     "not_allowed": "You can't use this, only {first_name} can",
     "aprrovedu": "Hello, {name} wants to access your Spotify",
-    "approvedr": "You have not been approved, requesting {name} to approve..."
+    "approvedr": "You have not been approved, requesting {name} to approve...",
+    "only_users": "Please use this command only on users",
+    "aprove": "Approve access",
+    "deny": "Deny access"
 }
