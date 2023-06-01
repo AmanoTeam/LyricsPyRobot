@@ -12,5 +12,8 @@
     "song_added": "Canción añadida a la cola",
     "not_allowed": "No puedes usar esto, solo {first_name} puede",
     "aprrovedu": "Hola, {name} quiere acceder a tu cuenta de Spotify",
-    "approvedr": "No has sido aprobado, solicitando que {name} apruebe..."
+    "approvedr": "No has sido aprobado, solicitando que {name} apruebe...",
+    "only_users": "Por favor, utilice este comando sólo para usuarios",
+    "aprove": "Aprobar acceso",
+    "deny": "Denegar acceso"
 }
