@@ -1,0 +1,12 @@
+{
+    "my_spotify": "Spotify player",
+    "no_playng": "Calma aí, meu consagrado! Parece que a música deu uma pausa para tomar um cafézinho",
+    "play": "E aí, meu consagrado! Parece que o Spotify está meio tímido hoje, né? Mas não se preocupe, você pode dar um play na sua playlist e curtir o melhor da música! Afinal, quem precisa de recomendações quando se tem um gosto musical tão refinado, não é mesmo? Então bora lá, dê o play e deixe a música rolar!",
+    "top_button": "Mais Tocadas",
+    "top_text": "E aí, meu consagrado! Parece que você quer saber quais são as músicas mais tocadas pelo seu xará, hein? Pois bem, prepare-se para descobrir os maiores sucessos do momento! Afinal, quem sabe você não se inspira e começa a fazer sucesso também, né? Então, sem mais delongas, aqui estão as músicas mais tocadas por {name}\n\n",
+    "recent_button": "Tocado recentemente",
+    "recent_text": "E aí, meu consagrado! Parece que você quer saber o que o seu xará tem ouvido ultimamente, né? Pois bem, prepare-se para descobrir as últimas músicas que ele tem curtido! Quem sabe você não se identifica com alguma delas, né? Então, sem mais delongas, aqui estão as músicas reproduzidas recentemente por {name}\n\n",
+    "not_allowed": "Eita, meu consagrado, parece que você não tem permissão para usar isso não, viu? Só o {first_name} que pode mexer nesse trem aí. \nMelhor pedir a ajuda dele!",
+    "premium_only": "Ei, meu consagrado! Parece que você quer acessar uma função exclusiva do Spotify Premium, né? Infelizmente, eu não posso te ajudar com isso, afinal, essa é uma regalia reservada apenas para os usuários mais VIPs do serviço. Mas não fique triste, ainda tem muita coisa legal que você pode fazer por aqui!",
+    "song_added": "Ei, ei, ei! Parece que temos uma nova música na fila, hein?"
+}
