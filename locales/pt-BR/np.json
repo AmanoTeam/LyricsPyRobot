@@ -12,5 +12,8 @@
     "song_added": "Música adicionada à fila",
     "not_allowed": "Você não pode mexer nisso, somente o {first_name} pode",
     "aprrovedu": "Olá, {name} quer acessar seu Spotify",
-    "approvedr": "Você não foi aprovado, solicitando {name} para aprovar..."
+    "approvedr": "Você não foi aprovado, solicitando {name} para aprovar...",
+    "only_users": "Por favor, use este comando apenas em usuários",
+    "aprove": "Aprovar acesso",
+    "deny": "Negar acesso"
 }
