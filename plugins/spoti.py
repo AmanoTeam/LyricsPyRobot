@@ -39,7 +39,21 @@ async def spoti(c, m, t):
             )
             await m.reply_text(t("login_txt"), reply_markup=kb)
         else:
-            sess = await get_spoti_session(m.from_user.id)
+            try:
+                sess = await get_spoti_session(m.from_user.id)
+            except:
+                kb = InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [
+                            InlineKeyboardButton(
+                                text=t("login"),
+                                url=login_url,
+                            )
+                        ]
+                    ]
+                )
+                await m.reply_text(t("login_txt"), reply_markup=kb)
+                return
             spotify_json = sess.current_playback(additional_types="episode,track")
             if not spotify_json:
                 print("b")

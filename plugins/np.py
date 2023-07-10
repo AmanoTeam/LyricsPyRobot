@@ -46,7 +46,10 @@ async def np(c, m, t):
             await c.send_message(usr.id, ut("aprrovedu").format(name=m.from_user.first_name),
                                  reply_markup=kb)
             return await m.reply(t("approvedr").format(name=usr.first_name))
-    sess = await get_spoti_session(m.from_user.id)
+    try:
+        sess = await get_spoti_session(m.from_user.id)
+    except:
+        return await m.reply_text(t("not_logged"))
     if not sess or sess.current_playback() == None:
         tk = db.get(m.from_user.id)
         if not tk or not tk[2]:
