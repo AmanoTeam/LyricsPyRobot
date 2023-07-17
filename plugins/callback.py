@@ -9,6 +9,7 @@ import db
 from config import sudos, login_url
 from locales import default_language, get_locale_string, langdict, use_chat_lang
 from utils import letras, musixmatch, get_spoti_session
+from datetime import datetime
 
 # + original, - traduzido, _ telegraph
 
@@ -316,11 +317,41 @@ async def np_apvu(c, m, t):
     id, pg = m.data.split("_")[2:]
     pg = pg.split("pg")[1]
     app = db.get_aproved(m.from_user.id, id)
+    usr = await c.get_chat(id)
+    text = t("apuser").format(name=f"<a href='tg://user?id={usr.id}'>{usr.first_name}</a>")
+    keyb = []
+    if app and app[0] == 1:
+        if app[2]:
+            date1 = datetime.fromtimestamp(app[2]).strftime("%d/%m/%Y %H:%M:%S")
+        else:
+            date1 = "Nunca utilizado"
+        date2 = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
+        text += t("apuser_txt").format(data=date2.strftime("%d/%m/%Y %H:%M:%S"), data2=date1, count=app[1] if app[1] else "0")
+        keyb.append([(t("block"), f"np_apvt_{id}_pg{pg}")])
+    elif app and app[0] == 0:
+        date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
+        text += "Solicitado em: {data}".format(data=date.strftime("%d/%m/%Y %H:%M:%S"))
+        keyb.append([(t("aprove"), f"np_apvt_{id}_pg{pg}")])
+    elif app and app[0] == 2:
+        date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
+        text += "Reprovado em: {data}".format(data=date.strftime("%d/%m/%Y %H:%M:%S"))
+        keyb.append([(t("unblock"), f"np_apvt_{id}_pg{pg}")])
+    
+    keyb.append([(t("back"), f"np_apv_pg{pg}")])
+    
+    await m.edit_message_text(text, reply_markup=ikb(keyb))
+
+@Client.on_callback_query(filters.regex(r"np_apvt"))
+@use_chat_lang()
+async def np_apvt(c, m, t):
+    id, pg = m.data.split("_")[2:]
+    pg = pg.split("pg")[1]
+    app = db.get_aproved(m.from_user.id, id)
     if app:
         appv = "1" if app[0] == 0 or app[0] == 2 else "2"
-        db.add_aproved(m.from_user.id, id, appv)
-        m.data = f"np_apv_pg{pg}"
-        await np_apv(c, m)
+        db.add_aproved(m.from_user.id, id, appv, dates=datetime.now().timestamp(), usages=0)
+        m.data = f"np_apvu_{id}_pg{pg}"
+        await np_apvu(c, m)
 
 @Client.on_callback_query(filters.regex(r"language"))
 @use_chat_lang()
