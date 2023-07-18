@@ -21,6 +21,7 @@ async def np(c, m, t):
         if usr.type != ChatType.PRIVATE:
             return await m.reply_text(t("only_users"))
         if usr.id == m.from_user.id or (xm and xm[0] == 1):
+            xm[1] = 0 if not xm[1] else xm[1]
             db.add_aproved(usr.id, m.from_user.id, xm[0], usages=xm[1]+1, dates=datetime.now().timestamp())
             duid = m.from_user.id
             m.from_user.id = usr.id
