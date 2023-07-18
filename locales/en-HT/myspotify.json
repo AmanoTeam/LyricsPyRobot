@@ -1,1 +1,12 @@
-{}
+{
+    "my_spotify": "Download Spotify player.",
+    "no_playng": "There is no music",
+    "play": "How to stream Spotify for free?",
+    "top_button": "Family",
+    "top_text": "Best Song: {name}",
+    "recent_button": "~Very good",
+    "recent_text": "game {name}",
+    "not_allowed": "The file {first_name} does not exist.",
+    "premium_only": "Raw data from Spotify",
+    "song_added": "A place to listen to music"
+}
