@@ -14,7 +14,8 @@ enabled_locales = [
     "pt-BR",  # Portuguese (Brazil)
     "he-IL",  # Hebrew
     "es-ES",  # Spanish
-    "pt-BR2"  # Protugês zoeiro
+    "pt-BR2", # Protugês zoeiro
+    "en-HT"   # English HiperTranslate
 ]
 
 default_language = "en-US"
