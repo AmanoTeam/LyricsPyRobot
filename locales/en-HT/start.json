@@ -1,1 +1,6 @@
-{}
+{
+    "inline_btn": "Find a name",
+    "settings_btn": "School",
+    "start": "Get instant messages with Telegram.\n\n    - <i>More information</i>/Help\n\nUse the keyboard below to start your search.",
+    "help": "The bot will show songs that match your search criteria on Sixmatch.com.\n\nAs you can see (Spirobot et al."
+}
