@@ -25,5 +25,10 @@
     "logged": "Ei, {name}! Parece que você já está dentro do Spotify, hein! Mas se quiser mudar alguma coisa, é só mexer nas configurações abaixo:",
     "login": "Login",
     "np_apv": "Aprovações do NP",
-    "np_apv_txt": "Escolha os seus migos que vão poder ver o que você tá ouvindo:"
+    "np_apv_txt": "Escolha os seus migos que vão poder ver o que você tá ouvindo:",
+    "apuser": "Tretas sobre a aprovação do serumaninho {name}:\n\n",
+    "apuser_txt": "Carimbado em: {data}\nEnferrujado desde: {data2}\nQuantidade de gambiarras: {count}\"",
+    "block": "Não Passa",
+    "aprove": "Vamooo!",
+    "unblock": "Libera a passagem"
 }
