@@ -25,5 +25,10 @@
     "logged": "You are logged in with: {name}\n\nChange your login settings bellow:",
     "login": "Login",
     "np_apv": "NP approvals",
-    "np_apv_txt": "Choose approved users for your Now Playing:"
+    "np_apv_txt": "Choose approved users for your Now Playing:",
+    "apuser": "Information about user {name}'s approval:\n\n",
+    "apuser_txt": "Approved on: {data}\nLast used on: {data2}\nNumber of uses: {count}",
+    "block": "Block",
+    "aprove": "Approve",
+    "unblock": "Unblock"
 }
