@@ -1,0 +1,9 @@
+{
+    "no_playng": "Non se reproduce música",
+    "top_button": "Máis Tocadas",
+    "recent_button": "Reproducido recentemente",
+    "recent_text": "Reproducido recentemente por {name}\n\n",
+    "not_allowed": "Non podes usar isto, só {first_name} pode",
+    "premium_only": "Función exclusiva para Spotify Premium",
+    "song_added": "Engadiuse música á cola"
+}
