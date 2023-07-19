@@ -12,7 +12,7 @@ from utils import get_current, get_spoti_session, musixmatch
 
 # + original, - traduzido, _ telegraph
 
-
+"""
 @Client.on_inline_query(group=1)
 @use_chat_lang()
 async def inline(c, m, t):
@@ -91,7 +91,7 @@ async def inline(c, m, t):
                 )
     db.tem(m.from_user.id, r)
     await m.answer(articles)
-
+"""
 
 @Client.on_chosen_inline_result()
 @use_chat_lang()

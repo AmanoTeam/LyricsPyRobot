@@ -18,7 +18,7 @@ import re
 
 LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
-@Client.on_inline_query(filters.regex(r"^my"), group=0)
+@Client.on_inline_query(group=0)
 @use_chat_lang()
 async def my_spotify(c, m, t):
     sess = await get_spoti_session(m.from_user.id)
