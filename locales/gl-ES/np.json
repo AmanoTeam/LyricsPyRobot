@@ -1,0 +1,6 @@
+{
+    "not_aproved": "Vostede foi aprobado. Contacta con {first_name} para ser aprobado",
+    "blocked": "Bloqueáronte. Contacta con {first_name} para desbloquealo",
+    "aprove": "Aprobar acceso",
+    "deny": "Denegar o acceso"
+}
