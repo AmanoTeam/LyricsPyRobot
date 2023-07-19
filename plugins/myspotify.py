@@ -4,23 +4,39 @@ from pyrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQueryResultArticle,
+    InlineQueryResultCachedDocument,
     InputTextMessageContent,
 )
 
 import asyncio
 import db
 import datetime
-from utils import get_spoti_session
+from utils import get_spoti_session, get_current, get_track_info, http_pool, get_song_art
 from locales import use_chat_lang
+from config import cache_chat
+import re
+
+LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
 @Client.on_inline_query(filters.regex(r"^my"), group=0)
 @use_chat_lang()
 async def my_spotify(c, m, t):
-    tk = db.get(m.from_user.id)
-    if tk and tk[0]:
-        sess = await get_spoti_session(m.from_user.id)
-        spotify_json = sess.current_playback(additional_types="episode,track")
-        if not spotify_json:
+    sess = await get_spoti_session(m.from_user.id)
+    if not sess or sess.current_playback() == None:
+        tk = db.get(m.from_user.id)
+        if not tk or not tk[2]:
+            article = [InlineQueryResultArticle(
+                title=t("my_spotify"),
+                description=t("no_login"),
+                id="MySpotify",
+                thumb_url="https://piics.ml/amn/lpy/spoti.png",
+                input_message_content=InputTextMessageContent(
+                message_text=t("login"),
+                ),
+            )]
+            return await m.answer(article, cache_time=0)
+        a = await get_current(tk[2])
+        if not a:
             article = [InlineQueryResultArticle(
                 title=t("my_spotify"),
                 description=t("no_playng"),
@@ -31,6 +47,52 @@ async def my_spotify(c, m, t):
                 ),
             )]
             return await m.answer(article, cache_time=0)
+        track_info = await get_track_info(tk[2], a[0]["artist"]["#text"], a[0]["name"])
+        stick = db.theme(m.from_user.id)[3]
+        mtext = f"🎵 {a[0]['artist']['#text']} - {a[0]['name']}"
+        if stick == None or stick:
+            album_url = a[0]["image"][-1]["#text"]
+            if not album_url:
+                r = await http_pool.get(a[0]["url"].replace("/_/", "/"))
+                if r.status_code == 200:
+                    album_url = LFM_LINK_RE.findall(r.text)[0]
+                else:
+                    r2 = await http_pool.get(a[0]["url"])
+                    album_url = LFM_LINK_RE.findall(r2.text)[0]
+            album_art = await get_song_art(
+                song_name=a[0]["name"],
+                artist=a[0]["artist"]["#text"],
+                album_url=album_url,
+                color="dark" if db.theme(m.from_user.id)[0] else "light",
+                blur=db.theme(m.from_user.id)[1],
+                scrobbles=track_info["track"]["userplaycount"],
+            )
+            
+            msg = await c.send_document(cache_chat, album_art, caption=mtext)
+            
+            article = [InlineQueryResultCachedDocument(
+                title=t("my_spotify"),
+                description=f'🎧 {a[0]["artist"]["#text"]} - {a[0]["name"]}',
+                id="MySpotify",
+                document_file_id=msg.sticker.file_id,
+                caption=mtext,
+            )]
+        
+        else:
+            article = [InlineQueryResultArticle(
+                title=t("my_spotify"),
+                description=f'🎧 {a[0]["artist"]["#text"]} - {a[0]["name"]}',
+                id="MySpotify",
+                thumb_url="https://piics.ml/amn/lpy/spoti.png",
+                input_message_content=InputTextMessageContent(
+                message_text=mtext,
+                ),
+            )]
+        
+        return await m.answer(article, cache_time=0)
+        
+    else:
+        spotify_json = sess.current_playback(additional_types="episode,track")
         if spotify_json["repeat_state"] == "track":
             emoji = '🔂'
             call = f'sploopt|{m.from_user.id}'
@@ -59,16 +121,39 @@ async def my_spotify(c, m, t):
         text = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
         text += f'🗣 {spotify_json["device"]["name"]} | ⏳{datetime.timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
         
-        article = [InlineQueryResultArticle(
-            title=t("my_spotify"),
-            description=f'🎧 {spotify_json["item"]["name"]} - {publi}',
-            id="MySpotify",
-            thumb_url="https://piics.ml/amn/lpy/spoti.png",
-            reply_markup=keyboard,
-            input_message_content=InputTextMessageContent(
-                message_text=(text),
-            ),
-        )]
+        stick = db.theme(m.from_user.id)[3]
+        if stick == None or stick:
+            album_art = await get_song_art(
+                song_name=spotify_json["item"]["name"],
+                artist=publi,
+                album_url=spotify_json["item"]["album"]["images"][0]["url"] if "album" in spotify_json["item"] else spotify_json["item"]["images"][0]["url"],
+                duration=spotify_json["item"]["duration_ms"] // 1000,
+                progress=spotify_json["progress_ms"] // 1000,
+                color="dark" if db.theme(m.from_user.id)[0] else "light",
+                blur=db.theme(m.from_user.id)[1],
+            )
+            
+            msg = await c.send_document(cache_chat, album_art, caption=text)
+            
+            article = [InlineQueryResultCachedDocument(
+                title=t("my_spotify"),
+                description=f'🎧 {spotify_json["item"]["name"]} - {publi}',
+                id="MySpotify",
+                document_file_id=msg.sticker.file_id,
+                caption=text,
+                reply_markup=keyboard,
+            )]
+        else:
+            article = [InlineQueryResultArticle(
+                title=t("my_spotify"),
+                description=f'🎧 {spotify_json["item"]["name"]} - {publi}',
+                id="MySpotify",
+                thumb_url="https://piics.ml/amn/lpy/spoti.png",
+                reply_markup=keyboard,
+                input_message_content=InputTextMessageContent(
+                    message_text=(text),
+                ),
+            )]
         return await m.answer(article, cache_time=0)
 
 #Player

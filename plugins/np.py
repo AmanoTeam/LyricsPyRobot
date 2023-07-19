@@ -9,6 +9,9 @@ from utils import get_song_art, get_spoti_session, get_current, get_track_info, 
 from datetime import datetime
 
 from .letra import letra
+import re
+
+LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
 @Client.on_message(filters.command("np"))
 @use_chat_lang()
