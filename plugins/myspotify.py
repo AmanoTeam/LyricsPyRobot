@@ -161,7 +161,8 @@ async def my_spotify(c, m, t):
 @use_chat_lang()
 async def previous(c: Client, m, t):
     if m.data.split("|")[1] != str(m.from_user.id):
-        return await m.answer(t("not_allowed").format(first_name=m.from_user.first_name))
+        a = await c.get_chat(int(m.data.split("|")[1]))
+        return await m.answer(t("not_allowed").format(first_name=a.first_name))
     sp = await get_spoti_session(m.from_user.id)
     if not 'premium' in sp.current_user()["product"]:
         return await m.answer(t("premium_only"))
@@ -213,7 +214,8 @@ async def previous(c: Client, m, t):
 @use_chat_lang()
 async def next(c: Client, m, t):
     if m.data.split("|")[1] != str(m.from_user.id):
-        return await m.answer(t("not_allowed").format(first_name=m.from_user.first_name))
+        a = await c.get_chat(int(m.data.split("|")[1]))
+        return await m.answer(t("not_allowed").format(first_name=a.first_name))
     sp = await get_spoti_session(m.from_user.id)
     if not 'premium' in sp.current_user()["product"]:
         return await m.answer(t("premium_only"))
@@ -269,7 +271,8 @@ async def aa(c, m):
 @use_chat_lang()
 async def pauseplay(c: Client, m, t):
     if m.data.split("|")[1] != str(m.from_user.id):
-        return await m.answer(t("not_allowed").format(first_name=m.from_user.first_name))
+        a = await c.get_chat(int(m.data.split("|")[1]))
+        return await m.answer(t("not_allowed").format(first_name=a.first_name))
     sp = await get_spoti_session(m.from_user.id)
     if not 'premium' in sp.current_user()["product"]:
         return await m.answer(t("premium_only"))
@@ -323,7 +326,8 @@ async def pauseplay(c: Client, m, t):
 @use_chat_lang()
 async def recently(c: Client, m, t):
     if m.data.split("|")[1] != str(m.from_user.id):
-        return await m.answer(t("not_allowed").format(first_name=m.from_user.first_name))
+        a = await c.get_chat(int(m.data.split("|")[1]))
+        return await m.answer(t("not_allowed").format(first_name=a.first_name))
     sp = await get_spoti_session(m.from_user.id)
     profile = sp.current_user()
     if m.data.split("|")[0] == "recently":

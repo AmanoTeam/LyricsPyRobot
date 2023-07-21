@@ -6,7 +6,7 @@ from pyrogram.enums import ChatType
 import db
 from locales import use_chat_lang, use_user_lang
 from utils import get_song_art, get_spoti_session, get_current, get_track_info, http_pool
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .letra import letra
 import re
@@ -144,12 +144,10 @@ async def np(c, m, t):
             album_art, reply_markup=kb, caption=mtext
         )
     else:
-        time = "\n⏳ {t1} – {t1}".format(
-            t1=spotify_json["progress_ms"] // 1000,
-            t2=spotify_json["item"]["duration_ms"] // 1000
-        )
+        mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
+        mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
         await m.reply(
-            mtext+time,
+            mtext,
             reply_markup=kb,
             parse_mode=ParseMode.HTML,
         )
