@@ -240,8 +240,10 @@ async def previous(c, m, t):
             publi = spotify_json["item"]["show"]["name"]
         spotify_json = sess.current_playback(additional_types="episode,track")
         if not db.theme(m.from_user.id)[3]:
+            mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
+            mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
             await m.edit_message_text(
-                f"🎵 {publi} - {spotify_json['item']['name']}",
+                mtext,
                 reply_markup=kb,
                 parse_mode=ParseMode.HTML,
             )
@@ -302,8 +304,10 @@ async def next(c, m, t):
             publi = spotify_json["item"]["show"]["name"]
         spotify_json = sess.current_playback(additional_types="episode,track")
         if not db.theme(m.from_user.id)[3]:
+            mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
+            mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
             await m.edit_message_text(
-                f"🎵 {publi} - {spotify_json['item']['name']}",
+                mtext,
                 reply_markup=kb,
                 parse_mode=ParseMode.HTML,
             )
@@ -366,8 +370,10 @@ async def ppa(c, m, t):
         else:
             publi = spotify_json["item"]["show"]["name"]
         if not db.theme(m.from_user.id)[3]:
+            mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
+            mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
             await m.edit_message_text(
-                f"🎵 {publi} - {spotify_json['item']['name']}",
+                mtext,
                 reply_markup=kb,
                 parse_mode=ParseMode.HTML,
             )
