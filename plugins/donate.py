@@ -14,7 +14,7 @@ from pyrogram.raw.types import (
 from config import stripe_token, sudos
 from typing import Union
 
-from locales import use_chat_lang
+from locales import use_chat_lang, use_user_lang
 from pyromod.helpers import ikb
 
 @Client.on_callback_query(filters.regex(r"donate"))
@@ -79,5 +79,6 @@ async def raw_update(c: Client, update: Update, users: dict, chats: dict):
     ):
         # Sending a message confirming the order (additional to TGs service message)
         user = users[update.message.peer_id.user_id]
-        await c.send_message(user.id, 'Order "confirmed".')
+        ut = use_user_lang(user.id)
+        await c.send_message(user.id, ut("order_confirmed"))
         print(user.id, user.first_name, "order confirmed")
