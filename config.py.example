@@ -3,6 +3,10 @@
 TOKEN = ''
 API_ID = ''
 API_HASH = ''
+stripe_token = {
+    "TEST": "",
+    "LIVE": ""
+}
 
 sudos = [
     652890017,
