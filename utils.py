@@ -82,12 +82,12 @@ def build_webdriver_object(
 
     if browser_type == "chrome":
         copts = webdriver.ChromeOptions()
-        copts.headless = True
+        copts.add_argument("--headless")
 
         webdrv_ = webdriver.Chrome(options=copts)
     elif browser_type == "firefox":
         fopts = webdriver.FirefoxOptions()
-        fopts.headless = True
+        fopts.add_argument("--headless")
         fopts.add_argument("--kiosk")
 
         webdrv_ = webdriver.Firefox(options=fopts)
