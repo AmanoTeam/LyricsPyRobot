@@ -1,5 +1,9 @@
+import asyncio
+import datetime
+import re
+
 from pyrogram import Client, filters
-from pyromod.helpers import ikb
+from pyrogram.helpers import ikb
 from pyrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
@@ -8,13 +12,16 @@ from pyrogram.types import (
     InputTextMessageContent,
 )
 
-import asyncio
 import db
-import datetime
-from utils import get_spoti_session, get_current, get_track_info, http_pool, get_song_art
-from locales import use_chat_lang
 from config import cache_chat
-import re
+from locales import use_chat_lang
+from utils import (
+    get_current,
+    get_song_art,
+    get_spoti_session,
+    get_track_info,
+    http_pool,
+)
 
 LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
@@ -67,9 +74,9 @@ async def my_spotify(c, m, t):
                 blur=db.theme(m.from_user.id)[1],
                 scrobbles=track_info["track"]["userplaycount"],
             )
-            
+
             msg = await c.send_document(cache_chat, album_art, caption=mtext)
-            
+
             article = [InlineQueryResultCachedDocument(
                 title=t("my_spotify"),
                 description=f'🎧 {a[0]["artist"]["#text"]} - {a[0]["name"]}',
@@ -77,7 +84,7 @@ async def my_spotify(c, m, t):
                 document_file_id=msg.sticker.file_id,
                 caption=mtext,
             )]
-        
+
         else:
             article = [InlineQueryResultArticle(
                 title=t("my_spotify"),
@@ -88,9 +95,9 @@ async def my_spotify(c, m, t):
                 message_text=mtext,
                 ),
             )]
-        
+
         return await m.answer(article, cache_time=0)
-        
+
     else:
         spotify_json = sess.current_playback(additional_types="episode,track")
         if spotify_json["repeat_state"] == "track":
@@ -120,7 +127,7 @@ async def my_spotify(c, m, t):
         )
         text = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
         text += f'🗣 {spotify_json["device"]["name"]} | ⏳{datetime.timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
-        
+
         stick = db.theme(m.from_user.id)[3]
         if stick == None or stick:
             album_art = await get_song_art(
@@ -132,9 +139,9 @@ async def my_spotify(c, m, t):
                 color="dark" if db.theme(m.from_user.id)[0] else "light",
                 blur=db.theme(m.from_user.id)[1],
             )
-            
+
             msg = await c.send_document(cache_chat, album_art, caption=text)
-            
+
             article = [InlineQueryResultCachedDocument(
                 title=t("my_spotify"),
                 description=f'🎧 {spotify_json["item"]["name"]} - {publi}',
@@ -175,7 +182,7 @@ async def previous(c: Client, m, t):
     sp.previous_track(device_id)
     await asyncio.sleep(0.5)
     spotify_json = sp.current_playback(additional_types="episode,track")
-    
+
     if spotify_json["repeat_state"] == "track":
         emoji = '🔂'
         call = f'sploopt|{m.from_user.id}'
@@ -228,7 +235,7 @@ async def next(c: Client, m, t):
     sp.next_track(device_id)
     await asyncio.sleep(0.5)
     spotify_json = sp.current_playback(additional_types="episode,track")
-    
+
     if spotify_json["repeat_state"] == "track":
         emoji = '🔂'
         call = f'sploopt|{m.from_user.id}'
@@ -339,10 +346,10 @@ async def recently(c: Client, m, t):
     for n, i in enumerate(li["items"]):
         res = i["track"] if "track" in i else i
         text += f'{n+1}. {res["artists"][0]["name"]} - {res["name"]}\n'
-    
-    
+
+
     spotify_json = sp.current_playback(additional_types="episode,track")
-        
+
     if spotify_json["repeat_state"] == "track":
         emoji = '🔂'
         call = f'sploopt|{m.from_user.id}'
@@ -398,7 +405,7 @@ async def pauseplay(c: Client, m, t):
             sp.start_playback(device_id)
         await asyncio.sleep(0.5)
     spotify_json = sp.current_playback(additional_types="episode,track")
-        
+
     if spotify_json["repeat_state"] == "track":
         emoji = '🔂'
         call = f'sploopt|{m.from_user.id}'

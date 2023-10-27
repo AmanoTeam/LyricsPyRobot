@@ -1,15 +1,15 @@
 import re
+from datetime import datetime
 from functools import partial
 
 from pyrogram import Client, filters
+from pyrogram.helpers import ikb
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyromod.helpers import ikb
 
 import db
-from config import sudos, login_url
+from config import login_url, sudos
 from locales import default_language, get_locale_string, langdict, use_chat_lang
-from utils import letras, musixmatch, get_spoti_session
-from datetime import datetime
+from utils import get_spoti_session, letras, musixmatch
 
 # + original, - traduzido, _ telegraph
 
@@ -289,7 +289,7 @@ async def np_apv(c, m, t):
             emoji = "❌"
         row.append((usr.first_name + emoji, f"np_apvu_{id[1]}_pg{pg}"))
     table.append(row)
-    
+
     tabela = []
     for i in range(0, len(table), 3):
         tabela.append(table[i:i+3])
@@ -298,12 +298,12 @@ async def np_apv(c, m, t):
 
     if int(pg) != 0:
         extra.append(("back", f"np_apv_pg{int(pg)-1}"))
-    
+
     extra.append(("close", "settings"))
 
     if len(tabela)-int(pg) > 1:
         extra.append(("next", f"np_apv_pg{int(pg)+1}"))
-    
+
     keyb = tabela[int(pg)]
     keyb.append(extra)
 
@@ -336,9 +336,9 @@ async def np_apvu(c, m, t):
         date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
         text += "Reprovado em: {data}".format(data=date.strftime("%d/%m/%Y %H:%M:%S"))
         keyb.append([(t("unblock"), f"np_apvt_{id}_pg{pg}")])
-    
+
     keyb.append([(t("back"), f"np_apv_pg{pg}")])
-    
+
     await m.edit_message_text(text, reply_markup=ikb(keyb))
 
 @Client.on_callback_query(filters.regex(r"np_apvt"))
@@ -430,7 +430,7 @@ async def theme(c, m, t):
 @use_chat_lang()
 async def spotify_st(c, m, t):
     text = t('spotify')+'\n\n'
-    
+
     tk = db.get(m.from_user.id)
     if not tk or not tk[0]:
         text += t('nologged')
@@ -438,14 +438,14 @@ async def spotify_st(c, m, t):
         sp = await get_spoti_session(m.from_user.id)
         profile = sp.current_user()
         text += t('logged').format(name=profile["display_name"])
-    
+
     kb = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [InlineKeyboardButton(text=t("login"),url=login_url)],
                     [InlineKeyboardButton(text=t("back"), callback_data="settings")]
                 ]
             )
-    
+
     await m.edit_message_text(text, reply_markup=kb)
 
 @Client.on_callback_query(filters.regex("^set_lang "))

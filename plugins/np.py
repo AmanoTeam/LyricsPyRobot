@@ -1,15 +1,22 @@
+import re
+from datetime import datetime, timedelta
+
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.enums import ChatType
+from pyrogram.enums.parse_mode import ParseMode
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 import db
 from locales import use_chat_lang, use_user_lang
-from utils import get_song_art, get_spoti_session, get_current, get_track_info, http_pool
-from datetime import datetime, timedelta
+from utils import (
+    get_current,
+    get_song_art,
+    get_spoti_session,
+    get_track_info,
+    http_pool,
+)
 
 from .letra import letra
-import re
 
 LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 

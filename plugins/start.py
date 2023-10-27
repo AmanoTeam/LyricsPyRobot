@@ -1,9 +1,16 @@
+from typing import Union
+
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from pyrogram.enums import ChatType
+from pyrogram.types import (
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
 
 from locales import use_chat_lang
-from typing import Union
+
 
 @Client.on_message(filters.command("start"))
 @Client.on_callback_query(filters.regex(r"start_back"))

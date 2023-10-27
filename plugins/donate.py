@@ -1,5 +1,7 @@
+from typing import Union
+
 from pyrogram import Client, filters
-from pyrogram.types import CallbackQuery, Update, Message
+from pyrogram.helpers import ikb
 from pyrogram.raw.functions.messages import SendMedia, SetBotPrecheckoutResults
 from pyrogram.raw.types import (
     DataJSON,
@@ -10,12 +12,11 @@ from pyrogram.raw.types import (
     UpdateBotPrecheckoutQuery,
     UpdateNewMessage,
 )
+from pyrogram.types import CallbackQuery, Message, Update
 
 from config import stripe_token, sudos
-from typing import Union
-
 from locales import use_chat_lang, use_user_lang
-from pyromod.helpers import ikb
+
 
 @Client.on_callback_query(filters.regex(r"donate"))
 @use_chat_lang()
@@ -33,7 +34,7 @@ async def add_donate(c: Client, q: CallbackQuery, t):
             ("- R$ 1,00", f"donate_{val-100}"),
             ("- R$ 0,50", f"donate_{val-50}"),
         ]]
-        
+
         await q.edit_message_text(t("se_val"), reply_markup=ikb(key))
 
 @Client.on_message(filters.regex(r"\/start pay"))

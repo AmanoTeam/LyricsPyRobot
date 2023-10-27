@@ -1,13 +1,14 @@
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.enums.parse_mode import ParseMode
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 import db
+from config import login_url
 from locales import use_chat_lang
 from utils import get_song_art, get_spoti_session, get_token
-from config import login_url
 
 from .letra import letra
+
 
 @Client.on_message(filters.command("spoti"))
 @use_chat_lang()
