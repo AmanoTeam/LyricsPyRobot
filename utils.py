@@ -1,9 +1,8 @@
 import asyncio
 import os
-from functools import partial, wraps
 from io import BytesIO
 from time import time
-from typing import Callable, Coroutine, List, Union
+from typing import Union
 
 import httpx
 import spotipy
@@ -132,7 +131,7 @@ async def get_spoti_session(user_id) -> Union[spotipy.Spotify, bool]:
         return a
 
 
-async def get_current(user: str) -> List[dict]:
+async def get_current(user: str) -> list[dict]:
     r = await http_pool.get(
         "http://ws.audioscrobbler.com/2.0/",
         params=dict(

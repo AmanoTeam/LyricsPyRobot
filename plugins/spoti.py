@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.enums.parse_mode import ParseMode
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 import db
 from config import login_url
@@ -12,7 +12,7 @@ from .letra import letra
 
 @Client.on_message(filters.command("spoti"))
 @use_chat_lang()
-async def spoti(c, m, t):
+async def spoti(c: Client, m: Message, t):
     print("a")
     text = m.text.split(" ", 1)
     if len(text) == 2:
@@ -65,7 +65,7 @@ async def spoti(c, m, t):
                     publi = spotify_json["item"]["artists"][0]["name"]
                 else:
                     publi = spotify_json["item"]["show"]["name"]
-                if stick == None or stick:
+                if stick is None or stick:
                     album_art = await get_song_art(
                         song_name=spotify_json["item"]["name"],
                         artist=publi,
@@ -76,7 +76,7 @@ async def spoti(c, m, t):
                         blur=db.theme(m.from_user.id)[1],
                     )
                 mtext = f"🎵 {publi} - {spotify_json['item']['name']}"
-                if stick == None or stick:
+                if stick is None or stick:
                     await m.reply_document(album_art, caption=mtext)
                 else:
                     await m.reply(

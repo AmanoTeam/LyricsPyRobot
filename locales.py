@@ -3,9 +3,6 @@ import json
 import os.path
 from functools import partial, wraps
 from glob import glob
-from typing import Dict, List
-
-from pyrogram.types import CallbackQuery
 
 import db
 
@@ -21,7 +18,7 @@ enabled_locales = [
 default_language = "en-US"
 
 
-def cache_localizations(files: List[str]) -> Dict[str, Dict[str, Dict[str, str]]]:
+def cache_localizations(files: list[str]) -> dict[str, dict[str, dict[str, str]]]:
     ldict = {lang: {} for lang in enabled_locales}
     for file in files:
         _, lname, pname = file.split(os.path.sep)
@@ -32,7 +29,7 @@ def cache_localizations(files: List[str]) -> Dict[str, Dict[str, Dict[str, str]]
     return ldict
 
 
-jsons: List[str] = []
+jsons: list[str] = []
 
 for locale in enabled_locales:
     jsons += glob(os.path.join("locales", locale, "*.json"))

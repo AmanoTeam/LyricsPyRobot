@@ -46,5 +46,5 @@ async def start(c, m:Union[Message, CallbackQuery], t):
 
 @Client.on_message(filters.command("help"))
 @use_chat_lang()
-async def help(c, m, t):
+async def help(c: Client, m: Message, t):
     await m.reply_text(t("help"))

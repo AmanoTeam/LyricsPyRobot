@@ -5,8 +5,10 @@ import re
 from pyrogram import Client, filters
 from pyrogram.helpers import ikb
 from pyrogram.types import (
+    CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    InlineQuery,
     InlineQueryResultArticle,
     InlineQueryResultCachedDocument,
     InputTextMessageContent,
@@ -27,9 +29,9 @@ LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
 @Client.on_inline_query(group=0)
 @use_chat_lang()
-async def my_spotify(c, m, t):
+async def my_spotify(c: Client, m: InlineQuery, t):
     sess = await get_spoti_session(m.from_user.id)
-    if not sess or sess.current_playback() == None:
+    if not sess or sess.current_playback() is None:
         tk = db.get(m.from_user.id)
         if not tk or not tk[2]:
             article = [InlineQueryResultArticle(
@@ -57,7 +59,7 @@ async def my_spotify(c, m, t):
         track_info = await get_track_info(tk[2], a[0]["artist"]["#text"], a[0]["name"])
         stick = db.theme(m.from_user.id)[3]
         mtext = f"🎵 {a[0]['artist']['#text']} - {a[0]['name']}"
-        if stick == None or stick:
+        if stick is None or stick:
             album_url = a[0]["image"][-1]["#text"]
             if not album_url:
                 r = await http_pool.get(a[0]["url"].replace("/_/", "/"))
@@ -129,7 +131,7 @@ async def my_spotify(c, m, t):
         text += f'🗣 {spotify_json["device"]["name"]} | ⏳{datetime.timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
 
         stick = db.theme(m.from_user.id)[3]
-        if stick == None or stick:
+        if stick is None or stick:
             album_art = await get_song_art(
                 song_name=spotify_json["item"]["name"],
                 artist=publi,
@@ -166,18 +168,17 @@ async def my_spotify(c, m, t):
 #Player
 @Client.on_callback_query(filters.regex("^spprevious"))
 @use_chat_lang()
-async def previous(c: Client, m, t):
+async def previous(c: Client, m: CallbackQuery, t):
     if m.data.split("|")[1] != str(m.from_user.id):
         a = await c.get_chat(int(m.data.split("|")[1]))
         return await m.answer(t("not_allowed").format(first_name=a.first_name))
     sp = await get_spoti_session(m.from_user.id)
-    if not 'premium' in sp.current_user()["product"]:
+    if 'premium' not in sp.current_user()["product"]:
         return await m.answer(t("premium_only"))
     devices = sp.devices()
     for i in devices["devices"]:
         if i["is_active"]:
             device_id = i["id"]
-            device_name = i["name"]
             break
     sp.previous_track(device_id)
     await asyncio.sleep(0.5)
@@ -219,18 +220,17 @@ async def previous(c: Client, m, t):
 
 @Client.on_callback_query(filters.regex("^spnext"))
 @use_chat_lang()
-async def next(c: Client, m, t):
+async def next(c: Client, m: CallbackQuery, t):
     if m.data.split("|")[1] != str(m.from_user.id):
         a = await c.get_chat(int(m.data.split("|")[1]))
         return await m.answer(t("not_allowed").format(first_name=a.first_name))
     sp = await get_spoti_session(m.from_user.id)
-    if not 'premium' in sp.current_user()["product"]:
+    if 'premium' not in sp.current_user()["product"]:
         return await m.answer(t("premium_only"))
     devices = sp.devices()
     for i in devices["devices"]:
         if i["is_active"]:
             device_id = i["id"]
-            device_name = i["name"]
             break
     sp.next_track(device_id)
     await asyncio.sleep(0.5)
@@ -271,24 +271,23 @@ async def next(c: Client, m, t):
     await m.edit_message_text(text, reply_markup=ikb(keyb))
 
 @Client.on_callback_query(group=1)
-async def aa(c, m):
+async def aa(c: Client, m: CallbackQuery):
     print(m.data)
 
 @Client.on_callback_query(filters.regex("^sploopo|sploopc|sploopt"))
 @use_chat_lang()
-async def pauseplay(c: Client, m, t):
+async def sp_loop(c: Client, m: CallbackQuery, t):
     if m.data.split("|")[1] != str(m.from_user.id):
         a = await c.get_chat(int(m.data.split("|")[1]))
         return await m.answer(t("not_allowed").format(first_name=a.first_name))
     sp = await get_spoti_session(m.from_user.id)
-    if not 'premium' in sp.current_user()["product"]:
+    if 'premium' not in sp.current_user()["product"]:
         return await m.answer(t("premium_only"))
     spotify_json = sp.current_playback(additional_types="episode,track")
     devices = sp.devices()
     for i in devices["devices"]:
         if i["is_active"]:
             device_id = i["id"]
-            device_name = i["name"]
             break
     if spotify_json["repeat_state"] == 'context':
         sp.repeat('track',device_id)
@@ -331,7 +330,7 @@ async def pauseplay(c: Client, m, t):
 
 @Client.on_callback_query(filters.regex('^recently|top'))
 @use_chat_lang()
-async def recently(c: Client, m, t):
+async def recently(c: Client, m: CallbackQuery, t):
     if m.data.split("|")[1] != str(m.from_user.id):
         a = await c.get_chat(int(m.data.split("|")[1]))
         return await m.answer(t("not_allowed").format(first_name=a.first_name))
@@ -383,19 +382,18 @@ async def recently(c: Client, m, t):
 
 @Client.on_callback_query(filters.regex("^sppause|^spplay|^spmain"))
 @use_chat_lang()
-async def pauseplay(c: Client, m, t):
+async def sp_playpause(c: Client, m: CallbackQuery, t):
     if m.data.split("|")[1] != str(m.from_user.id):
         sess = await get_spoti_session(m.from_user.id)
         sess.add_to_queue(uri=f'spotify:track:{m.data.split("|")[2]}')
         return await m.answer(t("song_added"))
     sp = await get_spoti_session(m.from_user.id)
-    if not 'premium' in sp.current_user()["product"]:
+    if 'premium' not in sp.current_user()["product"]:
         return await m.answer(t("not_premium"))
     devices = sp.devices()
     for i in devices["devices"]:
         if i["is_active"]:
             device_id = i["id"]
-            device_name = i["name"]
             break
     spotify_json = sp.current_playback(additional_types="episode,track")
     if m.data.split("|")[0] != "spmain":

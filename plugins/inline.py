@@ -1,14 +1,13 @@
-from pyrogram import Client, filters
+from pyrogram import Client
 from pyrogram.types import (
+    ChosenInlineResult,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    InlineQueryResultArticle,
-    InputTextMessageContent,
 )
 
 import db
 from locales import use_chat_lang
-from utils import get_current, get_spoti_session, musixmatch
+from utils import musixmatch
 
 # + original, - traduzido, _ telegraph
 
@@ -95,7 +94,7 @@ async def inline(c, m, t):
 
 @Client.on_chosen_inline_result()
 @use_chat_lang()
-async def choosen(c, m, t):
+async def choosen(c: Client, m: ChosenInlineResult, t):
     if m.result_id == "MySpotify":
         return
     if m.result_id[0] == "s" or m.result_id[0] == "l":

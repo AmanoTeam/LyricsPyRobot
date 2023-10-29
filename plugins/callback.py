@@ -4,7 +4,7 @@ from functools import partial
 
 from pyrogram import Client, filters
 from pyrogram.helpers import ikb
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
 import db
 from config import login_url, sudos
@@ -41,7 +41,7 @@ def gen_langs_kb():
 
 @Client.on_callback_query(filters.regex(r"^(_\+)"))
 @use_chat_lang()
-async def teor(c, m, t):
+async def teor(c: Client, m: CallbackQuery, t):
     user, hash = m.data[2:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         print(hash)
@@ -99,7 +99,7 @@ async def teor(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"^(_\-)"))
 @use_chat_lang()
-async def tetr(c, m, t):
+async def tetr(c: Client, m: CallbackQuery, t):
     user, hash = m.data[2:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
@@ -146,7 +146,7 @@ async def tetr(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"^(\+)"))
 @use_chat_lang()
-async def ori(c, m, t):
+async def ori(c: Client, m: CallbackQuery, t):
     user, hash = m.data[1:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
@@ -206,7 +206,7 @@ async def ori(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"^(\-)"))
 @use_chat_lang()
-async def tr(c, m, t):
+async def tr(c: Client, m: CallbackQuery, t):
     user, hash = m.data[1:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
@@ -257,7 +257,7 @@ async def tr(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"settings"))
 @use_chat_lang()
-async def settings(c, m, t):
+async def settings(c: Client, m: CallbackQuery, t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text=t("np_settings"), callback_data="theme")]+
@@ -271,7 +271,7 @@ async def settings(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"np_apv_pg"))
 @use_chat_lang()
-async def np_apv(c, m, t):
+async def np_apv(c: Client, m: CallbackQuery, t):
     pg = m.data.split("pg")[1]
     ids = db.get_all_aproved(m.from_user.id)
     table = []
@@ -313,7 +313,7 @@ async def np_apv(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"np_apvu"))
 @use_chat_lang()
-async def np_apvu(c, m, t):
+async def np_apvu(c: Client, m: CallbackQuery, t):
     id, pg = m.data.split("_")[2:]
     pg = pg.split("pg")[1]
     app = db.get_aproved(m.from_user.id, id)
@@ -343,7 +343,7 @@ async def np_apvu(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"np_apvt"))
 @use_chat_lang()
-async def np_apvt(c, m, t):
+async def np_apvt(c: Client, m: CallbackQuery, t):
     id, pg = m.data.split("_")[2:]
     pg = pg.split("pg")[1]
     app = db.get_aproved(m.from_user.id, id)
@@ -355,7 +355,7 @@ async def np_apvt(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"language"))
 @use_chat_lang()
-async def lang(c, m, t):
+async def lang(c: Client, m: CallbackQuery, t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             *gen_langs_kb(),
@@ -367,7 +367,7 @@ async def lang(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"theme|pattern"))
 @use_chat_lang()
-async def theme(c, m, t):
+async def theme(c: Client, m: CallbackQuery, t):
     a = db.theme(m.from_user.id)
     print(a)
     if a[0] is None or "_" in m.data and a[0]:
@@ -428,7 +428,7 @@ async def theme(c, m, t):
 
 @Client.on_callback_query(filters.regex(r"spotify_st"))
 @use_chat_lang()
-async def spotify_st(c, m, t):
+async def spotify_st(c: Client, m: CallbackQuery, t):
     text = t('spotify')+'\n\n'
 
     tk = db.get(m.from_user.id)
@@ -450,7 +450,7 @@ async def spotify_st(c, m, t):
 
 @Client.on_callback_query(filters.regex("^set_lang "))
 @use_chat_lang()
-async def set_user_lang(c, m, f):
+async def set_user_lang(c: Client, m: CallbackQuery, f):
     lang = m.data.split()[1]
     db.db_set_lang(m.from_user.id, lang)
     strings = partial(
