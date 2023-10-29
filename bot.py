@@ -3,7 +3,9 @@ import asyncio
 from pyrogram import Client, idle
 
 from config import API_HASH, API_ID, TOKEN
-from utils import http_pool, letras, musixmatch, webdrv
+from utils import browser, http_pool, letras, loop, musixmatch
+
+asyncio.set_event_loop(loop)
 
 
 async def main():
@@ -15,10 +17,10 @@ async def main():
     await http_pool.aclose()
     await letras.http.aclose()
     await musixmatch.http.aclose()
-    webdrv.quit()
+    await browser.close()
 
 
 client = Client("bot", API_ID, API_HASH, bot_token=TOKEN, plugins=dict(root="plugins"))
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
+if __name__ == "__main__":
+    loop.run_until_complete(main())

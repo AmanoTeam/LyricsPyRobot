@@ -1,6 +1,6 @@
 git+https://github.com/AmanoTeam/lyricspy
 pillow
-selenium
+playwright
 git+https://github.com/AmanoTeam/pyrogram
 httpx[http2]
 spotipy

@@ -9,32 +9,17 @@ import httpx
 import spotipy
 from lyricspy.aio import Letras, Musixmatch
 from PIL import Image
-from selenium import webdriver
-from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
-from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxWebDriver
+from playwright.async_api import BrowserContext, PlaywrightContextManager
 from spotipy.client import SpotifyException
 from yarl import URL
 
 import db
 from config import BASIC, BROWSER, KEY, MUSIXMATCH_KEYS
 
-loop = asyncio.get_event_loop()
-
 http_pool = httpx.AsyncClient(http2=True)
 
 
-def aiowrap(fn: Callable) -> Coroutine:
-    @wraps(fn)
-    def decorator(*args, **kwargs):
-        wrapped = partial(fn, *args, **kwargs)
-
-        return loop.run_in_executor(None, wrapped)
-
-    return decorator
-
-
-@aiowrap
-def get_song_art(
+async def get_song_art(
     song_name: str,
     artist: str,
     album_url: str,
@@ -57,46 +42,45 @@ def get_song_art(
 
     url = URL("https://lyricspy.amanoteam.com/nowplaying-dom/") % params
 
-    webdrv.get(str(url))
+    page = await browser.new_page()
+
+    await page.goto(str(url))
 
     tmp_filename = f"{time()}.png"
 
-    webdrv.save_screenshot(tmp_filename)
+    await page.screenshot(path=tmp_filename)
+
+    await page.close()
 
     img = Image.open(tmp_filename)
 
-    bio = BytesIO()
-    bio.name = "sticker.webp"
+    new_file = BytesIO()
+    new_file.name = "sticker.webp"
 
-    img.save(bio)
+    img.save(new_file)
 
     os.remove(tmp_filename)
 
-    return bio
+    return new_file
 
 
-def build_webdriver_object(
-    browser_type: str,
-) -> Union[ChromeWebDriver, FirefoxWebDriver]:
+async def build_browser_object(browser_type: str) -> BrowserContext:
     browser_type = browser_type.lower()
 
-    if browser_type == "chrome":
-        copts = webdriver.ChromeOptions()
-        copts.add_argument("--headless")
+    p = await PlaywrightContextManager().start()
 
-        webdrv_ = webdriver.Chrome(options=copts)
+    if browser_type == "chromium" or browser_type == "chrome":
+        browser = await p.chromium.launch(headless=True)
     elif browser_type == "firefox":
-        fopts = webdriver.FirefoxOptions()
-        fopts.add_argument("--headless")
-        fopts.add_argument("--kiosk")
-
-        webdrv_ = webdriver.Firefox(options=fopts)
+        browser = await p.firefox.launch(headless=True)
+    elif browser_type == "webkit":
+        browser = await p.webkit.launch(headless=True)
     else:
-        raise TypeError("browser_type must be either 'chrome' or 'firefox'.")
+        raise TypeError("browser_type must be either 'chromium', 'firefox' or 'webkit'.")
 
-    webdrv_.set_window_size(512, 288)
+    context = await browser.new_context(viewport={'width': 512, 'height': 288})
 
-    return webdrv_
+    return context
 
 
 async def get_token(user_id, auth_code):
@@ -176,8 +160,9 @@ async def get_track_info(user: str, artist: str, track: str):
     )
     return r.json()
 
+loop = asyncio.new_event_loop()
 
-webdrv = build_webdriver_object(BROWSER)
+browser = loop.run_until_complete(build_browser_object(BROWSER))
 
 musixmatch = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 
