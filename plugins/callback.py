@@ -22,7 +22,7 @@ def gen_langs_kb():
         a = [
             InlineKeyboardButton(
                 f"{lang['language_flag']} {lang['language_name']}",
-                callback_data="set_lang " + langs[0],
+                callback_data=f"set_lang {langs[0]}",
             )
         ]
         langs.pop(0)
@@ -31,7 +31,7 @@ def gen_langs_kb():
             a.append(
                 InlineKeyboardButton(
                     f"{lang['language_flag']} {lang['language_name']}",
-                    callback_data="set_lang " + langs[0],
+                    callback_data=f"set_lang {langs[0]}",
                 )
             )
             langs.pop(0)
@@ -60,10 +60,7 @@ async def teor(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            if "art" in a:
-                a = letras.parce(a)
-            else:
-                a = musixmatch.parce(a)
+            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
             if musixmatch.translation(hash, "pt", None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
@@ -88,7 +85,7 @@ async def teor(c: Client, m: CallbackQuery, t):
                     ]
                 )
             await m.edit_message_text(
-                "{} - {}\n{}".format(a["musica"], a["autor"], n[1]),
+                f'{a["musica"]} - {a["autor"]}\n{n[1]}',
                 reply_markup=keyboard,
                 parse_mode=None,
             )
@@ -118,10 +115,7 @@ async def tetr(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            if "art" in a:
-                a = letras.parce(a)
-            else:
-                a = musixmatch.parce(a)
+            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -135,7 +129,7 @@ async def tetr(c: Client, m: CallbackQuery, t):
                 ]
             )
             await m.edit_message_text(
-                "{} - {}\n{}".format(a["musica"], a["autor"], n[2]),
+                f'{a["musica"]} - {a["autor"]}\n{n[2]}',
                 reply_markup=keyboard,
                 parse_mode=None,
             )
@@ -165,10 +159,7 @@ async def ori(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            if "art" in a:
-                a = letras.parce(a)
-            else:
-                a = musixmatch.parce(a)
+            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
             if musixmatch.translation(hash, "pt", None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
@@ -193,9 +184,7 @@ async def ori(c: Client, m: CallbackQuery, t):
                     ]
                 )
             await m.edit_message_text(
-                "[{} - {}]({})\n{}".format(
-                    a["musica"], a["autor"], a["link"], a["letra"]
-                )[:4096],
+                f'[{a["musica"]} - {a["autor"]}]({a["link"]})\n{a["letra"]}'[:4096],
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
@@ -225,10 +214,7 @@ async def tr(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            if "art" in a:
-                a = letras.parce(a)
-            else:
-                a = musixmatch.parce(a)
+            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -244,9 +230,7 @@ async def tr(c: Client, m: CallbackQuery, t):
             trad = await musixmatch.translation(hash, "pt", a["letra"])
             print(trad)
             await m.edit_message_text(
-                "[{} - {}]({})\n{}".format(a["musica"], a["autor"], a["link"], trad)[
-                    :4096
-                ],
+                f'[{a["musica"]} - {a["autor"]}]({a["link"]})\n{trad}'[:4096],
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
@@ -295,10 +279,7 @@ async def np_apv(c: Client, m: CallbackQuery, t):
         row.append((usr.first_name + emoji, f"np_apvu_{id[1]}_pg{pg}"))
     table.append(row)
 
-    tabela = []
-    for i in range(0, len(table), 3):
-        tabela.append(table[i : i + 3])
-
+    tabela = [table[i : i + 3] for i in range(0, len(table), 3)]
     extra = []
 
     if int(pg) != 0:
@@ -328,26 +309,32 @@ async def np_apvu(c: Client, m: CallbackQuery, t):
         name=f"<a href='tg://user?id={usr.id}'>{usr.first_name}</a>"
     )
     keyb = []
-    if app and app[0] == 1:
-        if app[2]:
-            date1 = datetime.fromtimestamp(app[2]).strftime("%d/%m/%Y %H:%M:%S")
-        else:
-            date1 = "Nunca utilizado"
-        date2 = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
-        text += t("apuser_txt").format(
-            data=date2.strftime("%d/%m/%Y %H:%M:%S"),
-            data2=date1,
-            count=app[1] if app[1] else "0",
-        )
-        keyb.append([(t("block"), f"np_apvt_{id}_pg{pg}")])
-    elif app and app[0] == 0:
-        date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
-        text += "Solicitado em: {data}".format(data=date.strftime("%d/%m/%Y %H:%M:%S"))
-        keyb.append([(t("aprove"), f"np_apvt_{id}_pg{pg}")])
-    elif app and app[0] == 2:
-        date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
-        text += "Reprovado em: {data}".format(data=date.strftime("%d/%m/%Y %H:%M:%S"))
-        keyb.append([(t("unblock"), f"np_apvt_{id}_pg{pg}")])
+    if app:
+        if app[0] == 1:
+            date1 = (
+                datetime.fromtimestamp(app[2]).strftime("%d/%m/%Y %H:%M:%S")
+                if app[2]
+                else "Nunca utilizado"
+            )
+            date2 = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
+            text += t("apuser_txt").format(
+                data=date2.strftime("%d/%m/%Y %H:%M:%S"),
+                data2=date1,
+                count=app[1] or "0",
+            )
+            keyb.append([(t("block"), f"np_apvt_{id}_pg{pg}")])
+        elif app[0] == 0:
+            date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
+            text += "Solicitado em: {data}".format(
+                data=date.strftime("%d/%m/%Y %H:%M:%S")
+            )
+            keyb.append([(t("aprove"), f"np_apvt_{id}_pg{pg}")])
+        elif app[0] == 2:
+            date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
+            text += "Reprovado em: {data}".format(
+                data=date.strftime("%d/%m/%Y %H:%M:%S")
+            )
+            keyb.append([(t("unblock"), f"np_apvt_{id}_pg{pg}")])
 
     keyb.append([(t("back"), f"np_apv_pg{pg}")])
 
@@ -361,7 +348,7 @@ async def np_apvt(c: Client, m: CallbackQuery, t):
     pg = pg.split("pg")[1]
     app = db.get_aproved(m.from_user.id, id)
     if app:
-        appv = "1" if app[0] == 0 or app[0] == 2 else "2"
+        appv = "1" if app[0] in [0, 2] else "2"
         db.add_aproved(
             m.from_user.id, id, appv, dates=datetime.now().timestamp(), usages=0
         )
@@ -388,19 +375,19 @@ async def theme(c: Client, m: CallbackQuery, t):
     print(a)
     if a[0] is None or "_" in m.data and a[0]:
         tid = 0
-    elif "_" in m.data and not a[0]:
+    elif "_" in m.data:
         tid = 1
     else:
         tid = a[0]
     if a[1] is None or "-" in m.data and not a[1]:
         bid = 1
-    elif "-" in m.data and a[1]:
+    elif "-" in m.data:
         bid = 0
     else:
         bid = a[1]
     if a[2] is None or "=" in m.data and a[2]:
         pid = False
-    elif "=" in m.data and not a[2]:
+    elif "=" in m.data:
         pid = True
     else:
         pid = a[2]
@@ -408,7 +395,7 @@ async def theme(c: Client, m: CallbackQuery, t):
     if a[3] is None or "+" in m.data and not a[3]:
         sid = 1
         print(4)
-    elif "+" in m.data and a[3]:
+    elif "+" in m.data:
         sid = 0
         print(5)
     else:

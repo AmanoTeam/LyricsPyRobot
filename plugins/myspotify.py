@@ -107,8 +107,6 @@ async def my_spotify(c: Client, m: InlineQuery, t):
                 )
             ]
 
-        return await m.answer(article, cache_time=0)
-
     else:
         spotify_json = sess.current_playback(additional_types="episode,track")
         if spotify_json["repeat_state"] == "track":
@@ -193,7 +191,8 @@ async def my_spotify(c: Client, m: InlineQuery, t):
                     ),
                 )
             ]
-        return await m.answer(article, cache_time=0)
+
+    return await m.answer(article, cache_time=0)
 
 
 # Player

@@ -16,10 +16,7 @@ async def spoti(c: Client, m: Message, t):
     print("a")
     text = m.text.split(" ", 1)
     if len(text) == 2:
-        if "code=" in text[1]:
-            access_code = text[1].split("code=")[1]
-        else:
-            access_code = text[1]
+        access_code = text[1].split("code=")[1] if "code=" in text[1] else text[1]
         res = await get_token(m.from_user.id, access_code)
         if res[0]:
             await m.reply_text(t("done"))
@@ -42,7 +39,7 @@ async def spoti(c: Client, m: Message, t):
         else:
             try:
                 sess = await get_spoti_session(m.from_user.id)
-            except:
+            except Exception:
                 kb = InlineKeyboardMarkup(
                     inline_keyboard=[
                         [

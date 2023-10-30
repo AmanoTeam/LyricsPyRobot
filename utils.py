@@ -68,7 +68,7 @@ async def build_browser_object(browser_type: str) -> BrowserContext:
 
     p = await PlaywrightContextManager().start()
 
-    if browser_type == "chromium" or browser_type == "chrome":
+    if browser_type in {"chromium", "chrome"}:
         browser = await p.chromium.launch(headless=True)
     elif browser_type == "firefox":
         browser = await p.firefox.launch(headless=True)
@@ -79,9 +79,7 @@ async def build_browser_object(browser_type: str) -> BrowserContext:
             "browser_type must be either 'chromium', 'firefox' or 'webkit'."
         )
 
-    context = await browser.new_context(viewport={"width": 512, "height": 288})
-
-    return context
+    return await browser.new_context(viewport={"width": 512, "height": 288})
 
 
 async def get_token(user_id, auth_code):
@@ -97,10 +95,9 @@ async def get_token(user_id, auth_code):
     b = r.json()
     if b.get("error"):
         return False, b["error"]
-    else:
-        print(b)
-        db.add_user(user_id, b["refresh_token"], b["access_token"])
-        return True, b["access_token"]
+    print(b)
+    db.add_user(user_id, b["refresh_token"], b["access_token"])
+    return True, b["access_token"]
 
 
 async def refresh_token(user_id):

@@ -30,7 +30,7 @@ async def add_donate(c: Client, q: CallbackQuery, t):
                 ("+ R$ 1,00", f"donate_{val+100}"),
                 ("+ R$ 0,50", f"donate_{val+50}"),
             ],
-            [("R$ " + str(val / 100), f"donation_{val}")],
+            [(f"R$ {str(val / 100)}", f"donation_{val}")],
             [
                 ("- R$ 100,00", f"donate_{val-10000}"),
                 ("- R$ 10,00", f"donate_{val-1000}"),
@@ -61,9 +61,8 @@ async def donation(c: Client, q: Union[CallbackQuery, Message], t):
                 description=t("donation_subtitle"),
                 invoice=Invoice(
                     currency="BRL",
-                    # prices needs to be a list, even for a single item
                     prices=[LabeledPrice(label=t("donation_label"), amount=val)],
-                    test=True if q.from_user.id in sudos else False,
+                    test=q.from_user.id in sudos,
                 ),
                 payload=b"payment",
                 provider=key,

@@ -37,10 +37,7 @@ async def np(c: Client, m: Message, t):
         if usr.type != ChatType.PRIVATE:
             return await m.reply_text(t("only_users"))
         if usr.id == m.from_user.id or (xm and xm[0] == 1):
-            if not xm[1]:
-                usages = 1
-            else:
-                usages = xm[1] + 1
+            usages = xm[1] + 1 if xm[1] else 1
             db.add_aproved(
                 usr.id,
                 m.from_user.id,
@@ -83,7 +80,7 @@ async def np(c: Client, m: Message, t):
             return await m.reply(t("approvedr").format(name=usr.first_name))
     try:
         sess = await get_spoti_session(m.from_user.id)
-    except:
+    except Exception:
         return await m.reply_text(t("not_logged"))
     if not sess or sess.current_playback() is None:
         tk = db.get(m.from_user.id)
@@ -95,31 +92,30 @@ async def np(c: Client, m: Message, t):
         track_info = await get_track_info(tk[2], a[0]["artist"]["#text"], a[0]["name"])
         stick = db.theme(duid)[3]
         mtext = f"🎵 {a[0]['artist']['#text']} - {a[0]['name']}"
-        if stick is None or stick:
-            album_url = a[0]["image"][-1]["#text"]
-            if not album_url:
-                # if not present in api return, try to get album url from page
-                r = await http_pool.get(a[0]["url"].replace("/_/", "/"))
-                if r.status_code == 200:
-                    album_url = LFM_LINK_RE.findall(r.text)[0]
-                else:
-                    r2 = await http_pool.get(a[0]["url"])
-                    album_url = LFM_LINK_RE.findall(r2.text)[0]
-            album_art = await get_song_art(
-                song_name=a[0]["name"],
-                artist=a[0]["artist"]["#text"],
-                album_url=album_url,
-                color="dark" if db.theme(duid)[0] else "light",
-                blur=db.theme(duid)[1],
-                scrobbles=track_info["track"]["userplaycount"],
-            )
-            return await m.reply_document(album_art, caption=mtext)
-        else:
+        if stick is not None and not stick:
             return await m.reply(
                 mtext,
                 parse_mode=ParseMode.HTML,
             )
 
+        album_url = a[0]["image"][-1]["#text"]
+        if not album_url:
+            # if not present in api return, try to get album url from page
+            r = await http_pool.get(a[0]["url"].replace("/_/", "/"))
+            if r.status_code == 200:
+                album_url = LFM_LINK_RE.findall(r.text)[0]
+            else:
+                r2 = await http_pool.get(a[0]["url"])
+                album_url = LFM_LINK_RE.findall(r2.text)[0]
+        album_art = await get_song_art(
+            song_name=a[0]["name"],
+            artist=a[0]["artist"]["#text"],
+            album_url=album_url,
+            color="dark" if db.theme(duid)[0] else "light",
+            blur=db.theme(duid)[1],
+            scrobbles=track_info["track"]["userplaycount"],
+        )
+        return await m.reply_document(album_art, caption=mtext)
     spotify_json = sess.current_playback(additional_types="episode,track")
     stick = db.theme(duid)[3]
     if "artists" in spotify_json["item"]:

@@ -98,10 +98,7 @@ async def inline(c, m, t):
 async def choosen(c: Client, m: ChosenInlineResult, t):
     if m.result_id == "MySpotify":
         return
-    if m.result_id[0] == "s" or m.result_id[0] == "l":
-        hash = m.result_id[1:]
-    else:
-        hash = m.result_id
+    hash = m.result_id[1:] if m.result_id[0] in ["s", "l"] else m.result_id
     a = await musixmatch.lyrics(hash)
     a = musixmatch.parce(a)
     uid = m.from_user.id
@@ -163,7 +160,7 @@ async def choosen(c: Client, m: ChosenInlineResult, t):
             )
         await c.edit_inline_text(
             m.inline_message_id,
-            "{} - {}\n{}".format(a["musica"], a["autor"], db.get_url(hash)[1]),
+            f'{a["musica"]} - {a["autor"]}\n{db.get_url(hash)[1]}',
             reply_markup=keyboard,
             parse_mode=None,
         )

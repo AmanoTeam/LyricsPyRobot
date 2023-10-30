@@ -95,5 +95,4 @@ def use_user_lang(cid, context=None):
         context = frame[0].f_code.co_filename.split(os.path.sep)[-1].split(".")[0]
 
     dic = langdict.get(lang, langdict[default_language])
-    lf = partial(get_locale_string, dic.get(context, {}), lang, context)
-    return lf
+    return partial(get_locale_string, dic.get(context, {}), lang, context)
