@@ -75,9 +75,11 @@ async def build_browser_object(browser_type: str) -> BrowserContext:
     elif browser_type == "webkit":
         browser = await p.webkit.launch(headless=True)
     else:
-        raise TypeError("browser_type must be either 'chromium', 'firefox' or 'webkit'.")
+        raise TypeError(
+            "browser_type must be either 'chromium', 'firefox' or 'webkit'."
+        )
 
-    context = await browser.new_context(viewport={'width': 512, 'height': 288})
+    context = await browser.new_context(viewport={"width": 512, "height": 288})
 
     return context
 
@@ -158,6 +160,7 @@ async def get_track_info(user: str, artist: str, track: str):
         ),
     )
     return r.json()
+
 
 loop = asyncio.new_event_loop()
 

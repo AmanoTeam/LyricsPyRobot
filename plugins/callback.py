@@ -244,9 +244,9 @@ async def tr(c: Client, m: CallbackQuery, t):
             trad = await musixmatch.translation(hash, "pt", a["letra"])
             print(trad)
             await m.edit_message_text(
-                "[{} - {}]({})\n{}".format(
-                    a["musica"], a["autor"], a["link"], trad
-                )[:4096],
+                "[{} - {}]({})\n{}".format(a["musica"], a["autor"], a["link"], trad)[
+                    :4096
+                ],
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
@@ -260,14 +260,19 @@ async def tr(c: Client, m: CallbackQuery, t):
 async def settings(c: Client, m: CallbackQuery, t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=t("np_settings"), callback_data="theme")]+
-            [InlineKeyboardButton(text=t("language"), callback_data="language")],
-            [InlineKeyboardButton(text=t("spotify"), callback_data="spotify_st")]+
-            [InlineKeyboardButton(text=t("np_apv"), callback_data="np_apv_pg0")],
-            [InlineKeyboardButton(text=t("back"), callback_data="start_back")]
+            [
+                InlineKeyboardButton(text=t("np_settings"), callback_data="theme"),
+                InlineKeyboardButton(text=t("language"), callback_data="language"),
+            ],
+            [
+                InlineKeyboardButton(text=t("spotify"), callback_data="spotify_st"),
+                InlineKeyboardButton(text=t("np_apv"), callback_data="np_apv_pg0"),
+            ],
+            [InlineKeyboardButton(text=t("back"), callback_data="start_back")],
         ]
     )
     await m.edit_message_text(t("settings_txt"), reply_markup=keyboard)
+
 
 @Client.on_callback_query(filters.regex(r"np_apv_pg"))
 @use_chat_lang()
@@ -292,7 +297,7 @@ async def np_apv(c: Client, m: CallbackQuery, t):
 
     tabela = []
     for i in range(0, len(table), 3):
-        tabela.append(table[i:i+3])
+        tabela.append(table[i : i + 3])
 
     extra = []
 
@@ -301,7 +306,7 @@ async def np_apv(c: Client, m: CallbackQuery, t):
 
     extra.append(("close", "settings"))
 
-    if len(tabela)-int(pg) > 1:
+    if len(tabela) - int(pg) > 1:
         extra.append(("next", f"np_apv_pg{int(pg)+1}"))
 
     keyb = tabela[int(pg)]
@@ -309,7 +314,8 @@ async def np_apv(c: Client, m: CallbackQuery, t):
 
     print(keyb)
 
-    await m.edit_message_text(t("np_apv_txt"), reply_markup = ikb(keyb))
+    await m.edit_message_text(t("np_apv_txt"), reply_markup=ikb(keyb))
+
 
 @Client.on_callback_query(filters.regex(r"np_apvu"))
 @use_chat_lang()
@@ -318,7 +324,9 @@ async def np_apvu(c: Client, m: CallbackQuery, t):
     pg = pg.split("pg")[1]
     app = db.get_aproved(m.from_user.id, id)
     usr = await c.get_chat(id)
-    text = t("apuser").format(name=f"<a href='tg://user?id={usr.id}'>{usr.first_name}</a>")
+    text = t("apuser").format(
+        name=f"<a href='tg://user?id={usr.id}'>{usr.first_name}</a>"
+    )
     keyb = []
     if app and app[0] == 1:
         if app[2]:
@@ -326,7 +334,11 @@ async def np_apvu(c: Client, m: CallbackQuery, t):
         else:
             date1 = "Nunca utilizado"
         date2 = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
-        text += t("apuser_txt").format(data=date2.strftime("%d/%m/%Y %H:%M:%S"), data2=date1, count=app[1] if app[1] else "0")
+        text += t("apuser_txt").format(
+            data=date2.strftime("%d/%m/%Y %H:%M:%S"),
+            data2=date1,
+            count=app[1] if app[1] else "0",
+        )
         keyb.append([(t("block"), f"np_apvt_{id}_pg{pg}")])
     elif app and app[0] == 0:
         date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
@@ -341,6 +353,7 @@ async def np_apvu(c: Client, m: CallbackQuery, t):
 
     await m.edit_message_text(text, reply_markup=ikb(keyb))
 
+
 @Client.on_callback_query(filters.regex(r"np_apvt"))
 @use_chat_lang()
 async def np_apvt(c: Client, m: CallbackQuery, t):
@@ -349,9 +362,12 @@ async def np_apvt(c: Client, m: CallbackQuery, t):
     app = db.get_aproved(m.from_user.id, id)
     if app:
         appv = "1" if app[0] == 0 or app[0] == 2 else "2"
-        db.add_aproved(m.from_user.id, id, appv, dates=datetime.now().timestamp(), usages=0)
+        db.add_aproved(
+            m.from_user.id, id, appv, dates=datetime.now().timestamp(), usages=0
+        )
         m.data = f"np_apvu_{id}_pg{pg}"
         await np_apvu(c, m)
+
 
 @Client.on_callback_query(filters.regex(r"language"))
 @use_chat_lang()
@@ -426,27 +442,29 @@ async def theme(c: Client, m: CallbackQuery, t):
     db.def_theme(m.from_user.id, tid, bid, pid, sid)
     await m.edit_message_text(t("np_settings_txt"), reply_markup=keyboard)
 
+
 @Client.on_callback_query(filters.regex(r"spotify_st"))
 @use_chat_lang()
 async def spotify_st(c: Client, m: CallbackQuery, t):
-    text = t('spotify')+'\n\n'
+    text = t("spotify") + "\n\n"
 
     tk = db.get(m.from_user.id)
     if not tk or not tk[0]:
-        text += t('nologged')
+        text += t("nologged")
     else:
         sp = await get_spoti_session(m.from_user.id)
         profile = sp.current_user()
-        text += t('logged').format(name=profile["display_name"])
+        text += t("logged").format(name=profile["display_name"])
 
     kb = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [InlineKeyboardButton(text=t("login"),url=login_url)],
-                    [InlineKeyboardButton(text=t("back"), callback_data="settings")]
-                ]
-            )
+        inline_keyboard=[
+            [InlineKeyboardButton(text=t("login"), url=login_url)],
+            [InlineKeyboardButton(text=t("back"), callback_data="settings")],
+        ]
+    )
 
     await m.edit_message_text(text, reply_markup=kb)
+
 
 @Client.on_callback_query(filters.regex("^set_lang "))
 @use_chat_lang()

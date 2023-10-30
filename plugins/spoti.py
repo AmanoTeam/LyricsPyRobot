@@ -69,7 +69,9 @@ async def spoti(c: Client, m: Message, t):
                     album_art = await get_song_art(
                         song_name=spotify_json["item"]["name"],
                         artist=publi,
-                        album_url=spotify_json["item"]["album"]["images"][0]["url"] if "album" in spotify_json["item"] else spotify_json["item"]["images"][0]["url"],
+                        album_url=spotify_json["item"]["album"]["images"][0]["url"]
+                        if "album" in spotify_json["item"]
+                        else spotify_json["item"]["images"][0]["url"],
                         duration=spotify_json["item"]["duration_ms"] // 1000,
                         progress=spotify_json["progress_ms"] // 1000,
                         color="dark" if db.theme(m.from_user.id)[0] else "light",

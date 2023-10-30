@@ -25,6 +25,7 @@ from .letra import letra
 
 LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
+
 @Client.on_message(filters.command("np"))
 @use_chat_lang()
 async def np(c: Client, m: Message, t):
@@ -39,12 +40,20 @@ async def np(c: Client, m: Message, t):
             if not xm[1]:
                 usages = 1
             else:
-                usages = xm[1]+1
-            db.add_aproved(usr.id, m.from_user.id, xm[0], usages=usages, dates=datetime.now().timestamp())
+                usages = xm[1] + 1
+            db.add_aproved(
+                usr.id,
+                m.from_user.id,
+                xm[0],
+                usages=usages,
+                dates=datetime.now().timestamp(),
+            )
             duid = m.from_user.id
             m.from_user.id = usr.id
         elif xm and xm[0] == 0:
-            return await m.reply_text(t("not_aproved").format(first_name=usr.first_name))
+            return await m.reply_text(
+                t("not_aproved").format(first_name=usr.first_name)
+            )
         elif xm and xm[0] == 2:
             return await m.reply_text(t("blocked").format(first_name=usr.first_name))
         else:
@@ -63,9 +72,14 @@ async def np(c: Client, m: Message, t):
                     ]
                 ]
             )
-            db.add_aproved(usr.id, m.from_user.id, False, dates=datetime.now().timestamp())
-            await c.send_message(usr.id, ut("aprrovedu").format(name=m.from_user.first_name),
-                                 reply_markup=kb)
+            db.add_aproved(
+                usr.id, m.from_user.id, False, dates=datetime.now().timestamp()
+            )
+            await c.send_message(
+                usr.id,
+                ut("aprrovedu").format(name=m.from_user.first_name),
+                reply_markup=kb,
+            )
             return await m.reply(t("approvedr").format(name=usr.first_name))
     try:
         sess = await get_spoti_session(m.from_user.id)
@@ -116,7 +130,9 @@ async def np(c: Client, m: Message, t):
         album_art = await get_song_art(
             song_name=spotify_json["item"]["name"],
             artist=publi,
-            album_url=spotify_json["item"]["album"]["images"][0]["url"] if "album" in spotify_json["item"] else spotify_json["item"]["images"][0]["url"],
+            album_url=spotify_json["item"]["album"]["images"][0]["url"]
+            if "album" in spotify_json["item"]
+            else spotify_json["item"]["images"][0]["url"],
             duration=spotify_json["item"]["duration_ms"] // 1000,
             progress=spotify_json["progress_ms"] // 1000,
             color="dark" if db.theme(duid)[0] else "light",
@@ -135,9 +151,7 @@ async def np(c: Client, m: Message, t):
                     if spotify_json["is_playing"]
                     else f"play|{m.from_user.id}",
                 ),
-                InlineKeyboardButton(
-                    text="⏭", callback_data=f"next|{m.from_user.id}"
-                ),
+                InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
             ],
             [
                 InlineKeyboardButton(
@@ -152,9 +166,7 @@ async def np(c: Client, m: Message, t):
         ]
     )
     if stick is None or stick:
-        await m.reply_document(
-            album_art, reply_markup=kb, caption=mtext
-        )
+        await m.reply_document(album_art, reply_markup=kb, caption=mtext)
     else:
         mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
         mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
@@ -175,6 +187,7 @@ async def aprova(c: Client, m: CallbackQuery, t):
     await c.send_message(uid, ut("aproved").format(first_name=m.from_user.first_name))
     await m.edit_message_text(t("saproved").format(first_name=usr.first_name))
 
+
 @Client.on_callback_query(filters.regex(r"^negar"))
 @use_chat_lang()
 async def negar(c: Client, m: CallbackQuery, t):
@@ -184,6 +197,7 @@ async def negar(c: Client, m: CallbackQuery, t):
     ut = use_user_lang(usr.id)
     await c.send_message(uid, ut("denied").format(first_name=m.from_user.first_name))
     await m.edit_message_text(t("sdenied").format(first_name=usr.first_name))
+
 
 @Client.on_callback_query(filters.regex(r"^sp_s"))
 async def sp_search(c: Client, m: CallbackQuery):
@@ -260,9 +274,7 @@ async def previous(c: Client, m: CallbackQuery, t):
                 parse_mode=ParseMode.HTML,
             )
         else:
-            await m.answer(
-                f"🎵 {publi} - {spotify_json['item']['name']}"
-            )
+            await m.answer(f"🎵 {publi} - {spotify_json['item']['name']}")
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
@@ -324,9 +336,7 @@ async def next(c: Client, m: CallbackQuery, t):
                 parse_mode=ParseMode.HTML,
             )
         else:
-            await m.answer(
-                f"🎵 {publi} - {spotify_json['item']['name']}"
-            )
+            await m.answer(f"🎵 {publi} - {spotify_json['item']['name']}")
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))

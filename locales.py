@@ -11,8 +11,8 @@ enabled_locales = [
     "pt-BR",  # Portuguese (Brazil)
     "he-IL",  # Hebrew
     "es-ES",  # Spanish
-    "pt-BR2", # Protugês zoeiro
-    "en-HT"   # English HiperTranslate
+    "pt-BR2",  # Protugês zoeiro
+    "en-HT",  # English HiperTranslate
 ]
 
 default_language = "en-US"
@@ -50,7 +50,6 @@ def get_locale_string(
 
 
 def get_lang(cid) -> str:
-
     lang = db.db_get_lang(cid)
 
     lang = lang[0] if lang and lang[0] else default_language
@@ -87,9 +86,10 @@ def use_chat_lang(context=None):
 
     return decorator
 
+
 def use_user_lang(cid, context=None):
     lang = get_lang(cid)
-    
+
     if not context:
         frame = inspect.stack()[1]
         context = frame[0].f_code.co_filename.split(os.path.sep)[-1].split(".")[0]

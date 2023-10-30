@@ -47,19 +47,31 @@ dbc.execute(
                                            dates INTEGER)"""
 )
 
+
 def add_aproved(user_id, user, aproved, usages=None, uusage=None, dates=None):
     if get_aproved(user_id, user):
-        dbc.execute("UPDATE aproved SET aproved = ?, usages = ?, uusage = ?, dates = ? WHERE user_id = ? AND user = ?", (aproved, usages, uusage, dates, user_id, user))
+        dbc.execute(
+            "UPDATE aproved SET aproved = ?, usages = ?, uusage = ?, dates = ? WHERE user_id = ? AND user = ?",
+            (aproved, usages, uusage, dates, user_id, user),
+        )
     else:
-        dbc.execute("INSERT INTO aproved (user_id, user, aproved, usages, uusage, dates) VALUES (?,?,?,?,?,?)", (user_id, user, aproved, usages, uusage, dates))
+        dbc.execute(
+            "INSERT INTO aproved (user_id, user, aproved, usages, uusage, dates) VALUES (?,?,?,?,?,?)",
+            (user_id, user, aproved, usages, uusage, dates),
+        )
     db.commit()
 
+
 def get_aproved(user_id, user):
-    dbc.execute("SELECT aproved, usages, uusage, dates FROM aproved WHERE user_id = (?) AND user = (?)", (user_id, user))
+    dbc.execute(
+        "SELECT aproved, usages, uusage, dates FROM aproved WHERE user_id = (?) AND user = (?)",
+        (user_id, user),
+    )
     try:
         return dbc.fetchone()
     except IndexError:
         return None
+
 
 def get_all_aproved(user_id):
     dbc.execute("SELECT *, aproved FROM aproved WHERE user_id = (?)", (user_id,))
@@ -67,6 +79,7 @@ def get_all_aproved(user_id):
         return dbc.fetchall()
     except IndexError:
         return None
+
 
 def add_hash(hash, h):
     dbc.execute("SELECT url FROM saves WHERE hash = (?)", (hash,))

@@ -92,6 +92,7 @@ async def inline(c, m, t):
     await m.answer(articles)
 """
 
+
 @Client.on_chosen_inline_result()
 @use_chat_lang()
 async def choosen(c: Client, m: ChosenInlineResult, t):
