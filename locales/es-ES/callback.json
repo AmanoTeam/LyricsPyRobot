@@ -25,5 +25,10 @@
     "logged": "Estás conectado con: {name}\n\nCambia tu configuración de inicio de sesión a continuación:",
     "login": "Ingresar",
     "np_apv": "aprobaciones de NP",
-    "np_apv_txt": "Elige usuarios aprobados para tu lista de reproducción Now Playing:"
+    "np_apv_txt": "Elige usuarios aprobados para tu lista de reproducción Now Playing:",
+    "apuser": "Información sobre la aprobación del usuario {name}:\n\n",
+    "apuser_txt": "Aprobado el: {data}\nÚltima utilización: {data2}\nNúmero de usos: {count}",
+    "block": "Bloquear",
+    "aprove": "Aprobar",
+    "unblock": "Desbloquear"
 }
