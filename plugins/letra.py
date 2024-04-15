@@ -16,6 +16,8 @@ async def letra(c: Client, m: Message, t):
     text = m.text.split(" ", 1)[1]
     if not text:
         await m.reply_text(t("use"))
+    elif 'spotify:' in text:
+        a = await musixmatch.lyrics(text.split(":", 1)[1])
     elif re.match(
         r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", text
     ):

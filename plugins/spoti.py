@@ -8,7 +8,7 @@ from locales import use_chat_lang
 from utils import get_song_art, get_spoti_session, get_token
 
 from .letra import letra
-
+from utils import musixmatch
 
 @Client.on_message(filters.command("spoti"))
 @use_chat_lang()
@@ -82,5 +82,7 @@ async def spoti(c: Client, m: Message, t):
                         mtext,
                         parse_mode=ParseMode.HTML,
                     )
-                m.text = f"/letra {spotify_json['item']['artists'][0]['name']} {spotify_json['item']['name']}"
-                await letra(c, m)
+                a = await musixmatch.spotify_lyrics(artist=spotify_json['item']['artists'][0]['name'], track=spotify_json['item']['name'])
+                if a:
+                    m.text = "/letra spotify:"+str(a['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id'])
+                    await letra(c, m)

@@ -8,6 +8,7 @@ from locales import use_chat_lang
 from utils import get_current, get_song_art, get_track_info, http_pool
 
 from .letra import letra
+from utils import musixmatch
 
 LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
@@ -59,5 +60,7 @@ async def lfm(c: Client, m: Message, t):
                         mtext,
                         parse_mode="html",
                     )
-                m.text = f"/letra {a[0]['artist']['#text']} {a[0]['name']}"
-                await letra(c, m)
+                a = await musixmatch.spotify_lyrics(artist=a[0]['artist']['#text'], track=a[0]['name'])
+                if a:
+                    m.text = "/letra spotify:"+str(a['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id'])
+                    await letra(c, m)
