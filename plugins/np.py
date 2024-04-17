@@ -216,7 +216,10 @@ async def sp_search(c: Client, m: CallbackQuery):
         a = await musixmatch.spotify_lyrics(artist=spotify_json['artists'][0]['name'], track=spotify_json['name'])
         if a:
             om.text = "/letra spotify:"+str(a['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id'])
-            await letra(c, om)
+            try:
+                await letra(c, m)
+            except:
+                await m.reply_text(t("lyrics_nf"))
 
 
 @Client.on_callback_query(filters.regex(r"^tcs"))

@@ -17,7 +17,6 @@ LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 @use_chat_lang()
 async def lfm(c: Client, m: Message, t):
     text = m.text.split(" ", 1)
-    print(text)
     if len(text) == 2:
         db.add_user_last(m.from_user.id, text[1])
         await m.reply_text(t("done"))
@@ -63,4 +62,7 @@ async def lfm(c: Client, m: Message, t):
                 a = await musixmatch.spotify_lyrics(artist=a[0]['artist']['#text'], track=a[0]['name'])
                 if a:
                     m.text = "/letra spotify:"+str(a['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id'])
-                    await letra(c, m)
+                    try:
+                        await letra(c, m)
+                    except:
+                        await m.reply_text(t("lyrics_nf"))
