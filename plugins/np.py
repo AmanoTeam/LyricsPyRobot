@@ -44,7 +44,7 @@ async def np(c: Client, m: Message, t):
                 m.from_user.id,
                 xm[0],
                 usages=usages,
-                dates=datetime.now().timestamp(),
+                uusage=datetime.now().timestamp(),
             )
             duid = m.from_user.id
             m.from_user.id = usr.id
@@ -136,20 +136,29 @@ async def np(c: Client, m: Message, t):
             blur=db.theme(duid)[1],
         )
     mtext = f"🎵 {publi} - {spotify_json['item']['name']}"
+    if "premium" not in sess.current_user()["product"]:
+        play_kb = [
+                    InlineKeyboardButton(
+                        "You need Spotify Premium to control playback",
+                        url="https://www.spotify.com/premium/"
+                    )
+                  ]
+    else:
+        play_kb = [
+                    InlineKeyboardButton(
+                        text="⏮", callback_data=f"previous|{m.from_user.id}"
+                    ),
+                    InlineKeyboardButton(
+                        text="⏸" if spotify_json["is_playing"] else "▶️",
+                        callback_data=f"pause|{m.from_user.id}"
+                        if spotify_json["is_playing"]
+                        else f"play|{m.from_user.id}",
+                    ),
+                    InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
+                ]
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="⏮", callback_data=f"previous|{m.from_user.id}"
-                ),
-                InlineKeyboardButton(
-                    text="⏸" if spotify_json["is_playing"] else "▶️",
-                    callback_data=f"pause|{m.from_user.id}"
-                    if spotify_json["is_playing"]
-                    else f"play|{m.from_user.id}",
-                ),
-                InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
-            ],
+            play_kb,
             [
                 InlineKeyboardButton(
                     text=t("play_in_sp"),
@@ -178,7 +187,7 @@ async def np(c: Client, m: Message, t):
 @use_chat_lang()
 async def aprova(c: Client, m: CallbackQuery, t):
     uid = m.data.split("|")[1]
-    db.add_aproved(m.from_user.id, uid, True)
+    db.add_aproved(m.from_user.id, uid, True, dates=datetime.now().timestamp())
     usr = await c.get_users(uid)
     ut = use_user_lang(usr.id)
     await c.send_message(uid, ut("aproved").format(first_name=m.from_user.first_name))
@@ -189,7 +198,7 @@ async def aprova(c: Client, m: CallbackQuery, t):
 @use_chat_lang()
 async def negar(c: Client, m: CallbackQuery, t):
     uid = m.data.split("|")[1]
-    db.add_aproved(m.from_user.id, uid, 2)
+    db.add_aproved(m.from_user.id, uid, 2, dates=datetime.now().timestamp())
     usr = await c.get_users(uid)
     ut = use_user_lang(usr.id)
     await c.send_message(uid, ut("denied").format(first_name=m.from_user.first_name))

@@ -49,10 +49,11 @@ dbc.execute(
 
 
 def add_aproved(user_id, user, aproved, usages=None, uusage=None, dates=None):
-    if get_aproved(user_id, user):
+    x = get_aproved(user_id, user)
+    if x:
         dbc.execute(
             "UPDATE aproved SET aproved = ?, usages = ?, uusage = ?, dates = ? WHERE user_id = ? AND user = ?",
-            (aproved, usages, uusage, dates, user_id, user),
+            (aproved, usages, uusage, dates if dates else x[3], user_id, user),
         )
     else:
         dbc.execute(

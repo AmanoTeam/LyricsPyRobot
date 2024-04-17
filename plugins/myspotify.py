@@ -316,11 +316,6 @@ async def next(c: Client, m: CallbackQuery, t):
     await m.edit_message_text(text, reply_markup=ikb(keyb))
 
 
-@Client.on_callback_query(group=1)
-async def aa(c: Client, m: CallbackQuery):
-    print(m.data)
-
-
 @Client.on_callback_query(filters.regex("^sploopo|sploopc|sploopt"))
 @use_chat_lang()
 async def sp_loop(c: Client, m: CallbackQuery, t):

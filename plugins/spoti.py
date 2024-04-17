@@ -13,7 +13,6 @@ from utils import musixmatch
 @Client.on_message(filters.command("spoti"))
 @use_chat_lang()
 async def spoti(c: Client, m: Message, t):
-    print("a")
     text = m.text.split(" ", 1)
     if len(text) == 2:
         access_code = text[1].split("code=")[1] if "code=" in text[1] else text[1]
@@ -54,7 +53,6 @@ async def spoti(c: Client, m: Message, t):
                 return
             spotify_json = sess.current_playback(additional_types="episode,track")
             if not spotify_json:
-                print("b")
                 await m.reply_text(t("play"))
             else:
                 stick = db.theme(m.from_user.id)[3]

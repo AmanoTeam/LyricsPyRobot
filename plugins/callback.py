@@ -44,7 +44,6 @@ def gen_langs_kb():
 async def teor(c: Client, m: CallbackQuery, t):
     user, hash = m.data[2:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
-        print(hash)
         n = db.get_url(hash)
         if not n:
             await m.answer(t("hash_nf"), show_alert=True)
@@ -100,7 +99,6 @@ async def tetr(c: Client, m: CallbackQuery, t):
     user, hash = m.data[2:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
-        print(hash)
         if not n:
             await m.answer(t("hash_nf"), show_alert=True)
         else:
@@ -144,7 +142,6 @@ async def ori(c: Client, m: CallbackQuery, t):
     user, hash = m.data[1:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
-        print(hash)
         if not n:
             await m.answer(t("hash_nf"), show_alert=True)
         else:
@@ -199,7 +196,6 @@ async def tr(c: Client, m: CallbackQuery, t):
     user, hash = m.data[1:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
         n = db.get_url(hash)
-        print(hash)
         if not n:
             await m.answer(t("hash_nf"), show_alert=True)
         else:
@@ -228,7 +224,6 @@ async def tr(c: Client, m: CallbackQuery, t):
                 ]
             )
             trad = await musixmatch.translation(hash, "pt", a["letra"])
-            print(trad)
             await m.edit_message_text(
                 f'[{a["musica"]} - {a["autor"]}]({a["link"]})\n{trad}'[:4096],
                 reply_markup=keyboard,
@@ -293,8 +288,6 @@ async def np_apv(c: Client, m: CallbackQuery, t):
     keyb = tabela[int(pg)]
     keyb.append(extra)
 
-    print(keyb)
-
     await m.edit_message_text(t("np_apv_txt"), reply_markup=ikb(keyb))
 
 
@@ -316,23 +309,35 @@ async def np_apvu(c: Client, m: CallbackQuery, t):
                 if app[2]
                 else "Nunca utilizado"
             )
-            date2 = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
+            date2 = (
+                datetime.fromtimestamp(app[3]).strftime("%d/%m/%Y %H:%M:%S")
+                if app[3]
+                else "Sem data"
+            )
             text += t("apuser_txt").format(
-                data=date2.strftime("%d/%m/%Y %H:%M:%S"),
+                data=date2,
                 data2=date1,
                 count=app[1] or "0",
             )
             keyb.append([(t("block"), f"np_apvt_{id}_pg{pg}")])
         elif app[0] == 0:
-            date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
+            date = (
+                datetime.fromtimestamp(app[3]).strftime("%d/%m/%Y %H:%M:%S")
+                if app[3]
+                else "Sem data"
+            )
             text += "Solicitado em: {data}".format(
-                data=date.strftime("%d/%m/%Y %H:%M:%S")
+                data=date
             )
             keyb.append([(t("aprove"), f"np_apvt_{id}_pg{pg}")])
         elif app[0] == 2:
-            date = datetime.fromtimestamp(app[3]) if app[3] else datetime.now()
+            date = (
+                datetime.fromtimestamp(app[3]).strftime("%d/%m/%Y %H:%M:%S")
+                if app[3]
+                else "Sem data"
+            )
             text += "Reprovado em: {data}".format(
-                data=date.strftime("%d/%m/%Y %H:%M:%S")
+                data=date
             )
             keyb.append([(t("unblock"), f"np_apvt_{id}_pg{pg}")])
 
@@ -372,7 +377,6 @@ async def lang(c: Client, m: CallbackQuery, t):
 @use_chat_lang()
 async def theme(c: Client, m: CallbackQuery, t):
     a = db.theme(m.from_user.id)
-    print(a)
     if a[0] is None or "_" in m.data and a[0]:
         tid = 0
     elif "_" in m.data:
@@ -391,20 +395,15 @@ async def theme(c: Client, m: CallbackQuery, t):
         pid = True
     else:
         pid = a[2]
-    print(m.data)
     if a[3] is None or "+" in m.data and not a[3]:
         sid = 1
-        print(4)
     elif "+" in m.data:
         sid = 0
-        print(5)
     else:
         sid = a[3]
-        print(6)
     tname = [t("light"), t("dark")]
     bname = ["☑️", "✅"]
     pname = [t("text"), t("tgph")]
-    print(sid)
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
