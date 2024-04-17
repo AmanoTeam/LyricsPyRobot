@@ -217,9 +217,9 @@ async def sp_search(c: Client, m: CallbackQuery):
         if a:
             om.text = "/letra spotify:"+str(a['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id'])
             try:
-                await letra(c, m)
+                await letra(c, om)
             except:
-                await m.reply_text(t("lyrics_nf"))
+                await om.reply_text(t("lyrics_nf"))
 
 
 @Client.on_callback_query(filters.regex(r"^tcs"))
