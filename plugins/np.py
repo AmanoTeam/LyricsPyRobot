@@ -136,26 +136,18 @@ async def np(c: Client, m: Message, t):
             blur=db.theme(duid)[1],
         )
     mtext = f"🎵 {publi} - {spotify_json['item']['name']}"
-    if "premium" not in sess.current_user()["product"]:
-        play_kb = [
-                    InlineKeyboardButton(
-                        "You need Spotify Premium to control playback",
-                        url="https://www.spotify.com/premium/"
-                    )
-                  ]
-    else:
-        play_kb = [
-                    InlineKeyboardButton(
-                        text="⏮", callback_data=f"previous|{m.from_user.id}"
-                    ),
-                    InlineKeyboardButton(
-                        text="⏸" if spotify_json["is_playing"] else "▶️",
-                        callback_data=f"pause|{m.from_user.id}"
-                        if spotify_json["is_playing"]
-                        else f"play|{m.from_user.id}",
-                    ),
-                    InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
-                ]
+    play_kb = [
+                InlineKeyboardButton(
+                    text="⏮", callback_data=f"previous|{m.from_user.id}"
+                ),
+                InlineKeyboardButton(
+                    text="⏸" if spotify_json["is_playing"] else "▶️",
+                    callback_data=f"pause|{m.from_user.id}"
+                    if spotify_json["is_playing"]
+                    else f"play|{m.from_user.id}",
+                ),
+                InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
+            ]
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             play_kb,
