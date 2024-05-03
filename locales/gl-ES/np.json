@@ -1,0 +1,19 @@
+{
+    "not_aproved": "Vostede foi aprobado. Contacta con {first_name} para ser aprobado",
+    "blocked": "Bloqueáronte. Contacta con {first_name} para desbloquealo",
+    "not_logged": "Non iniciaches sesión. Use /spoti ou /lfm para iniciar sesión",
+    "not_playing": "Non estás a reproducir nada",
+    "play_in_sp": "Engadir á cola",
+    "search_lyric": "Procurar letras",
+    "aproved": "{first_name} aprobou o teu acceso",
+    "saproved": "Aprobaches o acceso para {first_name}",
+    "denied": "{first_name} denegouche o acceso",
+    "sdenied": "Denegaches o acceso a {first_name}",
+    "song_added": "Engadiuse música á cola",
+    "not_allowed": "Non podes usar isto, só {first_name} pode",
+    "aprrovedu": "Ola, {name} quere acceder ao teu Spotify",
+    "approvedr": "Non te aprobaron, solicitando a {name} a aprobación...",
+    "only_users": "Por favor, use este comando só nos usuarios",
+    "aprove": "Aprobar acceso",
+    "deny": "Denegar o acceso"
+}

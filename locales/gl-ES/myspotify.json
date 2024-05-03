@@ -1,0 +1,12 @@
+{
+    "my_spotify": "Reprodutor de Spotify",
+    "no_playng": "Non se reproduce música",
+    "play": "Agora non hai nada tocando. Que tal dar un <i>play</i> á tu Spotify?",
+    "top_button": "Máis Tocadas",
+    "top_text": "Cancións máis reproducidas de {name}\n\n",
+    "recent_button": "Reproducido recentemente",
+    "recent_text": "Reproducido recentemente por {name}\n\n",
+    "not_allowed": "Non podes usar isto, só {first_name} pode",
+    "premium_only": "Función exclusiva para Spotify Premium",
+    "song_added": "Engadiuse música á cola"
+}
