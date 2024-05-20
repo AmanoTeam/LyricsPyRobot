@@ -20,7 +20,6 @@
     "pattern_settings_text": "Cambia tu configuración predeterminada a continuación:",
     "lang_sucess": "Idioma cambiado correctamente",
     "ch_lang": "Elija un idioma:",
-    "Spotify": "Configuración de Spotify",
     "nologged": "No has iniciado sesión en Spotify.\nUsa el botón de abajo e inicia sesión. Luego copia el comando y envíalo aquí.",
     "logged": "Estás conectado con: {name}\n\nCambia tu configuración de inicio de sesión a continuación:",
     "login": "Ingresar",
