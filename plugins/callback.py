@@ -5,6 +5,7 @@ from functools import partial
 from pyrogram import Client, filters
 from pyrogram.helpers import ikb
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.errors import ListenerTimeout
 
 import db
 from config import login_url, sudos
@@ -244,7 +245,7 @@ async def settings(c: Client, m: CallbackQuery, t):
                 InlineKeyboardButton(text=t("language"), callback_data="language"),
             ],
             [
-                InlineKeyboardButton(text=t("spotify"), callback_data="spotify_st"),
+                InlineKeyboardButton(text="Spotify / Last.fm", callback_data="player_st"),
                 InlineKeyboardButton(text=t("np_apv"), callback_data="np_apv_pg0"),
             ],
             [InlineKeyboardButton(text=t("back"), callback_data="start_back")],
@@ -252,6 +253,17 @@ async def settings(c: Client, m: CallbackQuery, t):
     )
     await m.edit_message_text(t("settings_txt"), reply_markup=keyboard)
 
+@Client.on_callback_query(filters.regex(r"player_st"))
+@use_chat_lang()
+async def player_st(c: Client, m: CallbackQuery, t):
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=t("spotify"), callback_data="spotify_st"),
+             InlineKeyboardButton(text=t("lastfm"), callback_data="lastfm_st")],
+            [InlineKeyboardButton(text=t("back"), callback_data="settings")],
+        ]
+    )
+    await m.edit_message_text(t("player_st_txt"), reply_markup=keyboard)
 
 @Client.on_callback_query(filters.regex(r"np_apv_pg"))
 @use_chat_lang()
@@ -428,6 +440,59 @@ async def theme(c: Client, m: CallbackQuery, t):
     db.def_theme(m.from_user.id, tid, bid, pid, sid)
     await m.edit_message_text(t("np_settings_txt"), reply_markup=keyboard)
 
+@Client.on_callback_query(filters.regex(r"lastfm_st"))
+@use_chat_lang()
+async def lastfm_st(c: Client, m: CallbackQuery, t):
+    text = t("lastfm") + "\n\n"
+
+    tk = db.get(m.from_user.id)
+    if not tk or not tk[2]:
+        text += t("nologged_lfm")
+    else:
+        text += t("logged_lfm").format(name=tk[2])
+
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=t("login"), callback_data="lfm_login"),
+             InlineKeyboardButton(text=t("logout"), callback_data="lfm_logout")],
+            [InlineKeyboardButton(text=t("back"), callback_data="player_st")],
+        ]
+    )
+
+    await m.edit_message_text(text, reply_markup=kb)
+
+@Client.on_callback_query(filters.regex(r"lfm_login"))
+@use_chat_lang()
+async def lfm_login(c: Client, m: CallbackQuery, t):
+    await m.edit_message_text(t("lfm_login"))
+
+    cmessage = None
+
+    while not cmessage:
+        try:
+            cmessage = await m.message.chat.listen(filters.text)
+        except ListenerTimeout:
+            return
+
+    db.add_user_last(m.from_user.id, cmessage.text)
+
+    keyb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=t("back"), callback_data="lastfm_st")],
+        ]
+    )
+    await m.edit_message_text(t("lfm_login_done").format(name=cmessage.text), reply_markup=keyb)
+
+@Client.on_callback_query(filters.regex(r"lfm_logout"))
+@use_chat_lang()
+async def lfm_logout(c: Client, m: CallbackQuery, t):
+    db.add_user_last(m.from_user.id, None)
+    keyb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=t("back"), callback_data="lastfm_st")],
+        ]
+    )
+    await m.edit_message_text(t("lfm_logout"), reply_markup=keyb)
 
 @Client.on_callback_query(filters.regex(r"spotify_st"))
 @use_chat_lang()
@@ -444,12 +509,24 @@ async def spotify_st(c: Client, m: CallbackQuery, t):
 
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=t("login"), url=login_url)],
-            [InlineKeyboardButton(text=t("back"), callback_data="settings")],
+            [InlineKeyboardButton(text=t("login"), url=login_url),
+             InlineKeyboardButton(text=t("logout"), callback_data="sp_logout")],
+            [InlineKeyboardButton(text=t("back"), callback_data="player_st")],
         ]
     )
 
     await m.edit_message_text(text, reply_markup=kb)
+
+@Client.on_callback_query(filters.regex(r"sp_logout"))
+@use_chat_lang()
+async def sp_logout(c: Client, m: CallbackQuery, t):
+    db.add_user(m.from_user.id, None, None)
+    keyb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=t("back"), callback_data="spotify_st")],
+        ]
+    )
+    await m.edit_message_text(t("sp_logout"), reply_markup=keyb)
 
 
 @Client.on_callback_query(filters.regex("^set_lang "))
