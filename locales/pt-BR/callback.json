@@ -33,7 +33,7 @@
     "lfm_logout": "Você está desconectado do Last.fm",
     "login": "Login",
     "logout": "Encerrar sessão",
-    "np_apv": "\"Aprovações do NP",
+    "np_apv": "Aprovações do NP",
     "np_apv_txt": "Escolha os usuários aprovados para seu Now Playing:",
     "apuser": "Informações sobre a aprovação do usuário {name}:\n\n",
     "apuser_txt": "Aprovado em: {data}\nÚltimo uso em: {data2}\nNúmero de usos: {count}",
