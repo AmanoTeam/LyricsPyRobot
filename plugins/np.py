@@ -1,10 +1,10 @@
 import re
 from datetime import datetime, timedelta
 
-from pyrogram import Client, filters
-from pyrogram.enums import ChatType
-from pyrogram.enums.parse_mode import ParseMode
-from pyrogram.types import (
+from hydrogram import Client, filters
+from hydrogram.enums import ChatType
+from hydrogram.enums.parse_mode import ParseMode
+from hydrogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,

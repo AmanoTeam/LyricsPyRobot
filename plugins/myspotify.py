@@ -2,9 +2,9 @@ import asyncio
 import datetime
 import re
 
-from pyrogram import Client, filters
-from pyrogram.helpers import ikb
-from pyrogram.types import (
+from hydrogram import Client, filters
+from hydrogram.helpers import ikb
+from hydrogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,

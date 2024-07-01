@@ -1,6 +1,6 @@
-from pyrogram import Client, filters
-from pyrogram.enums.parse_mode import ParseMode
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from hydrogram import Client, filters
+from hydrogram.enums.parse_mode import ParseMode
+from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 import db
 from config import login_url

@@ -1,9 +1,9 @@
 from typing import Union
 
-from pyrogram import Client, filters
-from pyrogram.helpers import ikb
-from pyrogram.raw.functions.messages import SendMedia, SetBotPrecheckoutResults
-from pyrogram.raw.types import (
+from hydrogram import Client, filters
+from hydrogram.helpers import ikb
+from hydrogram.raw.functions.messages import SendMedia, SetBotPrecheckoutResults
+from hydrogram.raw.types import (
     DataJSON,
     InputMediaInvoice,
     Invoice,
@@ -12,7 +12,7 @@ from pyrogram.raw.types import (
     UpdateBotPrecheckoutQuery,
     UpdateNewMessage,
 )
-from pyrogram.types import CallbackQuery, Message, Update
+from hydrogram.types import CallbackQuery, Message, Update
 
 from config import stripe_token, sudos
 from locales import use_chat_lang, use_user_lang
