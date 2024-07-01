@@ -13,6 +13,7 @@ from hydrogram.types import (
     InlineQueryResultCachedDocument,
     InputTextMessageContent,
 )
+from spotipy.exceptions import SpotifyException
 
 import db
 from config import cache_chat
@@ -109,6 +110,10 @@ async def my_spotify(c: Client, m: InlineQuery, t):
 
     else:
         spotify_json = sess.current_playback(additional_types="episode,track")
+        try:
+            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+        except SpotifyException:
+            fav = False
         if spotify_json["repeat_state"] == "track":
             emoji = "🔂"
             call = f"sploopt|{m.from_user.id}"
@@ -137,7 +142,7 @@ async def my_spotify(c: Client, m: InlineQuery, t):
                 ],
                 [
                     InlineKeyboardButton(
-                        f'{spotify_json["item"]["name"]} - {publi}',
+                        f'{"❤" if fav else ""} {spotify_json["item"]["name"]} - {publi}',
                         f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}',
                     )
                 ],
@@ -213,6 +218,10 @@ async def previous(c: Client, m: CallbackQuery, t):
     sp.previous_track(device_id)
     await asyncio.sleep(0.5)
     spotify_json = sp.current_playback(additional_types="episode,track")
+    try:
+        fav = sp.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+    except SpotifyException:
+        fav = False
 
     if spotify_json["repeat_state"] == "track":
         emoji = "🔂"
@@ -241,7 +250,7 @@ async def previous(c: Client, m: CallbackQuery, t):
         ],
         [
             (
-                f'{spotify_json["item"]["name"]} - {publi}',
+                f'{spotify_json["item"]["name"]} - {publi} {"❤" if fav else ""}',
                 f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}',
             )
         ],
@@ -273,6 +282,10 @@ async def next(c: Client, m: CallbackQuery, t):
     sp.next_track(device_id)
     await asyncio.sleep(0.5)
     spotify_json = sp.current_playback(additional_types="episode,track")
+    try:
+        fav = sp.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+    except SpotifyException:
+        fav = False
 
     if spotify_json["repeat_state"] == "track":
         emoji = "🔂"
@@ -301,7 +314,7 @@ async def next(c: Client, m: CallbackQuery, t):
         ],
         [
             (
-                f'{spotify_json["item"]["name"]} - {publi}',
+                f'{spotify_json["item"]["name"]} - {publi} {"❤" if fav else ""}',
                 f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}',
             )
         ],
@@ -345,6 +358,11 @@ async def sp_loop(c: Client, m: CallbackQuery, t):
         callb = f"sploopo|{m.from_user.id}"
     await asyncio.sleep(0.5)
     spotify_json = sp.current_playback(additional_types="episode,track")
+    try:
+        fav = sp.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+    except SpotifyException:
+        fav = False
+
     if "artists" in spotify_json["item"]:
         publi = spotify_json["item"]["artists"][0]["name"]
     else:
@@ -363,7 +381,7 @@ async def sp_loop(c: Client, m: CallbackQuery, t):
         ],
         [
             (
-                f'{spotify_json["item"]["name"]} - {publi}',
+                f'{spotify_json["item"]["name"]} - {publi} {"❤" if fav else ""}',
                 f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}',
             )
         ],
@@ -397,6 +415,10 @@ async def recently(c: Client, m: CallbackQuery, t):
         text += f'{n+1}. {res["artists"][0]["name"]} - {res["name"]}\n'
 
     spotify_json = sp.current_playback(additional_types="episode,track")
+    try:
+        fav = sp.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+    except SpotifyException:
+        fav = False
 
     if spotify_json["repeat_state"] == "track":
         emoji = "🔂"
@@ -425,7 +447,7 @@ async def recently(c: Client, m: CallbackQuery, t):
         ],
         [
             (
-                f'{spotify_json["item"]["name"]} - {publi}',
+                f'{spotify_json["item"]["name"]} - {publi} {"❤" if fav else ""}',
                 f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}',
             )
         ],
@@ -460,6 +482,10 @@ async def sp_playpause(c: Client, m: CallbackQuery, t):
             sp.start_playback(device_id)
         await asyncio.sleep(0.5)
     spotify_json = sp.current_playback(additional_types="episode,track")
+    try:
+        fav = sp.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+    except SpotifyException:
+        fav = False
 
     if spotify_json["repeat_state"] == "track":
         emoji = "🔂"
@@ -488,7 +514,7 @@ async def sp_playpause(c: Client, m: CallbackQuery, t):
         ],
         [
             (
-                f'{spotify_json["item"]["name"]} - {publi}',
+                f'{spotify_json["item"]["name"]} - {publi} {"❤" if fav else ""}',
                 f'spmain|{m.from_user.id}|{spotify_json["item"]["id"]}',
             )
         ],

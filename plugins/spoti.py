@@ -1,14 +1,15 @@
 from hydrogram import Client, filters
 from hydrogram.enums.parse_mode import ParseMode
 from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from spotipy.exceptions import SpotifyException
 
 import db
 from config import login_url
 from locales import use_chat_lang
-from utils import get_song_art, get_spoti_session, get_token
+from utils import get_song_art, get_spoti_session, get_token, musixmatch
 
 from .letra import letra
-from utils import musixmatch
+
 
 @Client.on_message(filters.command("spoti"))
 @use_chat_lang()
@@ -52,6 +53,12 @@ async def spoti(c: Client, m: Message, t):
                 await m.reply_text(t("login_txt"), reply_markup=kb)
                 return
             spotify_json = sess.current_playback(additional_types="episode,track")
+            try:
+                fav = sess.current_user_saved_tracks_contains(
+                    [spotify_json["item"]["id"]]
+                )[0]
+            except SpotifyException:
+                fav = False
             if not spotify_json:
                 await m.reply_text(t("play"))
             else:
@@ -74,15 +81,23 @@ async def spoti(c: Client, m: Message, t):
                     )
                 mtext = f"🎵 {publi} - {spotify_json['item']['name']}"
                 if stick is None or stick:
-                    await m.reply_document(album_art, caption=mtext)
+                    mes = await m.reply_document(album_art, caption=mtext)
                 else:
-                    await m.reply(
+                    mes = await m.reply(
                         mtext,
                         parse_mode=ParseMode.HTML,
                     )
-                a = await musixmatch.spotify_lyrics(artist=spotify_json['item']['artists'][0]['name'], track=spotify_json['item']['name'])
+                await mes.react("❤" if fav else "")
+                a = await musixmatch.spotify_lyrics(
+                    artist=spotify_json["item"]["artists"][0]["name"],
+                    track=spotify_json["item"]["name"],
+                )
                 if a:
-                    m.text = "/letra spotify:"+str(a['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id'])
+                    m.text = "/letra spotify:" + str(
+                        a["message"]["body"]["macro_calls"]["matcher.track.get"][
+                            "message"
+                        ]["body"]["track"]["track_id"]
+                    )
                     try:
                         await letra(c, m)
                     except:
