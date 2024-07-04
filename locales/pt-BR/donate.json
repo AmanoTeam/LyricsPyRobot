@@ -1,7 +1,7 @@
 {
-    "se_val": "Obrigado por querer fazer uma doação para nós! Abaixo, você verá botões para selecionar o valor da sua doação. Para definir o valor, basta pressionar o botão do meio e você será direcionado para a tela de pagamento. Infelizmente, no momento, as doações são aceitas apenas em BRL (Real Brasileiro), mas em breve estaremos adicionando mais tipos de moedas. Agradecemos imensamente o seu apoio!",
+    "se_val": "Que legal que você quer contribuir com o projeto!\n\nEscolha o valor da sua doação: logo abaixo tem uns botões pra você escolher quanto quer doar. É só clicar no botão do meio e você vai direto pra página de pagamento.\n\nAh, e por enquanto a gente só aceita doações em Real (BRL), mas já já vamos adicionar outras moedas.\n\nValeu de coração pelo seu apoio!",
     "donation_title": "Nos apoie!",
     "donation_subtitle": "Faça uma doação para nos ajudar a manter o bot funcionando!",
     "donation_label": "Valor da doação:",
-    "order_confirmed": "Queremos expressar nossa sincera gratidão por sua generosidade! Realmente apreciamos sua doação. Com a sua contribuição, poderemos continuar o nosso trabalho e alcançar os nossos objetivos. A sua dedicação e apoio significa muito para nós."
+    "order_confirmed": "Uau, sua generosidade realmente aquece nossos corações! Somos incrivelmente gratos pela sua doação. Significa muito para nós que você acredita em nosso trabalho e quer nos ajudar a fazer a diferença. Sua contribuição será de grande ajuda para continuarmos nossos esforços e alcançarmos nossos objetivos. Simplesmente não poderíamos fazer isso sem o apoio de pessoas incríveis como você. Muito obrigado do fundo dos nossos corações!"
 }
