@@ -2,10 +2,10 @@ import re
 from datetime import datetime
 from functools import partial
 
-from pyrogram import Client, filters
-from pyrogram.helpers import ikb
-from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram.errors import ListenerTimeout
+from hydrogram import Client, filters
+from hydrogram.helpers import ikb
+from hydrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
+from hydrogram.errors import ListenerTimeout
 
 import db
 from config import login_url, sudos

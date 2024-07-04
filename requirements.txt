@@ -1,7 +1,7 @@
 git+https://github.com/AmanoTeam/lyricspy
 pillow
 playwright
-git+https://github.com/AmanoTeam/pyrogram
+hydrogram@https://github.com/hydrogram/hydrogram/archive/dev.zip
 httpx[http2]
 spotipy
 telegraph

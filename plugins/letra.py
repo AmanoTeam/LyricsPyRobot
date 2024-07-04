@@ -1,7 +1,7 @@
 import re
 
-from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from hydrogram import Client, filters
+from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 import db
 from locales import use_chat_lang

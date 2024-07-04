@@ -1,6 +1,6 @@
 import asyncio
 
-from pyrogram import Client, idle
+from hydrogram import Client, idle
 
 from config import API_HASH, API_ID, TOKEN
 from utils import browser, http_pool, letras, loop, musixmatch
@@ -20,7 +20,7 @@ async def main():
     await browser.close()
 
 
-client = Client("bot", API_ID, API_HASH, bot_token=TOKEN, plugins=dict(root="plugins"))
+client = Client("bot", API_ID, API_HASH, bot_token=TOKEN, plugins={"root": "plugins"})
 
 if __name__ == "__main__":
     loop.run_until_complete(main())

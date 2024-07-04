@@ -14,6 +14,8 @@ sudos = [
     200097591
 ]
 
+cache_chat = 
+
 #Musixmatch config
 
 MUSIXMATCH_KEYS = []
@@ -21,9 +23,15 @@ MUSIXMATCH_KEYS = []
 #spoti config
 
 BASIC = ''
+CLIENT_ID = ''
 
 #lfm config
 
 KEY = ''
 
 BROWSER = 'firefox'
+
+login_url = ("https://accounts.spotify.com/authorize?response_type=code&"
+            + f"client_id={CLIENT_ID}&"
+            + "scope=user-top-read+user-read-currently-playing+user-read-recently-played+user-modify-playback-state+user-read-playback-state+user-read-private+user-read-email+user-library-read&"
+            + "redirect_uri=https://lyricspy.amanoteam.com/go")

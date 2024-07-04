@@ -1,15 +1,16 @@
 import re
 from datetime import datetime, timedelta
 
-from pyrogram import Client, filters
-from pyrogram.enums import ChatType
-from pyrogram.enums.parse_mode import ParseMode
-from pyrogram.types import (
+from hydrogram import Client, filters
+from hydrogram.enums import ChatType
+from hydrogram.enums.parse_mode import ParseMode
+from hydrogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     Message,
 )
+from spotipy.exceptions import SpotifyException
 
 import db
 from locales import use_chat_lang, use_user_lang
@@ -19,9 +20,9 @@ from utils import (
     get_spoti_session,
     get_track_info,
     http_pool,
+    musixmatch,
 )
 
-from utils import musixmatch
 from .letra import letra
 
 LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
@@ -123,6 +124,10 @@ async def np(c: Client, m: Message, t):
         publi = spotify_json["item"]["artists"][0]["name"]
     else:
         publi = spotify_json["item"]["show"]["name"]
+    try:
+        fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+    except SpotifyException:
+        fav = False
     if stick is None or stick:
         album_art = await get_song_art(
             song_name=spotify_json["item"]["name"],
@@ -137,17 +142,15 @@ async def np(c: Client, m: Message, t):
         )
     mtext = f"🎵 {publi} - {spotify_json['item']['name']}"
     play_kb = [
-                InlineKeyboardButton(
-                    text="⏮", callback_data=f"previous|{m.from_user.id}"
-                ),
-                InlineKeyboardButton(
-                    text="⏸" if spotify_json["is_playing"] else "▶️",
-                    callback_data=f"pause|{m.from_user.id}"
-                    if spotify_json["is_playing"]
-                    else f"play|{m.from_user.id}",
-                ),
-                InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
-            ]
+        InlineKeyboardButton(text="⏮", callback_data=f"previous|{m.from_user.id}"),
+        InlineKeyboardButton(
+            text="⏸" if spotify_json["is_playing"] else "▶️",
+            callback_data=f"pause|{m.from_user.id}"
+            if spotify_json["is_playing"]
+            else f"play|{m.from_user.id}",
+        ),
+        InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
+    ]
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             play_kb,
@@ -164,15 +167,17 @@ async def np(c: Client, m: Message, t):
         ]
     )
     if stick is None or stick:
-        await m.reply_document(album_art, reply_markup=kb, caption=mtext)
+        mes = await m.reply_document(album_art, reply_markup=kb, caption=mtext)
     else:
         mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
         mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
-        await m.reply(
+        mes = await m.reply(
             mtext,
             reply_markup=kb,
             parse_mode=ParseMode.HTML,
         )
+
+    await mes.react("❤" if fav else None)
 
 
 @Client.on_callback_query(filters.regex(r"^aprova"))
@@ -205,9 +210,15 @@ async def sp_search(c: Client, m: CallbackQuery):
         om = m.message
         om.from_user = m.from_user
         spotify_json = sess.track(track)
-        a = await musixmatch.spotify_lyrics(artist=spotify_json['artists'][0]['name'], track=spotify_json['name'])
+        a = await musixmatch.spotify_lyrics(
+            artist=spotify_json["artists"][0]["name"], track=spotify_json["name"]
+        )
         if a:
-            om.text = "/letra spotify:"+str(a['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id'])
+            om.text = "/letra spotify:" + str(
+                a["message"]["body"]["macro_calls"]["matcher.track.get"]["message"][
+                    "body"
+                ]["track"]["track_id"]
+            )
             try:
                 await letra(c, om)
             except:
@@ -268,6 +279,13 @@ async def previous(c: Client, m: CallbackQuery, t):
         else:
             publi = spotify_json["item"]["show"]["name"]
         spotify_json = sess.current_playback(additional_types="episode,track")
+        try:
+            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+        except SpotifyException:
+            fav = False
+
+        await m.message.react("❤" if fav else None)
+
         if not db.theme(m.from_user.id)[3]:
             mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
             mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
@@ -330,6 +348,13 @@ async def next(c: Client, m: CallbackQuery, t):
         else:
             publi = spotify_json["item"]["show"]["name"]
         spotify_json = sess.current_playback(additional_types="episode,track")
+        try:
+            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+        except SpotifyException:
+            fav = False
+
+        await m.message.react("❤" if fav else None)
+
         if not db.theme(m.from_user.id)[3]:
             mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
             mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
@@ -361,6 +386,13 @@ async def ppa(c: Client, m: CallbackQuery, t):
         else:
             sess.start_playback(device_id)
         spotify_json = sess.current_playback(additional_types="episode,track")
+        try:
+            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+        except SpotifyException:
+            fav = False
+
+        await m.message.react("❤" if fav else None)
+
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
