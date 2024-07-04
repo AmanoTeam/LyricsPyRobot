@@ -20,7 +20,7 @@ async def privacy(c: Client, m: Message | CallbackQuery, t):
     kb = [[(t("delete_data"), "delete_data")]]
     await func(
         t("privacy"),
-        reply_markup=ikb(kb) if isinstance(chat.type, ChatType.PRIVATE) else None,
+        reply_markup=ikb(kb) if chat.type == ChatType.PRIVATE else None,
     )
 
 
