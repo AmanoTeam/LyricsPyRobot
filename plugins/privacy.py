@@ -1,5 +1,5 @@
 from hydrogram import Client, filters
-from pyrogram.types import Message
+from hydrogram.types import Message
 
 from locales import use_chat_lang
 
