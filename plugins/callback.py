@@ -10,7 +10,7 @@ from hydrogram.errors import ListenerTimeout
 import db
 from config import login_url, sudos
 from locales import default_language, get_locale_string, langdict, use_chat_lang
-from utils import get_spoti_session, letras, musixmatch
+from utils import get_spoti_session, genius, musixmatch
 
 # + original, - traduzido, _ telegraph
 
@@ -50,9 +50,9 @@ async def teor(c: Client, m: CallbackQuery, t):
             await m.answer(t("hash_nf"), show_alert=True)
         else:
             if re.match(
-                r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", n[0]
+                r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]
             ):
-                a = await letras.letra(n[0])
+                a = await genius.lyrics(hash)
             elif re.match(
                 r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
             ):
@@ -60,7 +60,7 @@ async def teor(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
+            a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
             if musixmatch.translation(hash, "pt", None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
@@ -104,9 +104,9 @@ async def tetr(c: Client, m: CallbackQuery, t):
             await m.answer(t("hash_nf"), show_alert=True)
         else:
             if re.match(
-                r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", n[0]
+                r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]
             ):
-                a = await letras.letra(n[0])
+                a = await genius.lyrics(hash)
             elif re.match(
                 r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
             ):
@@ -114,7 +114,7 @@ async def tetr(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
+            a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -147,9 +147,9 @@ async def ori(c: Client, m: CallbackQuery, t):
             await m.answer(t("hash_nf"), show_alert=True)
         else:
             if re.match(
-                r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", n[0]
+                r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]
             ):
-                a = await letras.letra(n[0])
+                a = await genius.lyrics(hash)
             elif re.match(
                 r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
             ):
@@ -157,7 +157,7 @@ async def ori(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
+            a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
             if musixmatch.translation(hash, "pt", None):
                 keyboard = InlineKeyboardMarkup(
                     inline_keyboard=[
@@ -201,7 +201,7 @@ async def tr(c: Client, m: CallbackQuery, t):
             await m.answer(t("hash_nf"), show_alert=True)
         else:
             if re.match(
-                r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", n[0]
+                r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]
             ):
                 a = await letras.letra(n[0])
             elif re.match(
@@ -211,7 +211,7 @@ async def tr(c: Client, m: CallbackQuery, t):
             else:
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
-            a = letras.parce(a) if "art" in a else musixmatch.parce(a)
+            a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [

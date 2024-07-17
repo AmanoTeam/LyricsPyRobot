@@ -5,7 +5,7 @@ from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 import db
 from locales import use_chat_lang
-from utils import letras, musixmatch
+from utils import genius, musixmatch
 
 # + original, - traduzido, _ telegraph
 
@@ -13,6 +13,7 @@ from utils import letras, musixmatch
 @Client.on_message(filters.command(["lyrics", "letra"]))
 @use_chat_lang()
 async def letra(c: Client, m: Message, t):
+    print(m)
     text = m.text.split(" ", 1)[1]
     if not text:
         await m.reply_text(t("use"))
@@ -21,20 +22,25 @@ async def letra(c: Client, m: Message, t):
     elif re.match(
         r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", text
     ):
-        a = await letras.letra(text)
+        a = await genius.auto(text)
     elif re.match(
         r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", text
     ):
         a = await musixmatch.lyrics(text)
     else:
-        a = await musixmatch.auto(text, limit=1, lang="pt") or await letras.auto(
-            text, limit=1
-        )
+        try:
+            a = await musixmatch.auto(text, limit=1, lang="pt") or await genius.auto(
+                text, limit=1
+            )
+        except Exception as e:
+            a = await genius.auto(text, limit=1)
         if not a:
             await m.reply_text(t("lyrics_nf"))
             return True
     a = a[0] if isinstance(a, list) else a
-    a = letras.parce(a) if "art" in a else musixmatch.parce(a)
+    print(a)
+    a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
+    print(a)
     hash = str(a["id"])
     db.add_hash(hash, a)
     uid = m.from_user.id
@@ -97,3 +103,4 @@ async def letra(c: Client, m: Message, t):
             reply_markup=keyboard,
             parse_mode=None,
         )
+    return True

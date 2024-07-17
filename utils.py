@@ -6,7 +6,7 @@ from typing import Union
 
 import httpx
 import spotipy
-from lyricspy.aio import Letras, Musixmatch
+from lyricspy.aio import Genius, Musixmatch
 from PIL import Image
 from playwright.async_api import BrowserContext, PlaywrightContextManager
 from spotipy.client import SpotifyException
@@ -165,4 +165,4 @@ browser = loop.run_until_complete(build_browser_object(BROWSER))
 
 musixmatch = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 
-letras = Letras()
+genius = Genius()
