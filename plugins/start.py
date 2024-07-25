@@ -12,7 +12,7 @@ from hydrogram.types import (
 from locales import use_chat_lang
 
 
-@Client.on_message(filters.command("start"))
+@Client.on_message(filters.command("start") &~ filters.regex(r"start "), group=1)
 @Client.on_callback_query(filters.regex(r"start_back"))
 @use_chat_lang()
 async def start(c, m: Union[Message, CallbackQuery], t):

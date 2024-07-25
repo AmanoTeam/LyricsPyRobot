@@ -1,6 +1,15 @@
 from hydrogram import Client, filters
+from hydrogram.enums import ChatType
 from hydrogram.enums.parse_mode import ParseMode
-from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from hydrogram.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    Message,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    WebAppInfo,
+)
 from spotipy.exceptions import SpotifyException
 
 import db
@@ -9,6 +18,28 @@ from locales import use_chat_lang
 from utils import get_song_art, get_spoti_session, get_token, musixmatch
 
 from .letra import letra
+
+
+@Client.on_message(filters.service)
+@use_chat_lang()
+async def no(c: Client, m: Message, t):
+    code = m.web_app_data.data
+    print(code)
+    res = await get_token(m.from_user.id, code)
+    if res[0]:
+        await m.reply_text(t("done"), reply_markup=ReplyKeyboardRemove())
+    else:
+        await m.reply_text(t("error").format(error=res[1]))
+
+
+@Client.on_message(filters.command("start spoti_login"), group=0)
+@use_chat_lang()
+async def start(c: Client, m: Message, t):
+    kb = ReplyKeyboardMarkup(
+        one_time_keyboard=True,
+        keyboard=[[KeyboardButton(text=t("login"), web_app=WebAppInfo(url=login_url))]],
+    )
+    await m.reply_text(t("login_txt"), reply_markup=kb)
 
 
 @Client.on_message(filters.command("spoti"))
@@ -25,16 +56,30 @@ async def spoti(c: Client, m: Message, t):
     else:
         tk = db.get(m.from_user.id)
         if not tk or not tk[0]:
-            kb = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text=t("login"),
-                            url=login_url,
-                        )
+            if m.chat.type == ChatType.PRIVATE:
+                kb = ReplyKeyboardMarkup(
+                    one_time_keyboard=True,
+                    keyboard=[
+                        [
+                            KeyboardButton(
+                                text=t("login"), web_app=WebAppInfo(url=login_url)
+                            )
+                        ]
+                    ],
+                )
+            else:
+                kb = InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [
+                            InlineKeyboardButton(
+                                text=t("login"),
+                                url="https://t.me/"
+                                + c.me.username
+                                + "?start=spoti_login",
+                            )
+                        ]
                     ]
-                ]
-            )
+                )
             await m.reply_text(t("login_txt"), reply_markup=kb)
         else:
             try:
