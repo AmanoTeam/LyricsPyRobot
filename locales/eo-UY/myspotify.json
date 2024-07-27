@@ -1,1 +1,12 @@
-{}
+{
+    "my_spotify": "Akiru Spotify-ludanton",
+    "no_playng": "Neniu muziko ludanta",
+    "play": "Estas nenio ludanta nun. Kiom pri doni teatraĵon al via Spotify?",
+    "top_button": "Supro Ludis",
+    "top_text": "Plej bonaj kantoj luditaj de {name}\n\n",
+    "recent_button": "Lastatempe Ludita",
+    "recent_text": "Lastatempe ludita de {name}\n\n",
+    "not_allowed": "Vi ne povas uzi ĉi tion, nur {first_name} povas",
+    "premium_only": "Ekskluziva spotify premium-funkcio",
+    "song_added": "Kanto aldonita al vico"
+}
