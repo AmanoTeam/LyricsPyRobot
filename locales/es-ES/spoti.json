@@ -2,6 +2,5 @@
     "done": "Hecho, ahora puedes usar /spoti o /np :)",
     "error": "Ha ocurrido un error:\n{error}",
     "login": "Ingresar",
-    "login_txt": "Use el botón de abajo e inicie sesión. Luego copie el comando y envíelo aquí.",
     "play": "No hay nada tocando en este momento. ¿Qué tal si le damos a tu Spotify un <i>play</i>?"
 }
