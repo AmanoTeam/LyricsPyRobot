@@ -1,1 +1,19 @@
-{}
+{
+    "not_aproved": "Vi ne estas aprobita. Kontaktu {first_name} por esti aprobita",
+    "blocked": "Vi estas blokita. Kontaktu {first_name} por esti malblokita",
+    "not_logged": "Vi ne estas ensalutinta. Uzu /spoti aŭ /lfm por ensaluti",
+    "not_playing": "Vi ludas nenion",
+    "play_in_sp": "Aldoni al Vico",
+    "search_lyric": "Serĉu kantotekstojn",
+    "aproved": "{first_name} aprobis vian aliron",
+    "saproved": "Vi aprobis aliron al {first_name}",
+    "denied": "{first_name} rifuzis vian aliron",
+    "sdenied": "Vi rifuzis aliron al {first_name}",
+    "song_added": "Kanto aldonita al vico",
+    "not_allowed": "Vi ne povas uzi ĉi tion, nur {first_name} povas",
+    "aprrovedu": "Saluton, {name} volas aliri vian Spotify nun ludantan",
+    "approvedr": "Vi ne estis aprobita, petante {name} aprobi...",
+    "only_users": "Bonvolu uzi ĉi tiun komandon nur ĉe uzantoj",
+    "aprove": "Aprobi aliron",
+    "deny": "Nei aliron"
+}
