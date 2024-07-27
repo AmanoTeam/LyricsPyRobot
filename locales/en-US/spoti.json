@@ -2,6 +2,10 @@
     "done": "Done, you can now use /spoti or /np :)",
     "error": "An error has occurred:\n{error}",
     "login": "Login",
-    "login_txt": "Use the button below and login. Then copy the command and send it here.",
-    "play": "There is nothing playing right now. How about giving your Spotify a <i>play</i>?"
+    "login_txt": "You are currently not logged into Spotify. To access your account, please choose one of the following options:\n\n• Automatic Login (Recommended): Simply log in to Spotify and your login will be automatically confirmed in the bot. No further action is required on your part.\n• Manual Login: If you encounter any issues with the automatic login, please follow these steps:\n    1.Log in to your Spotify account.\n    2.Copy the command that appears on your screen after logging in.\n    3.Paste the copied command into this chat to confirm your login with the bot.",
+    "play": "There is nothing playing right now. How about giving your Spotify a <i>play</i>?",
+    "automatic_login": "Automatic Login",
+    "automatic_text": "To automatically log in, simply click the button under the text box.",
+    "manual_login": "Manual Login",
+    "manual_text": "Use button below and follow these steps:\n  1.Log in to your Spotify account.\n  2.Copy the command that appears on your screen after logging in.\n  3.Paste the copied command into this chat to confirm your login with the bot."
 }

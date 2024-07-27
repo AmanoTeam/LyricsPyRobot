@@ -2,6 +2,7 @@ from hydrogram import Client, filters
 from hydrogram.enums import ChatType
 from hydrogram.enums.parse_mode import ParseMode
 from hydrogram.types import (
+    CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     KeyboardButton,
@@ -32,14 +33,46 @@ async def no(c: Client, m: Message, t):
         await m.reply_text(t("error").format(error=res[1]))
 
 
-@Client.on_message(filters.command("start spoti_login"), group=0)
+@Client.on_message(filters.command("start spoti_auto"), group=0)
+@Client.on_callback_query(filters.regex("spoti_auto"))
 @use_chat_lang()
-async def start(c: Client, m: Message, t):
+async def spoti_auto(c: Client, m: Message | CallbackQuery, t):
+    if isinstance(m, CallbackQuery):
+        func = m.edit_message_text
+    else:
+        func = m.reply_text
     kb = ReplyKeyboardMarkup(
         one_time_keyboard=True,
-        keyboard=[[KeyboardButton(text=t("login"), web_app=WebAppInfo(url=login_url))]],
+        keyboard=[
+            [
+                KeyboardButton(
+                    text=t("automatic_login"), web_app=WebAppInfo(url=login_url)
+                )
+            ]
+        ],
     )
-    await m.reply_text(t("login_txt"), reply_markup=kb)
+    await func(t("automatic_text"), reply_markup=kb)
+
+
+@Client.on_message(filters.command("start spoti_manual"), group=0)
+@Client.on_callback_query(filters.regex("spoti_manual"))
+@use_chat_lang()
+async def spoti_manual(c: Client, m: Message | CallbackQuery, t):
+    if isinstance(m, CallbackQuery):
+        func = m.edit_message_text
+    else:
+        func = m.reply_text
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=t("manual_login"),
+                    url=login_url,
+                )
+            ]
+        ]
+    )
+    await func(t("manual_text"), reply_markup=kb)
 
 
 @Client.on_message(filters.command("spoti"))
@@ -50,34 +83,45 @@ async def spoti(c: Client, m: Message, t):
         access_code = text[1].split("code=")[1] if "code=" in text[1] else text[1]
         res = await get_token(m.from_user.id, access_code)
         if res[0]:
-            await m.reply_text(t("done"))
+            await m.reply_text(t("done"), reply_markup=ReplyKeyboardRemove())
         else:
             await m.reply_text(t("error").format(error=res[1]))
     else:
         tk = db.get(m.from_user.id)
         if not tk or not tk[0]:
-            if m.chat.type == ChatType.PRIVATE:
-                kb = ReplyKeyboardMarkup(
-                    one_time_keyboard=True,
-                    keyboard=[
+            if m.chat.type != ChatType.PRIVATE:
+                dp_link = f"t.me/{c.me.username}?start="
+                kb = InlineKeyboardMarkup(
+                    inline_keyboard=[
                         [
-                            KeyboardButton(
-                                text=t("login"), web_app=WebAppInfo(url=login_url)
+                            InlineKeyboardButton(
+                                text=t("automatic_login"),
+                                url=dp_link + "spoti_auto",
                             )
-                        ]
-                    ],
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                text=t("manual_login"),
+                                url=dp_link + "spoti_manual",
+                            )
+                        ],
+                    ]
                 )
             else:
                 kb = InlineKeyboardMarkup(
                     inline_keyboard=[
                         [
                             InlineKeyboardButton(
-                                text=t("login"),
-                                url="https://t.me/"
-                                + c.me.username
-                                + "?start=spoti_login",
+                                text=t("automatic_login"),
+                                callback_data="spoti_auto",
                             )
-                        ]
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                text=t("manual_login"),
+                                callback_data="spoti_manual",
+                            )
+                        ],
                     ]
                 )
             await m.reply_text(t("login_txt"), reply_markup=kb)
