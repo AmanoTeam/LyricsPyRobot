@@ -1,1 +1,7 @@
-{}
+{
+    "se_val": "¡Es genial que quieras contribuir!\n\nElige la cantidad de tu donación: abajo verás los botones para seleccionar la cantidad de tu donación. Simplemente haga clic en el botón central y se le llevará a la pantalla de pago.\n\nTenga en cuenta que actualmente las donaciones sólo son aceptadas en los Reais brasileños (BRL), pero pronto estaremos añadiendo más divisas.\n\n¡Muchas gracias por tu apoyo!",
+    "donation_title": "¡Apóyanos!",
+    "donation_subtitle": "¡Haz una donación para ayudarnos a mantener el bot funcionando!",
+    "donation_label": "Monto de donación",
+    "order_confirmed": "¡Wow, tu generosidad realmente calienta nuestros corazones! Estamos muy agradecidos por tu donación. Significa el mundo para nosotros que usted cree en nuestro trabajo y quiere ayudarnos a marcar la diferencia. Su contribución será muy importante para ayudarnos a continuar nuestros esfuerzos y alcanzar nuestros objetivos. Simplemente no pudimos hacerlo sin el apoyo de gente asombrosa como tú. ¡Gracias desde el fondo de nuestros corazones!"
+}
