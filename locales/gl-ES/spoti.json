@@ -2,5 +2,10 @@
     "done": "Feito, podes usar /spoti ou /np agora :)",
     "error": "Produciuse un erro:\n{error}",
     "login": "Entrar",
-    "play": "Agora non hai nada tocando. Que tal dar un <i>play</i> á tu Spotify?"
+    "login_txt": "Non iniciaches sesión en Spotify. Para acceder á túa conta, escolla unha das seguintes opcións:\n\n• Inicio de sesión automático (recomendado): simplemente inicie sesión en Spotify e o seu inicio de sesión confirmarase automaticamente no bot. Non é necesaria ningunha acción adicional pola túa parte.\n• Inicio de sesión manual: se atopa algún problema co inicio de sesión automático, siga estes pasos:\n 1. Inicia sesión coa túa conta de Spotify.\n 2. Copia o comando que aparece na pantalla despois de iniciar sesión.\n 3. Pega o comando copiado neste chat para confirmar o teu inicio de sesión co bot.",
+    "play": "Agora non hai nada tocando. Que tal dar un <i>play</i> á tu Spotify?",
+    "automatic_login": "Inicio de sesión automático",
+    "automatic_text": "Para iniciar sesión automaticamente, só tes que facer clic no botón debaixo da caixa de texto.",
+    "manual_login": "Inicio de sesión manual",
+    "manual_text": "Use o botón de abaixo e siga estes pasos:\n 1. Inicia sesión coa túa conta de Spotify.\n 2. Copia o comando que aparece na pantalla despois de iniciar sesión.\n 3. Pega o comando copiado neste chat para confirmar o teu inicio de sesión co bot."
 }
