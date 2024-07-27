@@ -4,5 +4,6 @@
     "login": "the meal",
     "login_txt": "You are not a Spotify seller. You can log in to your account by choosing one of the options below.\n\n• Sign in automatically (required) Readers will see your name when you sign in to Spotify. there is no need\nIf you are having trouble logging in, please enter your details.\n    1. Sign in to your Spotify account.\n    2. After logging in, enter the given instructions.\n    3. Type the text in the dialog box and make sure it is compatible with your bot.",
     "play": "Don't want to play Spotify?",
-    "automatic_login": "black black"
+    "automatic_login": "black black",
+    "automatic_text": "Enter your route by clicking the icon at the bottom of the page."
 }
