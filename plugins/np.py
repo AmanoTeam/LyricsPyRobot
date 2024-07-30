@@ -44,7 +44,7 @@ async def np(c: Client, m: Message, t):
         # Usernames and phone numbers with +
         else:
             user_id = m.command[1]
-        usr = await c.get_users(user_id)
+        usr = await c.get_chat(user_id)
         xm = db.get_aproved(usr.id, m.from_user.id)
         if usr.type != ChatType.PRIVATE:
             return await m.reply_text(t("only_users"))
