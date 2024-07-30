@@ -2,7 +2,7 @@ import re
 from datetime import datetime, timedelta
 
 from hydrogram import Client, filters
-from hydrogram.enums import ChatType
+from hydrogram.enums import ChatType, MessageEntityType
 from hydrogram.enums.parse_mode import ParseMode
 from hydrogram.types import (
     CallbackQuery,
@@ -34,7 +34,17 @@ async def np(c: Client, m: Message, t):
     text = m.text.split(" ", 1)
     duid = m.from_user.id
     if len(text) == 2:
-        usr = await c.get_chat(text[1])
+        if m.reply_to_message:
+            user_id = m.reply_to_message.from_user.id
+        elif m.entities and m.entities[0].type == MessageEntityType.TEXT_MENTION:
+            user_id = m.entities[0].user.id
+        # User ids: integers
+        elif m.command[1].isdigit():
+            user_id = int(m.command[1])
+        # Usernames and phone numbers with +
+        else:
+            user_id = m.command[1]
+        usr = await c.get_users(user_id)
         xm = db.get_aproved(usr.id, m.from_user.id)
         if usr.type != ChatType.PRIVATE:
             return await m.reply_text(t("only_users"))
@@ -82,8 +92,8 @@ async def np(c: Client, m: Message, t):
             return await m.reply(t("approvedr").format(name=usr.first_name))
     try:
         sess = await get_spoti_session(m.from_user.id)
-    except Exception:
-        return await m.reply_text(t("not_logged"))
+    except SpotifyException:
+        sess = None
     if not sess or sess.current_playback() is None:
         tk = db.get(m.from_user.id)
         if not tk or not tk[2]:
