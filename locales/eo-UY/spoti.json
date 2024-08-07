@@ -1,0 +1,11 @@
+{
+    "done": "Farite, vi nun povas uzi /spoti aŭ /np :)",
+    "error": "Eraro okazis:\n{error}",
+    "login": "Ensaluti",
+    "login_txt": "Vi nuntempe ne estas ensalutinta en Spotify. Por aliri vian konton, bonvolu elekti unu el la sekvaj opcioj:\n\n• Aŭtomata ensaluto (Rekomendita): Simple ensalutu al Spotify kaj via ensaluto estos aŭtomate konfirmita en la bot. Neniu plia ago estas bezonata viaflanke.\n• Mana ensaluto: Se vi renkontas problemojn kun la aŭtomata ensaluto, bonvolu sekvi ĉi tiujn paŝojn:\n 1.Ensalutu al via Spotify-konto.\n 2.Kopiu la komandon kiu aperas sur via ekrano post ensaluto.\n 3.Algluu la kopiitan komandon en ĉi tiun babilejon por konfirmi vian ensaluton kun la bot.",
+    "play": "Estas nenio ludanta nun. Kiom pri doni teatraĵon al via Spotify?",
+    "automatic_login": "Aŭtomata ensaluto",
+    "automatic_text": "Por aŭtomate ensaluti, simple alklaku la butonon sub la tekstujo.",
+    "manual_login": "Mana ensaluto",
+    "manual_text": "Uzu la suban butonon kaj sekvu ĉi tiujn paŝojn:\n 1.Ensalutu al via Spotify-konto.\n 2.Kopiu la komandon kiu aperas sur via ekrano post ensaluto.\n 3.Algluu la kopiitan komandon en ĉi tiun babilejon por konfirmi vian ensaluton kun la bot."
+}
