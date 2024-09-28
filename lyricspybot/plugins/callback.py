@@ -29,252 +29,122 @@ def generate_language_keyboard():
     languages = list(langdict)
     keyboard = []
     while languages:
-        language = langdict[languages[0]]["main"]
-        button_row = [
-            InlineKeyboardButton(
-                f"{language['language_flag']} {language['language_name']}",
-                callback_data=f"set_lang {languages[0]}",
-            )
-        ]
-        languages.pop(0)
-        if languages:
-            language = langdict[languages[0]]["main"]
-            button_row.append(
-                InlineKeyboardButton(
-                    f"{language['language_flag']} {language['language_name']}",
-                    callback_data=f"set_lang {languages[0]}",
+        row = []
+        for _ in range(2):
+            if languages:
+                lang = languages.pop(0)
+                language = langdict[lang]["main"]
+                row.append(
+                    InlineKeyboardButton(
+                        f"{language['language_flag']} {language['language_name']}",
+                        callback_data=f"set_lang {lang}",
+                    )
                 )
-            )
-            languages.pop(0)
-        keyboard.append(button_row)
+        keyboard.append(row)
     return keyboard
+
+
+async def check_user_permission(c, m, user_id):
+    if m.from_user.id != int(user_id) and m.from_user.id not in sudos:
+        chat = await c.get_chat(int(user_id))
+        await m.answer(t("not_allowed").format(first_name=chat.first_name))
+        return False
+    return True
+
+
+async def get_lyrics_data(url_data, hash_value):
+    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", url_data[0]):
+        return await genius_client.lyrics(hash_value)
+    if re.match(
+        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", url_data[0]
+    ):
+        return await musixmatch_client.lyrics(hash_value)
+    return None
+
+
+async def handle_lyrics_request(c, m, t, user_id, hash_value, callback_prefix):
+    if not await check_user_permission(c, m, user_id):
+        return
+
+    url_data = database.get_url(hash_value)
+    if not url_data:
+        await m.answer(t("hash_nf"), show_alert=True)
+        return
+
+    lyrics_data = await get_lyrics_data(url_data, hash_value)
+    if not lyrics_data:
+        await m.answer(t("url_nf").format(text=url_data[0]), show_alert=True)
+        return
+
+    parsed_lyrics = (
+        genius_client.parse(lyrics_data)
+        if "meta" in lyrics_data
+        else musixmatch_client.parce(lyrics_data)
+    )
+
+    keyboard = await generate_lyrics_keyboard(
+        m, t, user_id, hash_value, callback_prefix
+    )
+
+    message_text = f'{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}\n{url_data[1 if callback_prefix == "_+" else 2]}'
+
+    await m.edit_message_text(
+        message_text,
+        reply_markup=keyboard,
+        parse_mode=None,
+    )
+
+
+async def generate_lyrics_keyboard(m, t, user_id, hash_value, callback_prefix):
+    keyboard = []
+    if await musixmatch_client.translation(hash_value, "pt", None):
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    text=t("text"), callback_data=f"+{user_id}|{hash_value}"
+                ),
+                InlineKeyboardButton(
+                    text=t("port"), callback_data=f"_-{user_id}|{hash_value}"
+                ),
+            ]
+        ]
+    else:
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    text=t("text"), callback_data=f"+{user_id}|{hash_value}"
+                )
+            ]
+        ]
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
 
 @Client.on_callback_query(filters.regex(r"^(_\+)"))
 @use_chat_lang()
 async def teor(c: Client, m: CallbackQuery, t):
     user_id, hash_value = m.data[2:].split("|")
-    if m.from_user.id != int(user_id) and m.from_user.id not in sudos:
-        chat = await c.get_chat(int(user_id))
-        await m.answer(t("not_allowed").format(first_name=chat.first_name))
-        return
-
-    url_data = database.get_url(hash_value)
-    if not url_data:
-        await m.answer(t("hash_nf"), show_alert=True)
-        return
-
-    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", url_data[0]):
-        lyrics_data = await genius_client.lyrics(hash_value)
-    elif re.match(
-        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", url_data[0]
-    ):
-        lyrics_data = await musixmatch_client.lyrics(hash_value)
-    else:
-        await m.answer(t("url_nf").format(text=url_data[0]), show_alert=True)
-        return
-
-    parsed_lyrics = (
-        genius_client.parse(lyrics_data)
-        if "meta" in lyrics_data
-        else musixmatch_client.parce(lyrics_data)
-    )
-
-    if await musixmatch_client.translation(hash_value, "pt", None):
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=t("text"), callback_data=f"+{user_id}|{hash_value}"
-                    ),
-                    InlineKeyboardButton(
-                        text=t("port"), callback_data=f"_-{user_id}|{hash_value}"
-                    ),
-                ]
-            ]
-        )
-    else:
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=t("text"), callback_data=f"+{user_id}|{hash_value}"
-                    )
-                ]
-            ]
-        )
-
-    await m.edit_message_text(
-        f'{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}\n{url_data[1]}',
-        reply_markup=keyboard,
-        parse_mode=None,
-    )
+    await handle_lyrics_request(c, m, t, user_id, hash_value, "_+")
 
 
 @Client.on_callback_query(filters.regex(r"^(_\-)"))
 @use_chat_lang()
 async def tetr(c: Client, m: CallbackQuery, t):
     user_id, hash_value = m.data[2:].split("|")
-    if m.from_user.id != int(user_id) and m.from_user.id not in sudos:
-        chat = await c.get_chat(int(user_id))
-        await m.answer(t("not_allowed").format(first_name=chat.first_name))
-        return
-
-    url_data = database.get_url(hash_value)
-    if not url_data:
-        await m.answer(t("hash_nf"), show_alert=True)
-        return
-
-    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", url_data[0]):
-        lyrics_data = await genius_client.lyrics(hash_value)
-    elif re.match(
-        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", url_data[0]
-    ):
-        lyrics_data = await musixmatch_client.lyrics(hash_value)
-    else:
-        await m.answer(t("url_nf").format(text=url_data[0]), show_alert=True)
-        return
-
-    parsed_lyrics = (
-        genius_client.parse(lyrics_data)
-        if "meta" in lyrics_data
-        else musixmatch_client.parce(lyrics_data)
-    )
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text=t("text"), callback_data=f"-{user_id}|{hash_value}"
-                ),
-                InlineKeyboardButton(
-                    text=t("original"), callback_data=f"_+{user_id}|{hash_value}"
-                ),
-            ]
-        ]
-    )
-    await m.edit_message_text(
-        f'{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}\n{url_data[2]}',
-        reply_markup=keyboard,
-        parse_mode=None,
-    )
+    await handle_lyrics_request(c, m, t, user_id, hash_value, "_-")
 
 
 @Client.on_callback_query(filters.regex(r"^(\+)"))
 @use_chat_lang()
 async def ori(c: Client, m: CallbackQuery, t):
     user_id, hash_value = m.data[1:].split("|")
-    if m.from_user.id != int(user_id) and m.from_user.id not in sudos:
-        chat = await c.get_chat(int(user_id))
-        await m.answer(t("not_allowed").format(first_name=chat.first_name))
-        return
-
-    url_data = database.get_url(hash_value)
-    if not url_data:
-        await m.answer(t("hash_nf"), show_alert=True)
-        return
-
-    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", url_data[0]):
-        lyrics_data = await genius_client.lyrics(hash_value)
-    elif re.match(
-        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", url_data[0]
-    ):
-        lyrics_data = await musixmatch_client.lyrics(hash_value)
-    else:
-        await m.answer(t("url_nf").format(text=url_data[0]), show_alert=True)
-        return
-
-    parsed_lyrics = (
-        genius_client.parse(lyrics_data)
-        if "meta" in lyrics_data
-        else musixmatch_client.parce(lyrics_data)
-    )
-
-    if await musixmatch_client.translation(hash_value, "pt", None):
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=t("tgph"),
-                        callback_data=f"_+{user_id}|{hash_value}",
-                    ),
-                    InlineKeyboardButton(
-                        text=t("port"), callback_data=f"-{user_id}|{hash_value}"
-                    ),
-                ]
-            ]
-        )
-    else:
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=t("tgph"),
-                        callback_data=f"_+{user_id}|{hash_value}",
-                    )
-                ]
-            ]
-        )
-
-    await m.edit_message_text(
-        f'[{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}]({parsed_lyrics["link"]})\n{parsed_lyrics["letra"]}'[
-            :4096
-        ],
-        reply_markup=keyboard,
-        disable_web_page_preview=True,
-    )
+    await handle_lyrics_request(c, m, t, user_id, hash_value, "+")
 
 
 @Client.on_callback_query(filters.regex(r"^(\-)"))
 @use_chat_lang()
 async def tr(c: Client, m: CallbackQuery, t):
     user_id, hash_value = m.data[1:].split("|")
-    if m.from_user.id != int(user_id) and m.from_user.id not in sudos:
-        chat = await c.get_chat(int(user_id))
-        await m.answer(t("not_allowed").format(first_name=chat.first_name))
-        return
-
-    url_data = database.get_url(hash_value)
-    if not url_data:
-        await m.answer(t("hash_nf"), show_alert=True)
-        return
-
-    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", url_data[0]):
-        lyrics_data = await genius_client.lyrics(url_data[0])
-    elif re.match(
-        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", url_data[0]
-    ):
-        lyrics_data = await musixmatch_client.lyrics(hash_value)
-    else:
-        await m.answer(t("url_nf").format(text=url_data[0]), show_alert=True)
-        return
-
-    parsed_lyrics = (
-        genius_client.parse(lyrics_data)
-        if "meta" in lyrics_data
-        else musixmatch_client.parce(lyrics_data)
-    )
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text=t("tgph"), callback_data=f"_-{user_id}|{hash_value}"
-                ),
-                InlineKeyboardButton(
-                    text=t("original"), callback_data=f"+{user_id}|{hash_value}"
-                ),
-            ]
-        ]
-    )
-    translated_lyrics = await musixmatch_client.translation(
-        hash_value, "pt", parsed_lyrics["letra"]
-    )
-    await m.edit_message_text(
-        f'[{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}]({parsed_lyrics["link"]})\n{translated_lyrics}'[
-            :4096
-        ],
-        reply_markup=keyboard,
-        disable_web_page_preview=True,
-    )
+    await handle_lyrics_request(c, m, t, user_id, hash_value, "-")
 
 
 @Client.on_callback_query(filters.regex(r"settings"))
@@ -340,7 +210,7 @@ async def now_playing_approvals(c: Client, m: CallbackQuery, t):
     if int(page) != 0:
         extra_buttons.append(("back", f"np_apv_pg{int(page) - 1}"))
 
-    extra_buttons.append(("close", "settings"))
+    extra_buttons.append((t("back"), "settings"))
 
     if len(paginated_table) - int(page) > 1:
         extra_buttons.append(("next", f"np_apv_pg{int(page) + 1}"))

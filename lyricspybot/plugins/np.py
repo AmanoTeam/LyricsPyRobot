@@ -353,5 +353,5 @@ async def update_playback_info(c: Client, m: CallbackQuery, t):
         )
     else:
         await m.answer(f"🎵 {artist_name} - {spotify_data['item']['name']}")
-        if action in ["pause", "play"]:
+        if action in {"pause", "play"}:
             await m.edit_message_reply_markup(reply_markup=keyboard)

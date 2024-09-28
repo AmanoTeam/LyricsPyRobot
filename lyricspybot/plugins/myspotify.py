@@ -215,21 +215,30 @@ async def my_spotify(c: Client, m: InlineQuery, t):
 def get_repeat_info(spotify_json: dict, user_id: int):
     if spotify_json["repeat_state"] == "track":
         return "🔂", f"sploopt|{user_id}"
-    elif spotify_json["repeat_state"] == "context":
+    if spotify_json["repeat_state"] == "context":
         return "🔁", f"sploopc|{user_id}"
-    else:
-        return "↪️", f"sploopo|{user_id}"
+    return "↪️", f"sploopo|{user_id}"
+
 
 def get_publisher(spotify_json):
-    return spotify_json["item"]["artists"][0]["name"] if "artists" in spotify_json["item"] else spotify_json["item"]["show"]["name"]
+    return (
+        spotify_json["item"]["artists"][0]["name"]
+        if "artists" in spotify_json["item"]
+        else spotify_json["item"]["show"]["name"]
+    )
 
-def get_player_keyboard(spotify_json, user_id, is_favorite, publisher, repeat_emoji, repeat_callback, t):
+
+def get_player_keyboard(
+    spotify_json, user_id, is_favorite, publisher, repeat_emoji, repeat_callback, t
+):
     return [
         [
             ("⏮", f"spprevious|{user_id}"),
             (
                 "⏸" if spotify_json["is_playing"] else "▶️",
-                f"sppause|{user_id}" if spotify_json["is_playing"] else f"spplay|{user_id}",
+                f"sppause|{user_id}"
+                if spotify_json["is_playing"]
+                else f"spplay|{user_id}",
             ),
             ("⏭", f"spnext|{user_id}"),
             (repeat_emoji, repeat_callback),
@@ -246,13 +255,17 @@ def get_player_keyboard(spotify_json, user_id, is_favorite, publisher, repeat_em
         ],
     ]
 
+
 def get_player_text(spotify_json, publisher):
     return (
         f'🎧 {spotify_json["item"]["name"]} - {publisher}\n'
         f'🗣 {spotify_json["device"]["name"]} | ⏳{datetime.timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
     )
 
-@Client.on_callback_query(filters.regex("^sp(previous|next|loopo|loopc|loopt|play|pause|main)"))
+
+@Client.on_callback_query(
+    filters.regex("^sp(previous|next|loopo|loopc|loopt|play|pause|main)")
+)
 @use_chat_lang()
 async def update_playback_info(c: Client, m: CallbackQuery, t):
     action = m.matches[0].group(1)
@@ -278,7 +291,9 @@ async def update_playback_info(c: Client, m: CallbackQuery, t):
     elif action == "next":
         spotify_session.next_track(device_id)
     elif action in {"play", "pause"}:
-        spotify_json = spotify_session.current_playback(additional_types="episode,track")
+        spotify_json = spotify_session.current_playback(
+            additional_types="episode,track"
+        )
         if spotify_json["is_playing"]:
             spotify_session.pause_playback(device_id)
         else:
@@ -306,7 +321,15 @@ async def update_playback_info(c: Client, m: CallbackQuery, t):
     repeat_emoji, repeat_callback = get_repeat_info(spotify_json, m.from_user.id)
     publisher = get_publisher(spotify_json)
 
-    keyboard = get_player_keyboard(spotify_json, m.from_user.id, is_favorite, publisher, repeat_emoji, repeat_callback, t)
+    keyboard = get_player_keyboard(
+        spotify_json,
+        m.from_user.id,
+        is_favorite,
+        publisher,
+        repeat_emoji,
+        repeat_callback,
+        t,
+    )
     text = get_player_text(spotify_json, publisher)
 
     await m.edit_message_text(text, reply_markup=ikb(keyboard))
@@ -341,6 +364,14 @@ async def recently(c: Client, m: CallbackQuery, t):
 
     repeat_emoji, repeat_callback = get_repeat_info(spotify_json, m.from_user.id)
     publisher = get_publisher(spotify_json)
-    keyboard = get_player_keyboard(spotify_json, m.from_user.id, is_favorite, publisher, repeat_emoji, repeat_callback, t)
+    keyboard = get_player_keyboard(
+        spotify_json,
+        m.from_user.id,
+        is_favorite,
+        publisher,
+        repeat_emoji,
+        repeat_callback,
+        t,
+    )
 
     await m.edit_message_text(text, reply_markup=ikb(keyboard))
