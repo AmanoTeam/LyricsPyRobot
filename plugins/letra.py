@@ -36,7 +36,7 @@ async def letra(c: Client, m: Message, t):
             a = await genius.auto(text, limit=1)
         if not a:
             await m.reply_text(t("lyrics_nf"))
-            return True
+            return
     a = a[0] if isinstance(a, list) else a
     print(a)
     a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
@@ -103,4 +103,4 @@ async def letra(c: Client, m: Message, t):
             reply_markup=keyboard,
             disable_web_page_preview=True,
         )
-    return True
+    return

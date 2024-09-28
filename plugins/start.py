@@ -42,6 +42,7 @@ async def start(c, m: Message | CallbackQuery, t):
                 ],
             ]
         )
+
     if isinstance(m, filters.CallbackQuery):
         await m.edit_message_text(text=t("start"), reply_markup=keyboard)
     else:

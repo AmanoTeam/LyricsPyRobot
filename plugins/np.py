@@ -47,7 +47,8 @@ async def np(c: Client, m: Message, t):
         usr = await c.get_chat(user_id)
         xm = db.get_aproved(usr.id, m.from_user.id)
         if usr.type != ChatType.PRIVATE:
-            return await m.reply_text(t("only_users"))
+            await m.reply_text(t("only_users"))
+            return
         if usr.id == m.from_user.id or (xm and xm[0] == 1):
             usages = xm[1] + 1 if xm[1] else 1
             db.add_aproved(
@@ -60,11 +61,11 @@ async def np(c: Client, m: Message, t):
             duid = m.from_user.id
             m.from_user.id = usr.id
         elif xm and xm[0] == 0:
-            return await m.reply_text(
-                t("not_aproved").format(first_name=usr.first_name)
-            )
+            await m.reply_text(t("not_aproved").format(first_name=usr.first_name))
+            return
         elif xm and xm[0] == 2:
-            return await m.reply_text(t("blocked").format(first_name=usr.first_name))
+            await m.reply_text(t("blocked").format(first_name=usr.first_name))
+            return
         else:
             ut = use_user_lang(usr.id)
             kb = InlineKeyboardMarkup(
@@ -89,7 +90,8 @@ async def np(c: Client, m: Message, t):
                 ut("aprrovedu").format(name=m.from_user.first_name),
                 reply_markup=kb,
             )
-            return await m.reply_text(t("approvedr").format(name=usr.first_name))
+            await m.reply_text(t("approvedr").format(name=usr.first_name))
+            return
     try:
         sess = await get_spoti_session(m.from_user.id)
     except SpotifyException:
@@ -97,18 +99,21 @@ async def np(c: Client, m: Message, t):
     if not sess or sess.current_playback() is None:
         tk = db.get(m.from_user.id)
         if not tk or not tk[2]:
-            return await m.reply_text(t("not_logged"))
+            await m.reply_text(t("not_logged"))
+            return
         a = await get_current(tk[2])
         if not a:
-            return await m.reply_text(t("not_playing"))
+            await m.reply_text(t("not_playing"))
+            return
         track_info = await get_track_info(tk[2], a[0]["artist"]["#text"], a[0]["name"])
         stick = db.theme(duid)[3]
         mtext = f"🎵 {a[0]['artist']['#text']} - {a[0]['name']}"
         if stick is not None and not stick:
-            return await m.reply_text(
+            await m.reply_text(
                 mtext,
                 parse_mode=ParseMode.HTML,
             )
+            return
 
         album_url = a[0]["image"][-1]["#text"]
         if not album_url:
@@ -127,7 +132,8 @@ async def np(c: Client, m: Message, t):
             blur=db.theme(duid)[1],
             scrobbles=track_info["track"]["userplaycount"],
         )
-        return await m.reply_document(album_art, caption=mtext)
+        await m.reply_document(album_art, caption=mtext)
+        return
     spotify_json = sess.current_playback(additional_types="episode,track")
     stick = db.theme(duid)[3]
     if "artists" in spotify_json["item"]:
@@ -187,8 +193,9 @@ async def np(c: Client, m: Message, t):
             parse_mode=ParseMode.HTML,
         )
 
-    await mes.react("❤" if fav else None)
-    return None
+    if fav:
+        await mes.react("❤")
+    return
 
 
 @Client.on_callback_query(filters.regex(r"^aprova"))
@@ -298,7 +305,8 @@ async def previous(c: Client, m: CallbackQuery, t):
         except SpotifyException:
             fav = False
 
-        await m.message.react("❤" if fav else None)
+        if fav:
+            await m.message.react("❤")
 
         if not db.theme(m.from_user.id)[3]:
             mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
@@ -369,7 +377,8 @@ async def next(c: Client, m: CallbackQuery, t):
         except SpotifyException:
             fav = False
 
-        await m.message.react("❤" if fav else None)
+        if fav:
+            await m.message.react("❤")
 
         if not db.theme(m.from_user.id)[3]:
             mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
@@ -409,7 +418,8 @@ async def ppa(c: Client, m: CallbackQuery, t):
         except SpotifyException:
             fav = False
 
-        await m.message.react("❤" if fav else None)
+        if fav:
+            await m.message.react("❤")
 
         kb = InlineKeyboardMarkup(
             inline_keyboard=[

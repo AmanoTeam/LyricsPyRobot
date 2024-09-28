@@ -20,24 +20,26 @@ from locales import use_chat_lang, use_user_lang
 @use_chat_lang()
 async def add_donate(c: Client, q: CallbackQuery, t):
     val = int(q.data.split("_")[1]) if "_" in q.data else 1000
-    if val >= 650:
-        key = [
-            [
-                ("+ R$ 100,00", f"donate_{val + 10000}"),
-                ("+ R$ 10,00", f"donate_{val + 1000}"),
-                ("+ R$ 1,00", f"donate_{val + 100}"),
-                ("+ R$ 0,50", f"donate_{val + 50}"),
-            ],
-            [(f"R$ {val / 100!s}", f"donation_{val}")],
-            [
-                ("- R$ 100,00", f"donate_{val - 10000}"),
-                ("- R$ 10,00", f"donate_{val - 1000}"),
-                ("- R$ 1,00", f"donate_{val - 100}"),
-                ("- R$ 0,50", f"donate_{val - 50}"),
-            ],
-        ]
+    if val < 650:
+        return
 
-        await q.edit_message_text(t("se_val"), reply_markup=ikb(key))
+    key = [
+        [
+            ("+ R$ 100,00", f"donate_{val + 10000}"),
+            ("+ R$ 10,00", f"donate_{val + 1000}"),
+            ("+ R$ 1,00", f"donate_{val + 100}"),
+            ("+ R$ 0,50", f"donate_{val + 50}"),
+        ],
+        [(f"R$ {val / 100!s}", f"donation_{val}")],
+        [
+            ("- R$ 100,00", f"donate_{val - 10000}"),
+            ("- R$ 10,00", f"donate_{val - 1000}"),
+            ("- R$ 1,00", f"donate_{val - 100}"),
+            ("- R$ 0,50", f"donate_{val - 50}"),
+        ],
+    ]
+
+    await q.edit_message_text(t("se_val"), reply_markup=ikb(key))
 
 
 @Client.on_message(filters.regex(r"\/start pay"))
