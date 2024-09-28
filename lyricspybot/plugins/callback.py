@@ -110,8 +110,6 @@ async def teor(c: Client, m: CallbackQuery, t):
         parse_mode=None,
     )
 
-    return
-
 
 @Client.on_callback_query(filters.regex(r"^(_\-)"))
 @use_chat_lang()
@@ -159,7 +157,6 @@ async def tetr(c: Client, m: CallbackQuery, t):
         reply_markup=keyboard,
         parse_mode=None,
     )
-    return
 
 
 @Client.on_callback_query(filters.regex(r"^(\+)"))
@@ -226,8 +223,6 @@ async def ori(c: Client, m: CallbackQuery, t):
         disable_web_page_preview=True,
     )
 
-    return
-
 
 @Client.on_callback_query(filters.regex(r"^(\-)"))
 @use_chat_lang()
@@ -280,8 +275,6 @@ async def tr(c: Client, m: CallbackQuery, t):
         reply_markup=keyboard,
         disable_web_page_preview=True,
     )
-
-    return
 
 
 @Client.on_callback_query(filters.regex(r"settings"))

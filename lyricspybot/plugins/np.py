@@ -208,7 +208,6 @@ async def now_playing(c: Client, m: Message, t):
 
     if is_favorite:
         await sent_message.react("❤")
-    return
 
 
 @Client.on_callback_query(filters.regex(r"^aprova"))
@@ -331,8 +330,7 @@ async def previous_track(c: Client, m: CallbackQuery, t):
     except SpotifyException:
         is_favorite = False
 
-    if is_favorite:
-        await m.message.react("❤")
+    await m.message.react("❤" if is_favorite else "")
 
     if not database.theme(m.from_user.id)[3]:
         track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
@@ -405,8 +403,7 @@ async def next_track(c: Client, m: CallbackQuery, t):
     except SpotifyException:
         is_favorite = False
 
-    if is_favorite:
-        await m.message.react("❤")
+    await m.message.react("❤" if is_favorite else "")
 
     if not database.theme(m.from_user.id)[3]:
         track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
@@ -450,8 +447,7 @@ async def pause_play_action(c: Client, m: CallbackQuery, t):
     except SpotifyException:
         is_favorite = False
 
-    if is_favorite:
-        await m.message.react("❤")
+    await m.message.react("❤" if is_favorite else "")
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[

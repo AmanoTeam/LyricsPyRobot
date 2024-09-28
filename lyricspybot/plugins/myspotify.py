@@ -210,13 +210,12 @@ async def my_spotify(c: Client, m: InlineQuery, t):
             ]
 
     await m.answer(article, cache_time=0)
-    return
 
 
 # Player
 @Client.on_callback_query(filters.regex("^spprevious"))
 @use_chat_lang()
-async def previous(c: Client, m: CallbackQuery, t):
+async def previous_track(c: Client, m: CallbackQuery, t):
     if m.data.split("|")[1] != str(m.from_user.id):
         user = await c.get_chat(int(m.data.split("|")[1]))
         await m.answer(t("not_allowed").format(first_name=user.first_name))
@@ -280,12 +279,11 @@ async def previous(c: Client, m: CallbackQuery, t):
     text += f'🗣 {spotify_json["device"]["name"]} | ⏳{datetime.timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
 
     await m.edit_message_text(text, reply_markup=ikb(keyboard))
-    return
 
 
 @Client.on_callback_query(filters.regex("^spnext"))
 @use_chat_lang()
-async def next(c: Client, m: CallbackQuery, t):
+async def next_track(c: Client, m: CallbackQuery, t):
     if m.data.split("|")[1] != str(m.from_user.id):
         user = await c.get_chat(int(m.data.split("|")[1]))
         await m.answer(t("not_allowed").format(first_name=user.first_name))
@@ -349,7 +347,6 @@ async def next(c: Client, m: CallbackQuery, t):
     text += f'🗣 {spotify_json["device"]["name"]} | ⏳{datetime.timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
 
     await m.edit_message_text(text, reply_markup=ikb(keyboard))
-    return
 
 
 @Client.on_callback_query(filters.regex("^sploopo|sploopc|sploopt"))
@@ -421,7 +418,6 @@ async def sp_loop(c: Client, m: CallbackQuery, t):
     text += f'🗣 {spotify_json["device"]["name"]} | ⏳{datetime.timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
 
     await m.edit_message_text(text, reply_markup=ikb(keyboard))
-    return
 
 
 @Client.on_callback_query(filters.regex("^recently|top"))
@@ -488,7 +484,6 @@ async def recently(c: Client, m: CallbackQuery, t):
         ],
     ]
     await m.edit_message_text(text, reply_markup=ikb(keyboard))
-    return
 
 
 @Client.on_callback_query(filters.regex("^sppause|^spplay|^spmain"))
@@ -563,4 +558,3 @@ async def sp_playpause(c: Client, m: CallbackQuery, t):
     text += f'🗣 {spotify_json["device"]["name"]} | ⏳{datetime.timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
 
     await m.edit_message_text(text, reply_markup=ikb(keyboard))
-    return
