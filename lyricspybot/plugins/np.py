@@ -273,153 +273,9 @@ async def add_to_queue(c: Client, m: CallbackQuery, t):
     await m.answer(t("song_added"))
 
 
-@Client.on_callback_query(filters.regex(r"^previous"))
+@Client.on_callback_query(filters.regex(r"^(pause|play|next|previous)"))
 @use_chat_lang()
-async def previous_track(c: Client, m: CallbackQuery, t):
-    user_id = m.data.split("|")[1]
-    if m.from_user.id != int(user_id):
-        user = await c.get_chat(int(user_id))
-        await m.answer(t("not_allowed").format(first_name=user.first_name))
-
-    spotify_session = await get_spotify_session(m.from_user.id)
-    devices = spotify_session.devices()
-    active_device = next(
-        (device for device in devices["devices"] if device["is_active"]), None
-    )
-    if not active_device:
-        return
-
-    device_id = active_device["id"]
-    spotify_session.previous_track(device_id)
-    spotify_data = spotify_session.current_playback(additional_types="episode,track")
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="⏮", callback_data=f"previous|{m.from_user.id}"
-                ),
-                InlineKeyboardButton(
-                    text="⏸" if spotify_data["is_playing"] else "▶️",
-                    callback_data=f"pause|{m.from_user.id}"
-                    if spotify_data["is_playing"]
-                    else f"play|{m.from_user.id}",
-                ),
-                InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
-            ],
-            [
-                InlineKeyboardButton(
-                    text=t("play_in_sp"),
-                    callback_data=f'tcs|{spotify_data["item"]["id"]}',
-                ),
-                InlineKeyboardButton(
-                    text=t("search_lyric"),
-                    callback_data=f'sp_s|{spotify_data["item"]["id"]}|{m.from_user.id}',
-                ),
-            ],
-        ]
-    )
-    if "artists" in spotify_data["item"]:
-        artist_name = spotify_data["item"]["artists"][0]["name"]
-    else:
-        artist_name = spotify_data["item"]["show"]["name"]
-    spotify_data = spotify_session.current_playback(additional_types="episode,track")
-    try:
-        is_favorite = spotify_session.current_user_saved_tracks_contains([
-            spotify_data["item"]["id"]
-        ])[0]
-    except SpotifyException:
-        is_favorite = False
-
-    await m.message.react("❤" if is_favorite else "")
-
-    if not database.theme(m.from_user.id)[3]:
-        track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
-        track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
-        await m.edit_message_text(
-            track_message,
-            reply_markup=keyboard,
-            parse_mode=ParseMode.HTML,
-        )
-    else:
-        await m.answer(f"🎵 {artist_name} - {spotify_data['item']['name']}")
-
-
-@Client.on_callback_query(filters.regex(r"^next"))
-@use_chat_lang()
-async def next_track(c: Client, m: CallbackQuery, t):
-    user_id = m.data.split("|")[1]
-    if m.from_user.id != int(user_id):
-        user = await c.get_chat(int(user_id))
-        await m.answer(t("not_allowed").format(first_name=user.first_name))
-        return
-
-    spotify_session = await get_spotify_session(m.from_user.id)
-    devices = spotify_session.devices()
-    active_device = next(
-        (device for device in devices["devices"] if device["is_active"]), None
-    )
-    if not active_device:
-        return
-
-    device_id = active_device["id"]
-    spotify_session.next_track(device_id)
-    spotify_data = spotify_session.current_playback(additional_types="episode,track")
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="⏮", callback_data=f"previous|{m.from_user.id}"
-                ),
-                InlineKeyboardButton(
-                    text="⏸" if spotify_data["is_playing"] else "▶️",
-                    callback_data=f"pause|{m.from_user.id}"
-                    if spotify_data["is_playing"]
-                    else f"play|{m.from_user.id}",
-                ),
-                InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
-            ],
-            [
-                InlineKeyboardButton(
-                    text=t("play_in_sp"),
-                    callback_data=f'tcs|{spotify_data["item"]["id"]}',
-                ),
-                InlineKeyboardButton(
-                    text=t("search_lyric"),
-                    callback_data=f'sp_s|{spotify_data["item"]["id"]}|{m.from_user.id}',
-                ),
-            ],
-        ]
-    )
-
-    if "artists" in spotify_data["item"]:
-        artist_name = spotify_data["item"]["artists"][0]["name"]
-    else:
-        artist_name = spotify_data["item"]["show"]["name"]
-    spotify_data = spotify_session.current_playback(additional_types="episode,track")
-    try:
-        is_favorite = spotify_session.current_user_saved_tracks_contains([
-            spotify_data["item"]["id"]
-        ])[0]
-    except SpotifyException:
-        is_favorite = False
-
-    await m.message.react("❤" if is_favorite else "")
-
-    if not database.theme(m.from_user.id)[3]:
-        track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
-        track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
-        await m.edit_message_text(
-            track_message,
-            reply_markup=keyboard,
-            parse_mode=ParseMode.HTML,
-        )
-    else:
-        await m.answer(f"🎵 {artist_name} - {spotify_data['item']['name']}")
-
-
-@Client.on_callback_query(filters.regex(r"^(pause|play)"))
-@use_chat_lang()
-async def pause_play_action(c: Client, m: CallbackQuery, t):
+async def update_playback_info(c: Client, m: CallbackQuery, t):
     action, user_id = m.data.split("|")
     if m.from_user.id != int(user_id):
         user = await c.get_chat(int(user_id))
@@ -435,20 +291,17 @@ async def pause_play_action(c: Client, m: CallbackQuery, t):
         return
 
     device_id = active_device["id"]
-    if "pause" in action:
+
+    if action == "previous":
+        spotify_session.previous_track(device_id)
+    elif action == "next":
+        spotify_session.next_track(device_id)
+    elif action == "pause":
         spotify_session.pause_playback(device_id)
-    else:
+    elif action == "play":
         spotify_session.start_playback(device_id)
+
     spotify_data = spotify_session.current_playback(additional_types="episode,track")
-    try:
-        is_favorite = spotify_session.current_user_saved_tracks_contains([
-            spotify_data["item"]["id"]
-        ])[0]
-    except SpotifyException:
-        is_favorite = False
-
-    await m.message.react("❤" if is_favorite else "")
-
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -456,9 +309,9 @@ async def pause_play_action(c: Client, m: CallbackQuery, t):
                     text="⏮", callback_data=f"previous|{m.from_user.id}"
                 ),
                 InlineKeyboardButton(
-                    text="⏸" if "play" in action else "▶️",
+                    text="⏸" if spotify_data["is_playing"] else "▶️",
                     callback_data=f"pause|{m.from_user.id}"
-                    if "play" in action
+                    if spotify_data["is_playing"]
                     else f"play|{m.from_user.id}",
                 ),
                 InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
@@ -480,6 +333,16 @@ async def pause_play_action(c: Client, m: CallbackQuery, t):
         artist_name = spotify_data["item"]["artists"][0]["name"]
     else:
         artist_name = spotify_data["item"]["show"]["name"]
+
+    try:
+        is_favorite = spotify_session.current_user_saved_tracks_contains([
+            spotify_data["item"]["id"]
+        ])[0]
+    except SpotifyException:
+        is_favorite = False
+
+    await m.message.react("❤" if is_favorite else "")
+
     if not database.theme(m.from_user.id)[3]:
         track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
         track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
@@ -489,4 +352,6 @@ async def pause_play_action(c: Client, m: CallbackQuery, t):
             parse_mode=ParseMode.HTML,
         )
     else:
-        await m.edit_message_reply_markup(reply_markup=keyboard)
+        await m.answer(f"🎵 {artist_name} - {spotify_data['item']['name']}")
+        if action in ["pause", "play"]:
+            await m.edit_message_reply_markup(reply_markup=keyboard)

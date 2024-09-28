@@ -80,7 +80,7 @@ async def teor(c: Client, m: CallbackQuery, t):
         else musixmatch_client.parce(lyrics_data)
     )
 
-    if musixmatch_client.translation(hash_value, "pt", None):
+    if await musixmatch_client.translation(hash_value, "pt", None):
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -189,7 +189,7 @@ async def ori(c: Client, m: CallbackQuery, t):
         else musixmatch_client.parce(lyrics_data)
     )
 
-    if musixmatch_client.translation(hash_value, "pt", None):
+    if await musixmatch_client.translation(hash_value, "pt", None):
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
