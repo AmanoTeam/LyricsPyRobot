@@ -5,10 +5,15 @@ from hydrogram.types import Message
 
 import db
 from locales import use_chat_lang
-from utils import get_current, get_song_art, get_track_info, http_pool
+from utils import (
+    get_current,
+    get_song_art,
+    get_track_info,
+    http_pool,
+    musixmatch,
+)
 
 from .letra import letra
-from utils import musixmatch
 
 LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
@@ -59,9 +64,15 @@ async def lfm(c: Client, m: Message, t):
                         mtext,
                         parse_mode="html",
                     )
-                a = await musixmatch.spotify_lyrics(artist=a[0]['artist']['#text'], track=a[0]['name'])
+                a = await musixmatch.spotify_lyrics(
+                    artist=a[0]["artist"]["#text"], track=a[0]["name"]
+                )
                 if a:
-                    m.text = "/letra spotify:"+str(a['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id'])
+                    m.text = "/letra spotify:" + str(
+                        a["message"]["body"]["macro_calls"]["matcher.track.get"][
+                            "message"
+                        ]["body"]["track"]["track_id"]
+                    )
                     try:
                         await letra(c, m)
                     except:

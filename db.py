@@ -53,7 +53,7 @@ def add_aproved(user_id, user, aproved, usages=None, uusage=None, dates=None):
     if x:
         dbc.execute(
             "UPDATE aproved SET aproved = ?, usages = ?, uusage = ?, dates = ? WHERE user_id = ? AND user = ?",
-            (aproved, usages, uusage, dates if dates else x[3], user_id, user),
+            (aproved, usages, uusage, dates or x[3], user_id, user),
         )
     else:
         dbc.execute(
@@ -153,6 +153,7 @@ def tem(user_id, json=None):
             return dbc.fetchone()
         except IndexError:
             return None
+    return None
 
 
 def get(uid):
@@ -176,7 +177,8 @@ def def_theme(uid, color, blur, pattern, current):
 
 def theme(uid):
     dbc.execute(
-        "SELECT color, blur, pattern, current FROM users WHERE user_id = (?)", (uid,)
+        "SELECT color, blur, pattern, current FROM users WHERE user_id = (?)",
+        (uid,),
     )
     try:
         return dbc.fetchone()

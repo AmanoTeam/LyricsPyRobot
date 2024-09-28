@@ -2,7 +2,6 @@ import asyncio
 import os
 from io import BytesIO
 from time import time
-from typing import Union
 
 import httpx
 import spotipy
@@ -28,16 +27,16 @@ async def get_song_art(
     color: str = "dark",
     blur: bool = False,
 ) -> BytesIO:
-    params = dict(
-        cover=album_url,
-        track=song_name,
-        artist=artist,
-        timenow=progress,
-        timetotal=duration,
-        scrobbles=scrobbles,
-        theme=color,
-        blurbg=int(blur if blur is not None else True),
-    )
+    params = {
+        "cover": album_url,
+        "track": song_name,
+        "artist": artist,
+        "timenow": progress,
+        "timetotal": duration,
+        "scrobbles": scrobbles,
+        "theme": color,
+        "blurbg": int(blur if blur is not None else True),
+    }
 
     url = URL("https://lyricspy.amanoteam.com/nowplaying-dom/") % params
 
@@ -85,12 +84,12 @@ async def build_browser_object(browser_type: str) -> BrowserContext:
 async def get_token(user_id, auth_code):
     r = await http_pool.post(
         "https://accounts.spotify.com/api/token",
-        headers=dict(Authorization=f"Basic {BASIC}"),
-        data=dict(
-            grant_type="authorization_code",
-            code=auth_code,
-            redirect_uri="https://lyricspy.amanoteam.com/go",
-        ),
+        headers={"Authorization": f"Basic {BASIC}"},
+        data={
+            "grant_type": "authorization_code",
+            "code": auth_code,
+            "redirect_uri": "https://lyricspy.amanoteam.com/go",
+        },
     )
     b = r.json()
     if b.get("error"):
@@ -106,8 +105,8 @@ async def refresh_token(user_id):
     print(tk[1])
     r = await http_pool.post(
         "https://accounts.spotify.com/api/token",
-        headers=dict(Authorization=f"Basic {BASIC}"),
-        data=dict(grant_type="refresh_token", refresh_token=tk[1]),
+        headers={"Authorization": f"Basic {BASIC}"},
+        data={"grant_type": "refresh_token", "refresh_token": tk[1]},
     )
     b = r.json()
 
@@ -116,7 +115,7 @@ async def refresh_token(user_id):
     return b["access_token"]
 
 
-async def get_spoti_session(user_id) -> Union[spotipy.Spotify, bool]:
+async def get_spoti_session(user_id) -> spotipy.Spotify | bool:
     tk = db.get(user_id)
     if not tk:
         return False
@@ -126,20 +125,19 @@ async def get_spoti_session(user_id) -> Union[spotipy.Spotify, bool]:
         return a
     except SpotifyException:
         new_token = await refresh_token(user_id)
-        a = spotipy.Spotify(auth=new_token)
-        return a
+        return spotipy.Spotify(auth=new_token)
 
 
 async def get_current(user: str) -> list[dict]:
     r = await http_pool.get(
         "http://ws.audioscrobbler.com/2.0/",
-        params=dict(
-            method="user.getrecenttracks",
-            user=user,
-            api_key=KEY,
-            format="json",
-            limit=1,
-        ),
+        params={
+            "method": "user.getrecenttracks",
+            "user": user,
+            "api_key": KEY,
+            "format": "json",
+            "limit": 1,
+        },
     )
     return r.json()["recenttracks"]["track"]
 
@@ -147,14 +145,14 @@ async def get_current(user: str) -> list[dict]:
 async def get_track_info(user: str, artist: str, track: str):
     r = await http_pool.get(
         "http://ws.audioscrobbler.com/2.0/",
-        params=dict(
-            method="track.getInfo",
-            user=user,
-            api_key=KEY,
-            format="json",
-            artist=artist,
-            track=track,
-        ),
+        params={
+            "method": "track.getInfo",
+            "user": user,
+            "api_key": KEY,
+            "format": "json",
+            "artist": artist,
+            "track": track,
+        },
     )
     return r.json()
 

@@ -37,10 +37,7 @@ async def no(c: Client, m: Message, t):
 @Client.on_callback_query(filters.regex("spoti_auto"))
 @use_chat_lang()
 async def spoti_auto(c: Client, m: Message | CallbackQuery, t):
-    if isinstance(m, CallbackQuery):
-        func = m.edit_message_text
-    else:
-        func = m.reply_text
+    func = m.edit_message_text if isinstance(m, CallbackQuery) else m.reply_text
     kb = ReplyKeyboardMarkup(
         one_time_keyboard=True,
         keyboard=[
@@ -58,10 +55,7 @@ async def spoti_auto(c: Client, m: Message | CallbackQuery, t):
 @Client.on_callback_query(filters.regex("spoti_manual"))
 @use_chat_lang()
 async def spoti_manual(c: Client, m: Message | CallbackQuery, t):
-    if isinstance(m, CallbackQuery):
-        func = m.edit_message_text
-    else:
-        func = m.reply_text
+    func = m.edit_message_text if isinstance(m, CallbackQuery) else m.reply_text
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -143,9 +137,9 @@ async def spoti(c: Client, m: Message, t):
                 return
             spotify_json = sess.current_playback(additional_types="episode,track")
             try:
-                fav = sess.current_user_saved_tracks_contains(
-                    [spotify_json["item"]["id"]]
-                )[0]
+                fav = sess.current_user_saved_tracks_contains([
+                    spotify_json["item"]["id"]
+                ])[0]
             except SpotifyException:
                 fav = False
             if not spotify_json:

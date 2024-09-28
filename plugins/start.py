@@ -1,5 +1,3 @@
-from typing import Union
-
 from hydrogram import Client, filters
 from hydrogram.enums import ChatType
 from hydrogram.types import (
@@ -12,16 +10,17 @@ from hydrogram.types import (
 from locales import use_chat_lang
 
 
-@Client.on_message(filters.command("start") &~ filters.regex(r"start "), group=1)
+@Client.on_message(filters.command("start") & ~filters.regex(r"start "), group=1)
 @Client.on_callback_query(filters.regex(r"start_back"))
 @use_chat_lang()
-async def start(c, m: Union[Message, CallbackQuery], t):
+async def start(c, m: Message | CallbackQuery, t):
     if not isinstance(m, filters.CallbackQuery) and m.chat.type != ChatType.PRIVATE:
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
                     InlineKeyboardButton(
-                        text=t("inline_btn"), switch_inline_query_current_chat=""
+                        text=t("inline_btn"),
+                        switch_inline_query_current_chat="",
                     ),
                 ]
             ]
@@ -37,7 +36,8 @@ async def start(c, m: Union[Message, CallbackQuery], t):
                 ],
                 [
                     InlineKeyboardButton(
-                        text=t("inline_btn"), switch_inline_query_current_chat=""
+                        text=t("inline_btn"),
+                        switch_inline_query_current_chat="",
                     ),
                 ],
             ]

@@ -18,7 +18,9 @@ enabled_locales = [
 default_language = "en-US"
 
 
-def cache_localizations(files: list[str]) -> dict[str, dict[str, dict[str, str]]]:
+def cache_localizations(
+    files: list[str],
+) -> dict[str, dict[str, dict[str, str]]]:
     ldict = {lang: {} for lang in enabled_locales}
     for file in files:
         _, lname, pname = file.split(os.path.sep)
@@ -38,7 +40,11 @@ langdict = cache_localizations(jsons)
 
 
 def get_locale_string(
-    dic: dict, language: str, default_context: str, key: str, context: str = None
+    dic: dict,
+    language: str,
+    default_context: str,
+    key: str,
+    context: str | None = None,
 ) -> str:
     if context:
         default_context = context

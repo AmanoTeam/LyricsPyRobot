@@ -17,7 +17,7 @@ async def letra(c: Client, m: Message, t):
     text = m.text.split(" ", 1)[1]
     if not text:
         await m.reply_text(t("use"))
-    elif 'spotify:' in text:
+    elif "spotify:" in text:
         a = await musixmatch.auto(id=text.split(":", 1)[1])
     elif re.match(
         r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", text
@@ -32,7 +32,7 @@ async def letra(c: Client, m: Message, t):
             a = await musixmatch.auto(text, limit=1, lang="pt") or await genius.auto(
                 text, limit=1
             )
-        except Exception as e:
+        except Exception:
             a = await genius.auto(text, limit=1)
         if not a:
             await m.reply_text(t("lyrics_nf"))

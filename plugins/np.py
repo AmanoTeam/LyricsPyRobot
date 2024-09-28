@@ -188,6 +188,7 @@ async def np(c: Client, m: Message, t):
         )
 
     await mes.react("❤" if fav else None)
+    return None
 
 
 @Client.on_callback_query(filters.regex(r"^aprova"))
@@ -221,7 +222,8 @@ async def sp_search(c: Client, m: CallbackQuery):
         om.from_user = m.from_user
         spotify_json = sess.track(track)
         a = await musixmatch.spotify_lyrics(
-            artist=spotify_json["artists"][0]["name"], track=spotify_json["name"]
+            artist=spotify_json["artists"][0]["name"],
+            track=spotify_json["name"],
         )
         if a:
             om.text = "/letra spotify:" + str(
@@ -290,7 +292,9 @@ async def previous(c: Client, m: CallbackQuery, t):
             publi = spotify_json["item"]["show"]["name"]
         spotify_json = sess.current_playback(additional_types="episode,track")
         try:
-            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[
+                0
+            ]
         except SpotifyException:
             fav = False
 
@@ -359,7 +363,9 @@ async def next(c: Client, m: CallbackQuery, t):
             publi = spotify_json["item"]["show"]["name"]
         spotify_json = sess.current_playback(additional_types="episode,track")
         try:
-            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[
+                0
+            ]
         except SpotifyException:
             fav = False
 
@@ -397,7 +403,9 @@ async def ppa(c: Client, m: CallbackQuery, t):
             sess.start_playback(device_id)
         spotify_json = sess.current_playback(additional_types="episode,track")
         try:
-            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[
+                0
+            ]
         except SpotifyException:
             fav = False
 

@@ -59,7 +59,8 @@ async def teor(c: Client, m: CallbackQuery, t):
             ):
                 a = await genius.lyrics(hash)
             elif re.match(
-                r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
+                r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+",
+                n[0],
             ):
                 a = await musixmatch.lyrics(hash)
             else:
@@ -97,6 +98,7 @@ async def teor(c: Client, m: CallbackQuery, t):
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
+    return None
 
 
 @Client.on_callback_query(filters.regex(r"^(_\-)"))
@@ -113,7 +115,8 @@ async def tetr(c: Client, m: CallbackQuery, t):
             ):
                 a = await genius.lyrics(hash)
             elif re.match(
-                r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
+                r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+",
+                n[0],
             ):
                 a = await musixmatch.lyrics(hash)
             else:
@@ -140,6 +143,7 @@ async def tetr(c: Client, m: CallbackQuery, t):
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
+    return None
 
 
 @Client.on_callback_query(filters.regex(r"^(\+)"))
@@ -156,7 +160,8 @@ async def ori(c: Client, m: CallbackQuery, t):
             ):
                 a = await genius.lyrics(hash)
             elif re.match(
-                r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
+                r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+",
+                n[0],
             ):
                 a = await musixmatch.lyrics(hash)
             else:
@@ -194,6 +199,7 @@ async def ori(c: Client, m: CallbackQuery, t):
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
+    return None
 
 
 @Client.on_callback_query(filters.regex(r"^(\-)"))
@@ -210,7 +216,8 @@ async def tr(c: Client, m: CallbackQuery, t):
             ):
                 a = await letras.letra(n[0])
             elif re.match(
-                r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
+                r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+",
+                n[0],
             ):
                 a = await musixmatch.lyrics(hash)
             else:
@@ -238,6 +245,7 @@ async def tr(c: Client, m: CallbackQuery, t):
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
+    return None
 
 
 @Client.on_callback_query(filters.regex(r"settings"))
@@ -301,12 +309,12 @@ async def np_apv(c: Client, m: CallbackQuery, t):
     extra = []
 
     if int(pg) != 0:
-        extra.append(("back", f"np_apv_pg{int(pg)-1}"))
+        extra.append(("back", f"np_apv_pg{int(pg) - 1}"))
 
     extra.append(("close", "settings"))
 
     if len(tabela) - int(pg) > 1:
-        extra.append(("next", f"np_apv_pg{int(pg)+1}"))
+        extra.append(("next", f"np_apv_pg{int(pg) + 1}"))
 
     keyb = tabela[int(pg)]
     keyb.append(extra)
@@ -349,7 +357,7 @@ async def np_apvu(c: Client, m: CallbackQuery, t):
                 if app[3]
                 else "Sem data"
             )
-            text += "Solicitado em: {data}".format(data=date)
+            text += f"Solicitado em: {date}"
             keyb.append([(t("aprove"), f"np_apvt_{id}_pg{pg}")])
         elif app[0] == 2:
             date = (
@@ -357,7 +365,7 @@ async def np_apvu(c: Client, m: CallbackQuery, t):
                 if app[3]
                 else "Sem data"
             )
-            text += "Reprovado em: {data}".format(data=date)
+            text += f"Reprovado em: {date}"
             keyb.append([(t("unblock"), f"np_apvt_{id}_pg{pg}")])
 
     keyb.append([(t("back"), f"np_apv_pg{pg}")])
@@ -372,7 +380,7 @@ async def np_apvt(c: Client, m: CallbackQuery, t):
     pg = pg.split("pg")[1]
     app = db.get_aproved(m.from_user.id, id)
     if app:
-        appv = "1" if app[0] in [0, 2] else "2"
+        appv = "1" if app[0] in {0, 2} else "2"
         db.add_aproved(
             m.from_user.id, id, appv, dates=datetime.now().timestamp(), usages=0
         )
@@ -396,25 +404,25 @@ async def lang(c: Client, m: CallbackQuery, t):
 @use_chat_lang()
 async def theme(c: Client, m: CallbackQuery, t):
     a = db.theme(m.from_user.id)
-    if a[0] is None or "_" in m.data and a[0]:
+    if a[0] is None or ("_" in m.data and a[0]):
         tid = 0
     elif "_" in m.data:
         tid = 1
     else:
         tid = a[0]
-    if a[1] is None or "-" in m.data and not a[1]:
+    if a[1] is None or ("-" in m.data and not a[1]):
         bid = 1
     elif "-" in m.data:
         bid = 0
     else:
         bid = a[1]
-    if a[2] is None or "=" in m.data and a[2]:
+    if a[2] is None or ("=" in m.data and a[2]):
         pid = False
     elif "=" in m.data:
         pid = True
     else:
         pid = a[2]
-    if a[3] is None or "+" in m.data and not a[3]:
+    if a[3] is None or ("+" in m.data and not a[3]):
         sid = 1
     elif "+" in m.data:
         sid = 0

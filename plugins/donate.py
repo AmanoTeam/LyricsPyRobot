@@ -1,5 +1,3 @@
-from typing import Union
-
 from hydrogram import Client, filters
 from hydrogram.helpers import ikb
 from hydrogram.raw.functions.messages import SendMedia, SetBotPrecheckoutResults
@@ -25,17 +23,17 @@ async def add_donate(c: Client, q: CallbackQuery, t):
     if val >= 650:
         key = [
             [
-                ("+ R$ 100,00", f"donate_{val+10000}"),
-                ("+ R$ 10,00", f"donate_{val+1000}"),
-                ("+ R$ 1,00", f"donate_{val+100}"),
-                ("+ R$ 0,50", f"donate_{val+50}"),
+                ("+ R$ 100,00", f"donate_{val + 10000}"),
+                ("+ R$ 10,00", f"donate_{val + 1000}"),
+                ("+ R$ 1,00", f"donate_{val + 100}"),
+                ("+ R$ 0,50", f"donate_{val + 50}"),
             ],
-            [(f"R$ {str(val / 100)}", f"donation_{val}")],
+            [(f"R$ {val / 100!s}", f"donation_{val}")],
             [
-                ("- R$ 100,00", f"donate_{val-10000}"),
-                ("- R$ 10,00", f"donate_{val-1000}"),
-                ("- R$ 1,00", f"donate_{val-100}"),
-                ("- R$ 0,50", f"donate_{val-50}"),
+                ("- R$ 100,00", f"donate_{val - 10000}"),
+                ("- R$ 10,00", f"donate_{val - 1000}"),
+                ("- R$ 1,00", f"donate_{val - 100}"),
+                ("- R$ 0,50", f"donate_{val - 50}"),
             ],
         ]
 
@@ -45,7 +43,7 @@ async def add_donate(c: Client, q: CallbackQuery, t):
 @Client.on_message(filters.regex(r"\/start pay"))
 @Client.on_callback_query(filters.regex(r"donation"))
 @use_chat_lang()
-async def donation(c: Client, q: Union[CallbackQuery, Message], t):
+async def donation(c: Client, q: CallbackQuery | Message, t):
     peer = await c.resolve_peer(q.from_user.id)
     val = (
         int(q.data.split("_")[1])
@@ -73,7 +71,6 @@ async def donation(c: Client, q: Union[CallbackQuery, Message], t):
             random_id=c.rnd_id(),
         )
     )
-    return
 
 
 @Client.on_raw_update(group=10)

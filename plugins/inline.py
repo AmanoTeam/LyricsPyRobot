@@ -98,7 +98,7 @@ async def inline(c, m, t):
 async def choosen(c: Client, m: ChosenInlineResult, t):
     if m.result_id == "MySpotify":
         return
-    hash = m.result_id[1:] if m.result_id[0] in ["s", "l"] else m.result_id
+    hash = m.result_id[1:] if m.result_id[0] in {"s", "l"} else m.result_id
     a = await musixmatch.lyrics(hash)
     a = musixmatch.parce(a)
     uid = m.from_user.id
