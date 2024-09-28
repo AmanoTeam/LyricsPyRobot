@@ -13,12 +13,16 @@ from hydrogram.types import (
 )
 from spotipy.exceptions import SpotifyException
 
-import db
 from config import login_url
-from locales import use_chat_lang
-from utils import get_song_art, get_spotify_session, get_token, musixmatch_client
-
-from .letra import get_lyrics
+from lyricspybot import database
+from lyricspybot.locales import use_chat_lang
+from lyricspybot.plugins.letra import get_lyrics
+from lyricspybot.utils import (
+    get_song_art,
+    get_spotify_session,
+    get_token,
+    musixmatch_client,
+)
 
 
 @Client.on_message(filters.service)
@@ -90,7 +94,7 @@ async def spoti(c: Client, m: Message, t):
             await m.reply_text(t("error").format(error=token_result[1]))
         return
 
-    user_token = db.get(m.from_user.id)
+    user_token = database.get(m.from_user.id)
     if not user_token or not user_token[0]:
         if m.chat.type != ChatType.PRIVATE:
             deep_link = f"t.me/{c.me.username}?start="
@@ -157,7 +161,7 @@ async def spoti(c: Client, m: Message, t):
             await m.reply_text(t("play"))
             return
 
-        use_sticker = db.theme(m.from_user.id)[3]
+        use_sticker = database.theme(m.from_user.id)[3]
         if "artists" in playback_info["item"]:
             publisher = playback_info["item"]["artists"][0]["name"]
         else:
@@ -171,8 +175,8 @@ async def spoti(c: Client, m: Message, t):
                 else playback_info["item"]["images"][0]["url"],
                 song_duration=playback_info["item"]["duration_ms"] // 1000,
                 playback_progress=playback_info["progress_ms"] // 1000,
-                theme_color="dark" if db.theme(m.from_user.id)[0] else "light",
-                blur_background=db.theme(m.from_user.id)[1],
+                theme_color="dark" if database.theme(m.from_user.id)[0] else "light",
+                blur_background=database.theme(m.from_user.id)[1],
             )
         message_text = f"🎵 {publisher} - {playback_info['item']['name']}"
         if use_sticker is None or use_sticker:

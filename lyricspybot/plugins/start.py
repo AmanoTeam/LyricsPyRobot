@@ -7,7 +7,7 @@ from hydrogram.types import (
     Message,
 )
 
-from locales import use_chat_lang
+from lyricspybot.locales import use_chat_lang
 
 
 @Client.on_message(filters.command("start") & ~filters.regex(r"start "), group=1)

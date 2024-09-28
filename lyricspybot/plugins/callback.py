@@ -12,10 +12,15 @@ from hydrogram.types import (
     WebAppInfo,
 )
 
-import db
 from config import login_url, sudos
-from locales import default_language, get_locale_string, langdict, use_chat_lang
-from utils import genius_client, get_spotify_session, musixmatch_client
+from lyricspybot import database
+from lyricspybot.locales import (
+    default_language,
+    get_locale_string,
+    langdict,
+    use_chat_lang,
+)
+from lyricspybot.utils import genius_client, get_spotify_session, musixmatch_client
 
 # + original, - traduzido, _ telegraph
 
@@ -54,7 +59,7 @@ async def teor(c: Client, m: CallbackQuery, t):
         await m.answer(t("not_allowed").format(first_name=chat.first_name))
         return
 
-    url_data = db.get_url(hash_value)
+    url_data = database.get_url(hash_value)
     if not url_data:
         await m.answer(t("hash_nf"), show_alert=True)
         return
@@ -117,7 +122,7 @@ async def tetr(c: Client, m: CallbackQuery, t):
         await m.answer(t("not_allowed").format(first_name=chat.first_name))
         return
 
-    url_data = db.get_url(hash_value)
+    url_data = database.get_url(hash_value)
     if not url_data:
         await m.answer(t("hash_nf"), show_alert=True)
         return
@@ -166,7 +171,7 @@ async def ori(c: Client, m: CallbackQuery, t):
         await m.answer(t("not_allowed").format(first_name=chat.first_name))
         return
 
-    url_data = db.get_url(hash_value)
+    url_data = database.get_url(hash_value)
     if not url_data:
         await m.answer(t("hash_nf"), show_alert=True)
         return
@@ -233,7 +238,7 @@ async def tr(c: Client, m: CallbackQuery, t):
         await m.answer(t("not_allowed").format(first_name=chat.first_name))
         return
 
-    url_data = db.get_url(hash_value)
+    url_data = database.get_url(hash_value)
     if not url_data:
         await m.answer(t("hash_nf"), show_alert=True)
         return
@@ -319,7 +324,7 @@ async def player_settings(c: Client, m: CallbackQuery, t):
 @use_chat_lang()
 async def now_playing_approvals(c: Client, m: CallbackQuery, t):
     page = m.data.split("pg")[1]
-    approved_ids = db.get_all_aproved(m.from_user.id)
+    approved_ids = database.get_all_aproved(m.from_user.id)
     table = []
     row = []
     for i, id_data in enumerate(approved_ids):
@@ -358,7 +363,7 @@ async def now_playing_approvals(c: Client, m: CallbackQuery, t):
 async def now_playing_approval_user(c: Client, m: CallbackQuery, t):
     user_id, page = m.data.split("_")[2:]
     page = page.split("pg")[1]
-    approval = db.get_aproved(m.from_user.id, user_id)
+    approval = database.get_aproved(m.from_user.id, user_id)
     user = await c.get_chat(user_id)
     text = t("apuser").format(
         name=f"<a href='tg://user?id={user.id}'>{user.first_name}</a>"
@@ -409,9 +414,9 @@ async def now_playing_approval_user(c: Client, m: CallbackQuery, t):
 async def now_playing_approval_toggle(c: Client, m: CallbackQuery, t):
     user_id, page = m.data.split("_")[2:]
     page = page.split("pg")[1]
-    if approval := db.get_aproved(m.from_user.id, user_id):
+    if approval := database.get_aproved(m.from_user.id, user_id):
         approval_status = "1" if approval[0] in {0, 2} else "2"
-        db.add_aproved(
+        database.add_aproved(
             m.from_user.id,
             user_id,
             approval_status,
@@ -437,7 +442,7 @@ async def language(c: Client, m: CallbackQuery, t):
 @Client.on_callback_query(filters.regex(r"theme|pattern"))
 @use_chat_lang()
 async def theme(c: Client, m: CallbackQuery, t):
-    user_theme = db.theme(m.from_user.id)
+    user_theme = database.theme(m.from_user.id)
     if user_theme[0] is None or ("_" in m.data and user_theme[0]):
         theme_id = 0
     elif "_" in m.data:
@@ -492,7 +497,7 @@ async def theme(c: Client, m: CallbackQuery, t):
             [InlineKeyboardButton(text=t("back"), callback_data="settings")],
         ]
     )
-    db.def_theme(m.from_user.id, theme_id, blur_id, pattern_id, sticker_id)
+    database.def_theme(m.from_user.id, theme_id, blur_id, pattern_id, sticker_id)
     await m.edit_message_text(t("np_settings_txt"), reply_markup=keyboard)
 
 
@@ -501,7 +506,7 @@ async def theme(c: Client, m: CallbackQuery, t):
 async def lastfm_settings(c: Client, m: CallbackQuery, t):
     text = t("lastfm") + "\n\n"
 
-    user_token = db.get(m.from_user.id)
+    user_token = database.get(m.from_user.id)
     if not user_token or not user_token[2]:
         text += t("nologged_lfm")
     else:
@@ -533,7 +538,7 @@ async def lastfm_login(c: Client, m: CallbackQuery, t):
         except ListenerTimeout:
             return
 
-    db.add_user_last(m.from_user.id, user_message.text)
+    database.add_user_last(m.from_user.id, user_message.text)
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -548,7 +553,7 @@ async def lastfm_login(c: Client, m: CallbackQuery, t):
 @Client.on_callback_query(filters.regex(r"lfm_logout"))
 @use_chat_lang()
 async def lastfm_logout(c: Client, m: CallbackQuery, t):
-    db.add_user_last(m.from_user.id, None)
+    database.add_user_last(m.from_user.id, None)
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text=t("back"), callback_data="lastfm_st")],
@@ -562,7 +567,7 @@ async def lastfm_logout(c: Client, m: CallbackQuery, t):
 async def spotify_settings(c: Client, m: CallbackQuery, t):
     text = t("spotify") + "\n\n"
 
-    user_token = db.get(m.from_user.id)
+    user_token = database.get(m.from_user.id)
     if not user_token or not user_token[0]:
         text += t("nologged")
     else:
@@ -588,7 +593,7 @@ async def spotify_settings(c: Client, m: CallbackQuery, t):
 @Client.on_callback_query(filters.regex(r"sp_logout"))
 @use_chat_lang()
 async def spotify_logout(c: Client, m: CallbackQuery, t):
-    db.add_user(m.from_user.id, None, None)
+    database.add_user(m.from_user.id, None, None)
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text=t("back"), callback_data="spotify_st")],
@@ -601,7 +606,7 @@ async def spotify_logout(c: Client, m: CallbackQuery, t):
 @use_chat_lang()
 async def set_user_lang(c: Client, m: CallbackQuery, f):
     lang = m.data.split()[1]
-    db.db_set_lang(m.from_user.id, lang)
+    database.db_set_lang(m.from_user.id, lang)
     strings = partial(
         get_locale_string,
         langdict[lang].get("callback", langdict[default_language]["callback"]),

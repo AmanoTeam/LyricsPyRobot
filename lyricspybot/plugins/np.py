@@ -12,10 +12,10 @@ from hydrogram.types import (
 )
 from spotipy.exceptions import SpotifyException
 
-import db
-from locales import use_chat_lang, use_user_lang
-from plugins.letra import get_lyrics
-from utils import (
+from lyricspybot import database
+from lyricspybot.locales import use_chat_lang, use_user_lang
+from lyricspybot.plugins.letra import get_lyrics
+from lyricspybot.utils import (
     get_current_track,
     get_song_art,
     get_spotify_session,
@@ -44,7 +44,7 @@ async def now_playing(c: Client, m: Message, t):
         else:
             target_user_id = m.command[1]
         target_user = await c.get_chat(target_user_id)
-        approval_status = db.get_aproved(target_user.id, m.from_user.id)
+        approval_status = database.get_aproved(target_user.id, m.from_user.id)
         if target_user.type != ChatType.PRIVATE:
             await m.reply_text(t("only_users"))
             return
@@ -52,7 +52,7 @@ async def now_playing(c: Client, m: Message, t):
             approval_status and approval_status[0] == 1
         ):
             usage_count = approval_status[1] + 1 if approval_status[1] else 1
-            db.add_aproved(
+            database.add_aproved(
                 target_user.id,
                 m.from_user.id,
                 approval_status[0],
@@ -85,7 +85,7 @@ async def now_playing(c: Client, m: Message, t):
                     ]
                 ]
             )
-            db.add_aproved(
+            database.add_aproved(
                 target_user.id, m.from_user.id, False, dates=datetime.now().timestamp()
             )
             await c.send_message(
@@ -100,7 +100,7 @@ async def now_playing(c: Client, m: Message, t):
     except SpotifyException:
         spotify_session = None
     if not spotify_session or spotify_session.current_playback() is None:
-        user_token = db.get(m.from_user.id)
+        user_token = database.get(m.from_user.id)
         if not user_token or not user_token[2]:
             await m.reply_text(t("not_logged"))
             return
@@ -111,7 +111,7 @@ async def now_playing(c: Client, m: Message, t):
         track_info = await get_track_info(
             user_token[2], current_track[0]["artist"]["#text"], current_track[0]["name"]
         )
-        use_sticker = db.theme(display_user_id)[3]
+        use_sticker = database.theme(display_user_id)[3]
         track_message = (
             f"🎵 {current_track[0]['artist']['#text']} - {current_track[0]['name']}"
         )
@@ -135,16 +135,16 @@ async def now_playing(c: Client, m: Message, t):
                 album_cover_url = LASTFM_IMAGE_REGEX.findall(fallback_response.text)[0]
         album_art = await get_song_art(
             song_name=current_track[0]["name"],
-            artist=current_track[0]["artist"]["#text"],
-            album_url=album_cover_url,
-            color="dark" if db.theme(display_user_id)[0] else "light",
-            blur=db.theme(display_user_id)[1],
-            scrobbles=track_info["track"]["userplaycount"],
+            artist_name=current_track[0]["artist"]["#text"],
+            album_cover_url=album_cover_url,
+            theme_color="dark" if database.theme(display_user_id)[0] else "light",
+            blur_background=database.theme(display_user_id)[1],
+            play_count=track_info["track"]["userplaycount"],
         )
         await m.reply_document(album_art, caption=track_message)
         return
     spotify_data = spotify_session.current_playback(additional_types="episode,track")
-    use_sticker = db.theme(display_user_id)[3]
+    use_sticker = database.theme(display_user_id)[3]
     if "artists" in spotify_data["item"]:
         artist_name = spotify_data["item"]["artists"][0]["name"]
     else:
@@ -164,8 +164,8 @@ async def now_playing(c: Client, m: Message, t):
             else spotify_data["item"]["images"][0]["url"],
             song_duration=spotify_data["item"]["duration_ms"] // 1000,
             playback_progress=spotify_data["progress_ms"] // 1000,
-            theme_color="dark" if db.theme(display_user_id)[0] else "light",
-            blur_background=db.theme(display_user_id)[1],
+            theme_color="dark" if database.theme(display_user_id)[0] else "light",
+            blur_background=database.theme(display_user_id)[1],
         )
     track_message = f"🎵 {artist_name} - {spotify_data['item']['name']}"
     playback_controls = [
@@ -215,7 +215,9 @@ async def now_playing(c: Client, m: Message, t):
 @use_chat_lang()
 async def approve(c: Client, m: CallbackQuery, t):
     user_id = m.data.split("|")[1]
-    db.add_approved(m.from_user.id, user_id, True, dates=datetime.now().timestamp())
+    database.add_approved(
+        m.from_user.id, user_id, True, dates=datetime.now().timestamp()
+    )
     user = await c.get_users(user_id)
     user_lang = use_user_lang(user.id)
     await c.send_message(
@@ -228,7 +230,7 @@ async def approve(c: Client, m: CallbackQuery, t):
 @use_chat_lang()
 async def deny(c: Client, m: CallbackQuery, t):
     user_id = m.data.split("|")[1]
-    db.add_aproved(m.from_user.id, user_id, 2, dates=datetime.now().timestamp())
+    database.add_aproved(m.from_user.id, user_id, 2, dates=datetime.now().timestamp())
     user = await c.get_users(user_id)
     user_lang = use_user_lang(user.id)
     await c.send_message(
@@ -332,7 +334,7 @@ async def previous_track(c: Client, m: CallbackQuery, t):
     if is_favorite:
         await m.message.react("❤")
 
-    if not db.theme(m.from_user.id)[3]:
+    if not database.theme(m.from_user.id)[3]:
         track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
         track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
         await m.edit_message_text(
@@ -406,7 +408,7 @@ async def next_track(c: Client, m: CallbackQuery, t):
     if is_favorite:
         await m.message.react("❤")
 
-    if not db.theme(m.from_user.id)[3]:
+    if not database.theme(m.from_user.id)[3]:
         track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
         track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
         await m.edit_message_text(
@@ -482,7 +484,7 @@ async def pause_play_action(c: Client, m: CallbackQuery, t):
         artist_name = spotify_data["item"]["artists"][0]["name"]
     else:
         artist_name = spotify_data["item"]["show"]["name"]
-    if not db.theme(m.from_user.id)[3]:
+    if not database.theme(m.from_user.id)[3]:
         track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
         track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
         await m.edit_message_text(

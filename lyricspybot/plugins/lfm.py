@@ -4,17 +4,16 @@ from hydrogram import Client, filters
 from hydrogram.enums import ParseMode
 from hydrogram.types import Message
 
-import db
-from locales import use_chat_lang
-from utils import (
+from lyricspybot import database
+from lyricspybot.locales import use_chat_lang
+from lyricspybot.plugins.letra import get_lyrics
+from lyricspybot.utils import (
     get_current_track,
     get_song_art,
     get_track_info,
     http_client,
     musixmatch_client,
 )
-
-from .letra import get_lyrics
 
 ALBUM_ART_REGEX = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
@@ -24,11 +23,11 @@ ALBUM_ART_REGEX = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 async def last_fm_command(c: Client, m: Message, t):
     command_parts = m.text.split(" ", 1)
     if len(command_parts) == 2:
-        db.add_user_last(m.from_user.id, command_parts[1])
+        database.add_user_last(m.from_user.id, command_parts[1])
         await m.reply_text(t("done"))
         return
 
-    user_data = db.get(m.from_user.id)
+    user_data = database.get(m.from_user.id)
     if not user_data or not user_data[2]:
         await m.reply_text(t("example"))
         return
@@ -45,7 +44,7 @@ async def last_fm_command(c: Client, m: Message, t):
     message_text = (
         f"🎵 {current_track[0]['artist']['#text']} - {current_track[0]['name']}"
     )
-    use_sticker = db.theme(m.from_user.id)[3]
+    use_sticker = database.theme(m.from_user.id)[3]
 
     if use_sticker is None or use_sticker:
         album_url = await get_album_url(current_track[0])
@@ -53,8 +52,8 @@ async def last_fm_command(c: Client, m: Message, t):
             song_name=current_track[0]["name"],
             artist_name=current_track[0]["artist"]["#text"],
             album_cover_url=album_url,
-            theme_color="dark" if db.theme(m.from_user.id)[0] else "light",
-            blur_background=db.theme(m.from_user.id)[1],
+            theme_color="dark" if database.theme(m.from_user.id)[0] else "light",
+            blur_background=database.theme(m.from_user.id)[1],
             play_count=track_info["track"]["userplaycount"],
         )
         await m.reply_document(album_art, caption=message_text)

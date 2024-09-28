@@ -15,10 +15,10 @@ from hydrogram.types import (
 )
 from spotipy.exceptions import SpotifyException
 
-import db
 from config import cache_chat
-from locales import use_chat_lang
-from utils import (
+from lyricspybot import database
+from lyricspybot.locales import use_chat_lang
+from lyricspybot.utils import (
     get_current_track,
     get_song_art,
     get_spotify_session,
@@ -34,7 +34,7 @@ LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 async def my_spotify(c: Client, m: InlineQuery, t):
     spotify_session = await get_spotify_session(m.from_user.id)
     if not spotify_session or spotify_session.current_playback() is None:
-        user_token = db.get(m.from_user.id)
+        user_token = database.get(m.from_user.id)
         if not user_token or not user_token[2]:
             article = [
                 InlineQueryResultArticle(
@@ -67,7 +67,7 @@ async def my_spotify(c: Client, m: InlineQuery, t):
         track_info = await get_track_info(
             user_token[2], current_track[0]["artist"]["#text"], current_track[0]["name"]
         )
-        use_sticker = db.theme(m.from_user.id)[3]
+        use_sticker = database.theme(m.from_user.id)[3]
         message_text = (
             f"🎵 {current_track[0]['artist']['#text']} - {current_track[0]['name']}"
         )
@@ -86,8 +86,8 @@ async def my_spotify(c: Client, m: InlineQuery, t):
                 song_name=current_track[0]["name"],
                 artist_name=current_track[0]["artist"]["#text"],
                 album_cover_url=album_url,
-                theme_color="dark" if db.theme(m.from_user.id)[0] else "light",
-                blur_background=db.theme(m.from_user.id)[1],
+                theme_color="dark" if database.theme(m.from_user.id)[0] else "light",
+                blur_background=database.theme(m.from_user.id)[1],
                 play_count=track_info["track"]["userplaycount"],
             )
 
@@ -169,7 +169,7 @@ async def my_spotify(c: Client, m: InlineQuery, t):
         text = f'🎧 {spotify_json["item"]["name"]} - {publisher}\n'
         text += f'🗣 {spotify_json["device"]["name"]} | ⏳{datetime.timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
 
-        use_sticker = db.theme(m.from_user.id)[3]
+        use_sticker = database.theme(m.from_user.id)[3]
         if use_sticker is None or use_sticker:
             album_art = await get_song_art(
                 song_name=spotify_json["item"]["name"],
@@ -179,8 +179,8 @@ async def my_spotify(c: Client, m: InlineQuery, t):
                 else spotify_json["item"]["images"][0]["url"],
                 song_duration=spotify_json["item"]["duration_ms"] // 1000,
                 playback_progress=spotify_json["progress_ms"] // 1000,
-                theme_color="dark" if db.theme(m.from_user.id)[0] else "light",
-                blur_background=db.theme(m.from_user.id)[1],
+                theme_color="dark" if database.theme(m.from_user.id)[0] else "light",
+                blur_background=database.theme(m.from_user.id)[1],
             )
 
             msg = await c.send_document(cache_chat, album_art, caption=text)

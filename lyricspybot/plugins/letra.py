@@ -3,9 +3,9 @@ import re
 from hydrogram import Client, filters
 from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-import db
-from locales import use_chat_lang
-from utils import genius_client, musixmatch_client
+from lyricspybot import database
+from lyricspybot.locales import use_chat_lang
+from lyricspybot.utils import genius_client, musixmatch_client
 
 # + original, - traduzido, _ telegraph
 
@@ -46,9 +46,9 @@ async def get_lyrics(c: Client, m: Message, t):
     )
     print(lyrics_data)
     lyrics_hash = str(lyrics_data["id"])
-    db.add_hash(lyrics_hash, lyrics_data)
+    database.add_hash(lyrics_hash, lyrics_data)
     user_id = m.from_user.id
-    if db.theme(m.from_user.id)[2]:
+    if database.theme(m.from_user.id)[2]:
         if lyrics_data["traducao"]:
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
@@ -73,7 +73,7 @@ async def get_lyrics(c: Client, m: Message, t):
                 ]
             )
         await m.reply_text(
-            f'{lyrics_data["musica"]} - {lyrics_data["autor"]}\n{db.get_url(lyrics_hash)[1]}',
+            f'{lyrics_data["musica"]} - {lyrics_data["autor"]}\n{database.get_url(lyrics_hash)[1]}',
             reply_markup=keyboard,
             parse_mode=None,
         )

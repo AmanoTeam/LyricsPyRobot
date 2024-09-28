@@ -13,7 +13,7 @@ from hydrogram.raw.types import (
 from hydrogram.types import CallbackQuery, Message, Update
 
 from config import stripe_token, sudos
-from locales import use_chat_lang, use_user_lang
+from lyricspybot.locales import use_chat_lang, use_user_lang
 
 
 @Client.on_callback_query(filters.regex(r"donate"))

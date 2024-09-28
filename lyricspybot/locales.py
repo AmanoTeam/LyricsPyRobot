@@ -4,7 +4,7 @@ import os.path
 from functools import partial, wraps
 from glob import glob
 
-import db
+from lyricspybot import database
 
 enabled_locales = [
     "en-US",  # English
@@ -56,7 +56,7 @@ def get_locale_string(
 
 
 def get_lang(cid) -> str:
-    lang = db.db_get_lang(cid)
+    lang = database.db_get_lang(cid)
 
     lang = lang[0] if lang and lang[0] else default_language
 

@@ -3,8 +3,8 @@ from hydrogram.enums import ChatType
 from hydrogram.helpers import ikb
 from hydrogram.types import CallbackQuery, Message
 
-from db import database, database_cursor
-from locales import use_chat_lang
+from lyricspybot.database import database, database_cursor
+from lyricspybot.locales import use_chat_lang
 
 
 @Client.on_message(filters.command("privacy"))

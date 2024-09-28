@@ -5,9 +5,9 @@ from hydrogram.types import (
     InlineKeyboardMarkup,
 )
 
-import db
-from locales import use_chat_lang
-from utils import musixmatch_client
+from lyricspybot import database
+from lyricspybot.locales import use_chat_lang
+from lyricspybot.utils import musixmatch_client
 
 # + original, - traduzido, _ telegraph
 
@@ -22,7 +22,7 @@ async def chosen(c: Client, m: ChosenInlineResult, t):
     lyrics_data = await musixmatch_client.lyrics(song_hash)
     parsed_lyrics = musixmatch_client.parce(lyrics_data)
     user_id = m.from_user.id
-    if db.theme(user_id)[2]:
+    if database.theme(user_id)[2]:
         if parsed_lyrics["traducao"]:
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
@@ -48,7 +48,7 @@ async def chosen(c: Client, m: ChosenInlineResult, t):
             )
         await c.edit_inline_text(
             m.inline_message_id,
-            f'{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}\n{db.get_url(song_hash)[1]}',
+            f'{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}\n{database.get_url(song_hash)[1]}',
             reply_markup=keyboard,
             parse_mode=None,
         )
@@ -77,7 +77,7 @@ async def chosen(c: Client, m: ChosenInlineResult, t):
                 ]
             )
         )
-        db.add_hash(song_hash, parsed_lyrics)
+        database.add_hash(song_hash, parsed_lyrics)
         await c.edit_inline_text(
             m.inline_message_id,
             f"[{parsed_lyrics['musica']} - {parsed_lyrics['autor']}]({parsed_lyrics['link']})\n{parsed_lyrics['letra']}"[

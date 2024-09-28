@@ -11,8 +11,8 @@ from playwright.async_api import BrowserContext, PlaywrightContextManager
 from spotipy.client import SpotifyException
 from yarl import URL
 
-import db
 from config import BASIC, BROWSER, KEY, MUSIXMATCH_KEYS
+from lyricspybot import database
 
 http_client = httpx.AsyncClient(http2=True)
 
@@ -97,13 +97,15 @@ async def get_token(user_id, auth_code):
     if response_data.get("error"):
         return False, response_data["error"]
     print(response_data)
-    db.add_user(user_id, response_data["refresh_token"], response_data["access_token"])
+    database.add_user(
+        user_id, response_data["refresh_token"], response_data["access_token"]
+    )
     return True, response_data["access_token"]
 
 
 async def refresh_token(user_id):
     print("refresh")
-    user_tokens = db.get(user_id)
+    user_tokens = database.get(user_id)
     print(user_tokens[1])
     response = await http_client.post(
         "https://accounts.spotify.com/api/token",
@@ -113,12 +115,12 @@ async def refresh_token(user_id):
     response_data = response.json()
 
     print(response_data)
-    db.update_user(user_id, response_data["access_token"])
+    database.update_user(user_id, response_data["access_token"])
     return response_data["access_token"]
 
 
 async def get_spotify_session(user_id) -> spotipy.Spotify | bool:
-    user_tokens = db.get(user_id)
+    user_tokens = database.get(user_id)
     if not user_tokens:
         return False
     spotify_client = spotipy.Spotify(auth=user_tokens[0])
