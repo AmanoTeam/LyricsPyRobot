@@ -25,7 +25,7 @@ client = Client(
     API_HASH,
     bot_token=TOKEN,
     plugins={"root": "lyricspybot.plugins"},
-    workdir="..",
+    workdir=".",
 )
 
 if __name__ == "__main__":
