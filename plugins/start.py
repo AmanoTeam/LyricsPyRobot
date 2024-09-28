@@ -14,8 +14,8 @@ from locales import use_chat_lang
 @Client.on_callback_query(filters.regex(r"start_back"))
 @use_chat_lang()
 async def start(c, m: Message | CallbackQuery, t):
-    if not isinstance(m, filters.CallbackQuery) and m.chat.type != ChatType.PRIVATE:
-        keyboard = InlineKeyboardMarkup(
+    if not isinstance(m, CallbackQuery) and m.chat.type != ChatType.PRIVATE:
+        inline_keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
                     InlineKeyboardButton(
@@ -26,7 +26,7 @@ async def start(c, m: Message | CallbackQuery, t):
             ]
         )
     else:
-        keyboard = InlineKeyboardMarkup(
+        inline_keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
                     InlineKeyboardButton(
@@ -43,13 +43,13 @@ async def start(c, m: Message | CallbackQuery, t):
             ]
         )
 
-    if isinstance(m, filters.CallbackQuery):
-        await m.edit_message_text(text=t("start"), reply_markup=keyboard)
+    if isinstance(m, CallbackQuery):
+        await m.edit_message_text(text=t("start"), reply_markup=inline_keyboard)
     else:
-        await m.reply_text(t("start"), reply_markup=keyboard)
+        await m.reply_text(t("start"), reply_markup=inline_keyboard)
 
 
 @Client.on_message(filters.command("help"))
 @use_chat_lang()
-async def help(c: Client, m: Message, t):
+async def help_command(c: Client, m: Message, t):
     await m.reply_text(t("help"))

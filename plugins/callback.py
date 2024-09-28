@@ -15,71 +15,75 @@ from hydrogram.types import (
 import db
 from config import login_url, sudos
 from locales import default_language, get_locale_string, langdict, use_chat_lang
-from utils import genius, get_spoti_session, musixmatch
+from utils import genius_client, get_spotify_session, musixmatch_client
 
 # + original, - traduzido, _ telegraph
 
 
-def gen_langs_kb():
-    langs = list(langdict)
-    kb = []
-    while langs:
-        lang = langdict[langs[0]]["main"]
-        a = [
+def generate_language_keyboard():
+    languages = list(langdict)
+    keyboard = []
+    while languages:
+        language = langdict[languages[0]]["main"]
+        button_row = [
             InlineKeyboardButton(
-                f"{lang['language_flag']} {lang['language_name']}",
-                callback_data=f"set_lang {langs[0]}",
+                f"{language['language_flag']} {language['language_name']}",
+                callback_data=f"set_lang {languages[0]}",
             )
         ]
-        langs.pop(0)
-        if langs:
-            lang = langdict[langs[0]]["main"]
-            a.append(
+        languages.pop(0)
+        if languages:
+            language = langdict[languages[0]]["main"]
+            button_row.append(
                 InlineKeyboardButton(
-                    f"{lang['language_flag']} {lang['language_name']}",
-                    callback_data=f"set_lang {langs[0]}",
+                    f"{language['language_flag']} {language['language_name']}",
+                    callback_data=f"set_lang {languages[0]}",
                 )
             )
-            langs.pop(0)
-        kb.append(a)
-    return kb
+            languages.pop(0)
+        keyboard.append(button_row)
+    return keyboard
 
 
 @Client.on_callback_query(filters.regex(r"^(_\+)"))
 @use_chat_lang()
 async def teor(c: Client, m: CallbackQuery, t):
-    user, hash = m.data[2:].split("|")
-    if m.from_user.id != int(user) and m.from_user.id not in sudos:
-        a = await c.get_chat(int(user))
-        await m.answer(t("not_allowed").format(first_name=a.first_name))
+    user_id, hash_value = m.data[2:].split("|")
+    if m.from_user.id != int(user_id) and m.from_user.id not in sudos:
+        chat = await c.get_chat(int(user_id))
+        await m.answer(t("not_allowed").format(first_name=chat.first_name))
         return
 
-    n = db.get_url(hash)
-    if not n:
+    url_data = db.get_url(hash_value)
+    if not url_data:
         await m.answer(t("hash_nf"), show_alert=True)
         return
 
-    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]):
-        a = await genius.lyrics(hash)
+    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", url_data[0]):
+        lyrics_data = await genius_client.lyrics(hash_value)
     elif re.match(
-        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
+        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", url_data[0]
     ):
-        a = await musixmatch.lyrics(hash)
+        lyrics_data = await musixmatch_client.lyrics(hash_value)
     else:
-        await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
+        await m.answer(t("url_nf").format(text=url_data[0]), show_alert=True)
         return
 
-    a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
+    parsed_lyrics = (
+        genius_client.parse(lyrics_data)
+        if "meta" in lyrics_data
+        else musixmatch_client.parce(lyrics_data)
+    )
 
-    if musixmatch.translation(hash, "pt", None):
+    if musixmatch_client.translation(hash_value, "pt", None):
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
                     InlineKeyboardButton(
-                        text=t("text"), callback_data=f"+{user}|{hash}"
+                        text=t("text"), callback_data=f"+{user_id}|{hash_value}"
                     ),
                     InlineKeyboardButton(
-                        text=t("port"), callback_data=f"_-{user}|{hash}"
+                        text=t("port"), callback_data=f"_-{user_id}|{hash_value}"
                     ),
                 ]
             ]
@@ -87,12 +91,16 @@ async def teor(c: Client, m: CallbackQuery, t):
     else:
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
-                [InlineKeyboardButton(text=t("text"), callback_data=f"+{user}|{hash}")]
+                [
+                    InlineKeyboardButton(
+                        text=t("text"), callback_data=f"+{user_id}|{hash_value}"
+                    )
+                ]
             ]
         )
 
     await m.edit_message_text(
-        f'{a["musica"]} - {a["autor"]}\n{n[1]}',
+        f'{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}\n{url_data[1]}',
         reply_markup=keyboard,
         parse_mode=None,
     )
@@ -103,40 +111,46 @@ async def teor(c: Client, m: CallbackQuery, t):
 @Client.on_callback_query(filters.regex(r"^(_\-)"))
 @use_chat_lang()
 async def tetr(c: Client, m: CallbackQuery, t):
-    user, hash = m.data[2:].split("|")
-    if m.from_user.id != int(user) and m.from_user.id not in sudos:
-        a = await c.get_chat(int(user))
-        await m.answer(t("not_allowed").format(first_name=a.first_name))
+    user_id, hash_value = m.data[2:].split("|")
+    if m.from_user.id != int(user_id) and m.from_user.id not in sudos:
+        chat = await c.get_chat(int(user_id))
+        await m.answer(t("not_allowed").format(first_name=chat.first_name))
         return
 
-    n = db.get_url(hash)
-    if not n:
+    url_data = db.get_url(hash_value)
+    if not url_data:
         await m.answer(t("hash_nf"), show_alert=True)
         return
 
-    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]):
-        a = await genius.lyrics(hash)
+    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", url_data[0]):
+        lyrics_data = await genius_client.lyrics(hash_value)
     elif re.match(
-        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
+        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", url_data[0]
     ):
-        a = await musixmatch.lyrics(hash)
+        lyrics_data = await musixmatch_client.lyrics(hash_value)
     else:
-        await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
+        await m.answer(t("url_nf").format(text=url_data[0]), show_alert=True)
         return
 
-    a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
+    parsed_lyrics = (
+        genius_client.parse(lyrics_data)
+        if "meta" in lyrics_data
+        else musixmatch_client.parce(lyrics_data)
+    )
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text=t("text"), callback_data=f"-{user}|{hash}"),
                 InlineKeyboardButton(
-                    text=t("original"), callback_data=f"_+{user}|{hash}"
+                    text=t("text"), callback_data=f"-{user_id}|{hash_value}"
+                ),
+                InlineKeyboardButton(
+                    text=t("original"), callback_data=f"_+{user_id}|{hash_value}"
                 ),
             ]
         ]
     )
     await m.edit_message_text(
-        f'{a["musica"]} - {a["autor"]}\n{n[2]}',
+        f'{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}\n{url_data[2]}',
         reply_markup=keyboard,
         parse_mode=None,
     )
@@ -146,39 +160,43 @@ async def tetr(c: Client, m: CallbackQuery, t):
 @Client.on_callback_query(filters.regex(r"^(\+)"))
 @use_chat_lang()
 async def ori(c: Client, m: CallbackQuery, t):
-    user, hash = m.data[1:].split("|")
-    if m.from_user.id != int(user) and m.from_user.id not in sudos:
-        a = await c.get_chat(int(user))
-        await m.answer(t("not_allowed").format(first_name=a.first_name))
+    user_id, hash_value = m.data[1:].split("|")
+    if m.from_user.id != int(user_id) and m.from_user.id not in sudos:
+        chat = await c.get_chat(int(user_id))
+        await m.answer(t("not_allowed").format(first_name=chat.first_name))
         return
 
-    n = db.get_url(hash)
-    if not n:
+    url_data = db.get_url(hash_value)
+    if not url_data:
         await m.answer(t("hash_nf"), show_alert=True)
         return
 
-    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]):
-        a = await genius.lyrics(hash)
+    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", url_data[0]):
+        lyrics_data = await genius_client.lyrics(hash_value)
     elif re.match(
-        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
+        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", url_data[0]
     ):
-        a = await musixmatch.lyrics(hash)
+        lyrics_data = await musixmatch_client.lyrics(hash_value)
     else:
-        await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
+        await m.answer(t("url_nf").format(text=url_data[0]), show_alert=True)
         return
 
-    a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
+    parsed_lyrics = (
+        genius_client.parse(lyrics_data)
+        if "meta" in lyrics_data
+        else musixmatch_client.parce(lyrics_data)
+    )
 
-    if musixmatch.translation(hash, "pt", None):
+    if musixmatch_client.translation(hash_value, "pt", None):
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [
                     InlineKeyboardButton(
                         text=t("tgph"),
-                        callback_data=f"_+{user}|{hash}",
+                        callback_data=f"_+{user_id}|{hash_value}",
                     ),
                     InlineKeyboardButton(
-                        text=t("port"), callback_data=f"-{user}|{hash}"
+                        text=t("port"), callback_data=f"-{user_id}|{hash_value}"
                     ),
                 ]
             ]
@@ -189,14 +207,16 @@ async def ori(c: Client, m: CallbackQuery, t):
                 [
                     InlineKeyboardButton(
                         text=t("tgph"),
-                        callback_data=f"_+{user}|{hash}",
+                        callback_data=f"_+{user_id}|{hash_value}",
                     )
                 ]
             ]
         )
 
     await m.edit_message_text(
-        f'[{a["musica"]} - {a["autor"]}]({a["link"]})\n{a["letra"]}'[:4096],
+        f'[{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}]({parsed_lyrics["link"]})\n{parsed_lyrics["letra"]}'[
+            :4096
+        ],
         reply_markup=keyboard,
         disable_web_page_preview=True,
     )
@@ -207,41 +227,51 @@ async def ori(c: Client, m: CallbackQuery, t):
 @Client.on_callback_query(filters.regex(r"^(\-)"))
 @use_chat_lang()
 async def tr(c: Client, m: CallbackQuery, t):
-    user, hash = m.data[1:].split("|")
-    if m.from_user.id != int(user) and m.from_user.id not in sudos:
-        a = await c.get_chat(int(user))
-        await m.answer(t("not_allowed").format(first_name=a.first_name))
+    user_id, hash_value = m.data[1:].split("|")
+    if m.from_user.id != int(user_id) and m.from_user.id not in sudos:
+        chat = await c.get_chat(int(user_id))
+        await m.answer(t("not_allowed").format(first_name=chat.first_name))
         return
 
-    n = db.get_url(hash)
-    if not n:
+    url_data = db.get_url(hash_value)
+    if not url_data:
         await m.answer(t("hash_nf"), show_alert=True)
         return
 
-    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]):
-        a = await letras.letra(n[0])
+    if re.match(r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", url_data[0]):
+        lyrics_data = await genius_client.lyrics(url_data[0])
     elif re.match(
-        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", n[0]
+        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", url_data[0]
     ):
-        a = await musixmatch.lyrics(hash)
+        lyrics_data = await musixmatch_client.lyrics(hash_value)
     else:
-        await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
+        await m.answer(t("url_nf").format(text=url_data[0]), show_alert=True)
         return
 
-    a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
+    parsed_lyrics = (
+        genius_client.parse(lyrics_data)
+        if "meta" in lyrics_data
+        else musixmatch_client.parce(lyrics_data)
+    )
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text=t("tgph"), callback_data=f"_-{user}|{hash}"),
                 InlineKeyboardButton(
-                    text=t("original"), callback_data=f"+{user}|{hash}"
+                    text=t("tgph"), callback_data=f"_-{user_id}|{hash_value}"
+                ),
+                InlineKeyboardButton(
+                    text=t("original"), callback_data=f"+{user_id}|{hash_value}"
                 ),
             ]
         ]
     )
-    trad = await musixmatch.translation(hash, "pt", a["letra"])
+    translated_lyrics = await musixmatch_client.translation(
+        hash_value, "pt", parsed_lyrics["letra"]
+    )
     await m.edit_message_text(
-        f'[{a["musica"]} - {a["autor"]}]({a["link"]})\n{trad}'[:4096],
+        f'[{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}]({parsed_lyrics["link"]})\n{translated_lyrics}'[
+            :4096
+        ],
         reply_markup=keyboard,
         disable_web_page_preview=True,
     )
@@ -272,7 +302,7 @@ async def settings(c: Client, m: CallbackQuery, t):
 
 @Client.on_callback_query(filters.regex(r"player_st"))
 @use_chat_lang()
-async def player_st(c: Client, m: CallbackQuery, t):
+async def player_settings(c: Client, m: CallbackQuery, t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -287,113 +317,117 @@ async def player_st(c: Client, m: CallbackQuery, t):
 
 @Client.on_callback_query(filters.regex(r"np_apv_pg"))
 @use_chat_lang()
-async def np_apv(c: Client, m: CallbackQuery, t):
-    pg = m.data.split("pg")[1]
-    ids = db.get_all_aproved(m.from_user.id)
+async def now_playing_approvals(c: Client, m: CallbackQuery, t):
+    page = m.data.split("pg")[1]
+    approved_ids = db.get_all_aproved(m.from_user.id)
     table = []
     row = []
-    for i, id in enumerate(ids):
+    for i, id_data in enumerate(approved_ids):
         if i % 3 == 0 and i != 0:
             table.append(row)
             row = []
-        usr = await c.get_chat(id[1])
-        if id[2] == 1:
+        user = await c.get_chat(id_data[1])
+        if id_data[2] == 1:
             emoji = "✅"
-        elif id[2] == 0:
+        elif id_data[2] == 0:
             emoji = "❓"
         else:
             emoji = "❌"
-        row.append((usr.first_name + emoji, f"np_apvu_{id[1]}_pg{pg}"))
+        row.append((user.first_name + emoji, f"np_apvu_{id_data[1]}_pg{page}"))
     table.append(row)
 
-    tabela = [table[i : i + 3] for i in range(0, len(table), 3)]
-    extra = []
+    paginated_table = [table[i : i + 3] for i in range(0, len(table), 3)]
+    extra_buttons = []
 
-    if int(pg) != 0:
-        extra.append(("back", f"np_apv_pg{int(pg) - 1}"))
+    if int(page) != 0:
+        extra_buttons.append(("back", f"np_apv_pg{int(page) - 1}"))
 
-    extra.append(("close", "settings"))
+    extra_buttons.append(("close", "settings"))
 
-    if len(tabela) - int(pg) > 1:
-        extra.append(("next", f"np_apv_pg{int(pg) + 1}"))
+    if len(paginated_table) - int(page) > 1:
+        extra_buttons.append(("next", f"np_apv_pg{int(page) + 1}"))
 
-    keyb = tabela[int(pg)]
-    keyb.append(extra)
+    keyboard = paginated_table[int(page)]
+    keyboard.append(extra_buttons)
 
-    await m.edit_message_text(t("np_apv_txt"), reply_markup=ikb(keyb))
+    await m.edit_message_text(t("np_apv_txt"), reply_markup=ikb(keyboard))
 
 
 @Client.on_callback_query(filters.regex(r"np_apvu"))
 @use_chat_lang()
-async def np_apvu(c: Client, m: CallbackQuery, t):
-    id, pg = m.data.split("_")[2:]
-    pg = pg.split("pg")[1]
-    app = db.get_aproved(m.from_user.id, id)
-    usr = await c.get_chat(id)
+async def now_playing_approval_user(c: Client, m: CallbackQuery, t):
+    user_id, page = m.data.split("_")[2:]
+    page = page.split("pg")[1]
+    approval = db.get_aproved(m.from_user.id, user_id)
+    user = await c.get_chat(user_id)
     text = t("apuser").format(
-        name=f"<a href='tg://user?id={usr.id}'>{usr.first_name}</a>"
+        name=f"<a href='tg://user?id={user.id}'>{user.first_name}</a>"
     )
-    keyb = []
-    if app:
-        if app[0] == 1:
+    keyboard = []
+    if approval:
+        if approval[0] == 1:
             date1 = (
-                datetime.fromtimestamp(app[2]).strftime("%d/%m/%Y %H:%M:%S")
-                if app[2]
+                datetime.fromtimestamp(approval[2]).strftime("%d/%m/%Y %H:%M:%S")
+                if approval[2]
                 else "Nunca utilizado"
             )
             date2 = (
-                datetime.fromtimestamp(app[3]).strftime("%d/%m/%Y %H:%M:%S")
-                if app[3]
+                datetime.fromtimestamp(approval[3]).strftime("%d/%m/%Y %H:%M:%S")
+                if approval[3]
                 else "Sem data"
             )
             text += t("apuser_txt").format(
                 data=date2,
                 data2=date1,
-                count=app[1] or "0",
+                count=approval[1] or "0",
             )
-            keyb.append([(t("block"), f"np_apvt_{id}_pg{pg}")])
-        elif app[0] == 0:
+            keyboard.append([(t("block"), f"np_apvt_{user_id}_pg{page}")])
+        elif approval[0] == 0:
             date = (
-                datetime.fromtimestamp(app[3]).strftime("%d/%m/%Y %H:%M:%S")
-                if app[3]
+                datetime.fromtimestamp(approval[3]).strftime("%d/%m/%Y %H:%M:%S")
+                if approval[3]
                 else "Sem data"
             )
             text += f"Solicitado em: {date}"
-            keyb.append([(t("aprove"), f"np_apvt_{id}_pg{pg}")])
-        elif app[0] == 2:
+            keyboard.append([(t("aprove"), f"np_apvt_{user_id}_pg{page}")])
+        elif approval[0] == 2:
             date = (
-                datetime.fromtimestamp(app[3]).strftime("%d/%m/%Y %H:%M:%S")
-                if app[3]
+                datetime.fromtimestamp(approval[3]).strftime("%d/%m/%Y %H:%M:%S")
+                if approval[3]
                 else "Sem data"
             )
             text += f"Reprovado em: {date}"
-            keyb.append([(t("unblock"), f"np_apvt_{id}_pg{pg}")])
+            keyboard.append([(t("unblock"), f"np_apvt_{user_id}_pg{page}")])
 
-    keyb.append([(t("back"), f"np_apv_pg{pg}")])
+    keyboard.append([(t("back"), f"np_apv_pg{page}")])
 
-    await m.edit_message_text(text, reply_markup=ikb(keyb))
+    await m.edit_message_text(text, reply_markup=ikb(keyboard))
 
 
 @Client.on_callback_query(filters.regex(r"np_apvt"))
 @use_chat_lang()
-async def np_apvt(c: Client, m: CallbackQuery, t):
-    id, pg = m.data.split("_")[2:]
-    pg = pg.split("pg")[1]
-    if app := db.get_aproved(m.from_user.id, id):
-        appv = "1" if app[0] in {0, 2} else "2"
+async def now_playing_approval_toggle(c: Client, m: CallbackQuery, t):
+    user_id, page = m.data.split("_")[2:]
+    page = page.split("pg")[1]
+    if approval := db.get_aproved(m.from_user.id, user_id):
+        approval_status = "1" if approval[0] in {0, 2} else "2"
         db.add_aproved(
-            m.from_user.id, id, appv, dates=datetime.now().timestamp(), usages=0
+            m.from_user.id,
+            user_id,
+            approval_status,
+            dates=datetime.now().timestamp(),
+            usages=0,
         )
-        m.data = f"np_apvu_{id}_pg{pg}"
-        await np_apvu(c, m)
+        m.data = f"np_apvu_{user_id}_pg{page}"
+        await now_playing_approval_user(c, m)
 
 
 @Client.on_callback_query(filters.regex(r"language"))
 @use_chat_lang()
-async def lang(c: Client, m: CallbackQuery, t):
+async def language(c: Client, m: CallbackQuery, t):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            *gen_langs_kb(),
+            *generate_language_keyboard(),
             [InlineKeyboardButton(text=t("back"), callback_data="settings")],
         ]
     )
@@ -403,71 +437,77 @@ async def lang(c: Client, m: CallbackQuery, t):
 @Client.on_callback_query(filters.regex(r"theme|pattern"))
 @use_chat_lang()
 async def theme(c: Client, m: CallbackQuery, t):
-    a = db.theme(m.from_user.id)
-    if a[0] is None or ("_" in m.data and a[0]):
-        tid = 0
+    user_theme = db.theme(m.from_user.id)
+    if user_theme[0] is None or ("_" in m.data and user_theme[0]):
+        theme_id = 0
     elif "_" in m.data:
-        tid = 1
+        theme_id = 1
     else:
-        tid = a[0]
-    if a[1] is None or ("-" in m.data and not a[1]):
-        bid = 1
+        theme_id = user_theme[0]
+    if user_theme[1] is None or ("-" in m.data and not user_theme[1]):
+        blur_id = 1
     elif "-" in m.data:
-        bid = 0
+        blur_id = 0
     else:
-        bid = a[1]
-    if a[2] is None or ("=" in m.data and a[2]):
-        pid = False
+        blur_id = user_theme[1]
+    if user_theme[2] is None or ("=" in m.data and user_theme[2]):
+        pattern_id = False
     elif "=" in m.data:
-        pid = True
+        pattern_id = True
     else:
-        pid = a[2]
-    if a[3] is None or ("+" in m.data and not a[3]):
-        sid = 1
+        pattern_id = user_theme[2]
+    if user_theme[3] is None or ("+" in m.data and not user_theme[3]):
+        sticker_id = 1
     elif "+" in m.data:
-        sid = 0
+        sticker_id = 0
     else:
-        sid = a[3]
-    tname = [t("light"), t("dark")]
-    bname = ["☑️", "✅"]
-    pname = [t("text"), t("tgph")]
+        sticker_id = user_theme[3]
+    theme_names = [t("light"), t("dark")]
+    blur_names = ["☑️", "✅"]
+    pattern_names = [t("text"), t("tgph")]
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(text=t("sticker"), callback_data="none"),
-                InlineKeyboardButton(text=bname[sid], callback_data="theme+"),
+                InlineKeyboardButton(
+                    text=blur_names[sticker_id], callback_data="theme+"
+                ),
             ],
             [
                 InlineKeyboardButton(text=t("theme"), callback_data="none"),
-                InlineKeyboardButton(text=tname[tid], callback_data="theme_"),
+                InlineKeyboardButton(
+                    text=theme_names[theme_id], callback_data="theme_"
+                ),
             ],
             [
                 InlineKeyboardButton(text=t("blur"), callback_data="none"),
-                InlineKeyboardButton(text=bname[bid], callback_data="theme-"),
+                InlineKeyboardButton(text=blur_names[blur_id], callback_data="theme-"),
             ],
             [
                 InlineKeyboardButton(text=t("pattern"), callback_data="none"),
-                InlineKeyboardButton(text=pname[pid], callback_data="theme="),
+                InlineKeyboardButton(
+                    text=pattern_names[pattern_id], callback_data="theme="
+                ),
             ],
             [InlineKeyboardButton(text=t("back"), callback_data="settings")],
         ]
     )
-    db.def_theme(m.from_user.id, tid, bid, pid, sid)
+    db.def_theme(m.from_user.id, theme_id, blur_id, pattern_id, sticker_id)
     await m.edit_message_text(t("np_settings_txt"), reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex(r"lastfm_st"))
 @use_chat_lang()
-async def lastfm_st(c: Client, m: CallbackQuery, t):
+async def lastfm_settings(c: Client, m: CallbackQuery, t):
     text = t("lastfm") + "\n\n"
 
-    tk = db.get(m.from_user.id)
-    if not tk or not tk[2]:
+    user_token = db.get(m.from_user.id)
+    if not user_token or not user_token[2]:
         text += t("nologged_lfm")
     else:
-        text += t("logged_lfm").format(name=tk[2])
+        text += t("logged_lfm").format(name=user_token[2])
 
-    kb = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(text=t("login"), callback_data="lfm_login"),
@@ -477,60 +517,60 @@ async def lastfm_st(c: Client, m: CallbackQuery, t):
         ]
     )
 
-    await m.edit_message_text(text, reply_markup=kb)
+    await m.edit_message_text(text, reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex(r"lfm_login"))
 @use_chat_lang()
-async def lfm_login(c: Client, m: CallbackQuery, t):
+async def lastfm_login(c: Client, m: CallbackQuery, t):
     await m.edit_message_text(t("lfm_login"))
 
-    cmessage = None
+    user_message = None
 
-    while not cmessage:
+    while not user_message:
         try:
-            cmessage = await m.message.chat.listen(filters.text)
+            user_message = await m.message.chat.listen(filters.text)
         except ListenerTimeout:
             return
 
-    db.add_user_last(m.from_user.id, cmessage.text)
+    db.add_user_last(m.from_user.id, user_message.text)
 
-    keyb = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text=t("back"), callback_data="lastfm_st")],
         ]
     )
     await m.edit_message_text(
-        t("lfm_login_done").format(name=cmessage.text), reply_markup=keyb
+        t("lfm_login_done").format(name=user_message.text), reply_markup=keyboard
     )
 
 
 @Client.on_callback_query(filters.regex(r"lfm_logout"))
 @use_chat_lang()
-async def lfm_logout(c: Client, m: CallbackQuery, t):
+async def lastfm_logout(c: Client, m: CallbackQuery, t):
     db.add_user_last(m.from_user.id, None)
-    keyb = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text=t("back"), callback_data="lastfm_st")],
         ]
     )
-    await m.edit_message_text(t("lfm_logout"), reply_markup=keyb)
+    await m.edit_message_text(t("lfm_logout"), reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex(r"spotify_st"))
 @use_chat_lang()
-async def spotify_st(c: Client, m: CallbackQuery, t):
+async def spotify_settings(c: Client, m: CallbackQuery, t):
     text = t("spotify") + "\n\n"
 
-    tk = db.get(m.from_user.id)
-    if not tk or not tk[0]:
+    user_token = db.get(m.from_user.id)
+    if not user_token or not user_token[0]:
         text += t("nologged")
     else:
-        sp = await get_spoti_session(m.from_user.id)
-        profile = sp.current_user()
+        spotify_session = await get_spotify_session(m.from_user.id)
+        profile = spotify_session.current_user()
         text += t("logged").format(name=profile["display_name"])
 
-    kb = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
@@ -542,19 +582,19 @@ async def spotify_st(c: Client, m: CallbackQuery, t):
         ]
     )
 
-    await m.edit_message_text(text, reply_markup=kb)
+    await m.edit_message_text(text, reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex(r"sp_logout"))
 @use_chat_lang()
-async def sp_logout(c: Client, m: CallbackQuery, t):
+async def spotify_logout(c: Client, m: CallbackQuery, t):
     db.add_user(m.from_user.id, None, None)
-    keyb = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text=t("back"), callback_data="spotify_st")],
         ]
     )
-    await m.edit_message_text(t("sp_logout"), reply_markup=keyb)
+    await m.edit_message_text(t("sp_logout"), reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex("^set_lang "))

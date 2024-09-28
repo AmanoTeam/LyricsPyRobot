@@ -5,55 +5,59 @@ from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 import db
 from locales import use_chat_lang
-from utils import genius, musixmatch
+from utils import genius_client, musixmatch_client
 
 # + original, - traduzido, _ telegraph
 
 
 @Client.on_message(filters.command(["lyrics", "letra"]))
 @use_chat_lang()
-async def letra(c: Client, m: Message, t):
+async def get_lyrics(c: Client, m: Message, t):
     print(m)
-    text = m.text.split(" ", 1)[1]
-    if not text:
+    query = m.text.split(" ", 1)[1]
+    if not query:
         await m.reply_text(t("use"))
-    elif "spotify:" in text:
-        a = await musixmatch.auto(id=text.split(":", 1)[1])
+    elif "spotify:" in query:
+        lyrics_data = await musixmatch_client.auto(id=query.split(":", 1)[1])
     elif re.match(
-        r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", text
+        r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", query
     ):
-        a = await genius.auto(text)
+        lyrics_data = await genius_client.auto(query)
     elif re.match(
-        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", text
+        r"^(https?://)?(musixmatch\.com/|(m\.|www\.)?musixmatch\.com/).+", query
     ):
-        a = await musixmatch.lyrics(text)
+        lyrics_data = await musixmatch_client.lyrics(query)
     else:
         try:
-            a = await musixmatch.auto(text, limit=1, lang="pt") or await genius.auto(
-                text, limit=1
-            )
+            lyrics_data = await musixmatch_client.auto(
+                query, limit=1, lang="pt"
+            ) or await genius_client.auto(query, limit=1)
         except Exception:
-            a = await genius.auto(text, limit=1)
-        if not a:
+            lyrics_data = await genius_client.auto(query, limit=1)
+        if not lyrics_data:
             await m.reply_text(t("lyrics_nf"))
             return
-    a = a[0] if isinstance(a, list) else a
-    print(a)
-    a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
-    print(a)
-    hash = str(a["id"])
-    db.add_hash(hash, a)
-    uid = m.from_user.id
-    if ma := db.theme(m.from_user.id)[2]:
-        if a["traducao"]:
+    lyrics_data = lyrics_data[0] if isinstance(lyrics_data, list) else lyrics_data
+    print(lyrics_data)
+    lyrics_data = (
+        genius_client.parse(lyrics_data)
+        if "meta" in lyrics_data
+        else musixmatch_client.parce(lyrics_data)
+    )
+    print(lyrics_data)
+    lyrics_hash = str(lyrics_data["id"])
+    db.add_hash(lyrics_hash, lyrics_data)
+    user_id = m.from_user.id
+    if db.theme(m.from_user.id)[2]:
+        if lyrics_data["traducao"]:
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text=t("text"), callback_data=f"+{uid}|{hash}"
+                            text=t("text"), callback_data=f"+{user_id}|{lyrics_hash}"
                         ),
                         InlineKeyboardButton(
-                            text=t("port"), callback_data=f"_-{uid}|{hash}"
+                            text=t("port"), callback_data=f"_-{user_id}|{lyrics_hash}"
                         ),
                     ]
                 ]
@@ -63,13 +67,13 @@ async def letra(c: Client, m: Message, t):
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text=t("text"), callback_data=f"+{uid}|{hash}"
+                            text=t("text"), callback_data=f"+{user_id}|{lyrics_hash}"
                         )
                     ]
                 ]
             )
         await m.reply_text(
-            f'{a["musica"]} - {a["autor"]}\n{db.get_url(hash)[1]}',
+            f'{lyrics_data["musica"]} - {lyrics_data["autor"]}\n{db.get_url(lyrics_hash)[1]}',
             reply_markup=keyboard,
             parse_mode=None,
         )
@@ -79,27 +83,29 @@ async def letra(c: Client, m: Message, t):
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text=t("tgph"), callback_data=f"_+{uid}|{hash}"
+                            text=t("tgph"), callback_data=f"_+{user_id}|{lyrics_hash}"
                         ),
                         InlineKeyboardButton(
-                            text=t("port"), callback_data=f"-{uid}|{hash}"
+                            text=t("port"), callback_data=f"-{user_id}|{lyrics_hash}"
                         ),
                     ]
                 ]
             )
-            if a["traducao"]
+            if lyrics_data["traducao"]
             else InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text=t("tgph"), callback_data=f"_+{uid}|{hash}"
+                            text=t("tgph"), callback_data=f"_+{user_id}|{lyrics_hash}"
                         )
                     ]
                 ]
             )
         )
         await m.reply_text(
-            f"[{a['musica']} - {a['autor']}]({a['link']})\n{a['letra']}"[:4096],
+            f"[{lyrics_data['musica']} - {lyrics_data['autor']}]({lyrics_data['link']})\n{lyrics_data['letra']}"[
+                :4096
+            ],
             reply_markup=keyboard,
             disable_web_page_preview=True,
         )

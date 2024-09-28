@@ -14,75 +14,77 @@ from yarl import URL
 import db
 from config import BASIC, BROWSER, KEY, MUSIXMATCH_KEYS
 
-http_pool = httpx.AsyncClient(http2=True)
+http_client = httpx.AsyncClient(http2=True)
 
 
 async def get_song_art(
     song_name: str,
-    artist: str,
-    album_url: str,
-    duration: int = 0,
-    progress: int = 0,
-    scrobbles: int = 0,
-    color: str = "dark",
-    blur: bool = False,
+    artist_name: str,
+    album_cover_url: str,
+    song_duration: int = 0,
+    playback_progress: int = 0,
+    play_count: int = 0,
+    theme_color: str = "dark",
+    blur_background: bool = False,
 ) -> BytesIO:
-    params = {
-        "cover": album_url,
+    request_params = {
+        "cover": album_cover_url,
         "track": song_name,
-        "artist": artist,
-        "timenow": progress,
-        "timetotal": duration,
-        "scrobbles": scrobbles,
-        "theme": color,
-        "blurbg": int(blur if blur is not None else True),
+        "artist": artist_name,
+        "timenow": playback_progress,
+        "timetotal": song_duration,
+        "scrobbles": play_count,
+        "theme": theme_color,
+        "blurbg": int(blur_background if blur_background is not None else True),
     }
 
-    url = URL("https://lyricspy.amanoteam.com/nowplaying-dom/") % params
+    nowplaying_url = (
+        URL("https://lyricspy.amanoteam.com/nowplaying-dom/") % request_params
+    )
 
-    page = await browser.new_page()
+    browser_page = await browser.new_page()
 
-    await page.goto(str(url))
+    await browser_page.goto(str(nowplaying_url))
 
-    tmp_filename = f"{time()}.png"
+    screenshot_filename = f"{time()}.png"
 
-    await page.screenshot(path=tmp_filename)
+    await browser_page.screenshot(path=screenshot_filename)
 
-    await page.close()
+    await browser_page.close()
 
-    img = Image.open(tmp_filename)
+    screenshot_image = Image.open(screenshot_filename)
 
-    new_file = BytesIO()
-    new_file.name = "sticker.webp"
+    sticker_file = BytesIO()
+    sticker_file.name = "sticker.webp"
 
-    img.save(new_file)
+    screenshot_image.save(sticker_file)
 
-    os.remove(tmp_filename)
+    os.remove(screenshot_filename)
 
-    return new_file
+    return sticker_file
 
 
 async def build_browser_object(browser_type: str) -> BrowserContext:
     browser_type = browser_type.lower()
 
-    p = await PlaywrightContextManager().start()
+    playwright_manager = await PlaywrightContextManager().start()
 
     if browser_type in {"chromium", "chrome"}:
-        browser = await p.chromium.launch(headless=True)
+        browser_instance = await playwright_manager.chromium.launch(headless=True)
     elif browser_type == "firefox":
-        browser = await p.firefox.launch(headless=True)
+        browser_instance = await playwright_manager.firefox.launch(headless=True)
     elif browser_type == "webkit":
-        browser = await p.webkit.launch(headless=True)
+        browser_instance = await playwright_manager.webkit.launch(headless=True)
     else:
         raise TypeError(
             "browser_type must be either 'chromium', 'firefox' or 'webkit'."
         )
 
-    return await browser.new_context(viewport={"width": 512, "height": 288})
+    return await browser_instance.new_context(viewport={"width": 512, "height": 288})
 
 
 async def get_token(user_id, auth_code):
-    r = await http_pool.post(
+    response = await http_client.post(
         "https://accounts.spotify.com/api/token",
         headers={"Authorization": f"Basic {BASIC}"},
         data={
@@ -91,45 +93,45 @@ async def get_token(user_id, auth_code):
             "redirect_uri": "https://lyricspy.amanoteam.com/go",
         },
     )
-    b = r.json()
-    if b.get("error"):
-        return False, b["error"]
-    print(b)
-    db.add_user(user_id, b["refresh_token"], b["access_token"])
-    return True, b["access_token"]
+    response_data = response.json()
+    if response_data.get("error"):
+        return False, response_data["error"]
+    print(response_data)
+    db.add_user(user_id, response_data["refresh_token"], response_data["access_token"])
+    return True, response_data["access_token"]
 
 
 async def refresh_token(user_id):
-    print("refreh")
-    tk = db.get(user_id)
-    print(tk[1])
-    r = await http_pool.post(
+    print("refresh")
+    user_tokens = db.get(user_id)
+    print(user_tokens[1])
+    response = await http_client.post(
         "https://accounts.spotify.com/api/token",
         headers={"Authorization": f"Basic {BASIC}"},
-        data={"grant_type": "refresh_token", "refresh_token": tk[1]},
+        data={"grant_type": "refresh_token", "refresh_token": user_tokens[1]},
     )
-    b = r.json()
+    response_data = response.json()
 
-    print(b)
-    db.update_user(user_id, b["access_token"])
-    return b["access_token"]
+    print(response_data)
+    db.update_user(user_id, response_data["access_token"])
+    return response_data["access_token"]
 
 
-async def get_spoti_session(user_id) -> spotipy.Spotify | bool:
-    tk = db.get(user_id)
-    if not tk:
+async def get_spotify_session(user_id) -> spotipy.Spotify | bool:
+    user_tokens = db.get(user_id)
+    if not user_tokens:
         return False
-    a = spotipy.Spotify(auth=tk[0])
+    spotify_client = spotipy.Spotify(auth=user_tokens[0])
     try:
-        a.devices()
-        return a
+        spotify_client.devices()
+        return spotify_client
     except SpotifyException:
-        new_token = await refresh_token(user_id)
-        return spotipy.Spotify(auth=new_token)
+        new_access_token = await refresh_token(user_id)
+        return spotipy.Spotify(auth=new_access_token)
 
 
-async def get_current(user: str) -> list[dict]:
-    r = await http_pool.get(
+async def get_current_track(user: str) -> list[dict]:
+    response = await http_client.get(
         "http://ws.audioscrobbler.com/2.0/",
         params={
             "method": "user.getrecenttracks",
@@ -139,11 +141,11 @@ async def get_current(user: str) -> list[dict]:
             "limit": 1,
         },
     )
-    return r.json()["recenttracks"]["track"]
+    return response.json()["recenttracks"]["track"]
 
 
 async def get_track_info(user: str, artist: str, track: str):
-    r = await http_pool.get(
+    response = await http_client.get(
         "http://ws.audioscrobbler.com/2.0/",
         params={
             "method": "track.getInfo",
@@ -154,13 +156,13 @@ async def get_track_info(user: str, artist: str, track: str):
             "track": track,
         },
     )
-    return r.json()
+    return response.json()
 
 
-loop = asyncio.new_event_loop()
+event_loop = asyncio.new_event_loop()
 
-browser = loop.run_until_complete(build_browser_object(BROWSER))
+browser = event_loop.run_until_complete(build_browser_object(BROWSER))
 
-musixmatch = Musixmatch(usertoken=MUSIXMATCH_KEYS)
+musixmatch_client = Musixmatch(usertoken=MUSIXMATCH_KEYS)
 
-genius = Genius()
+genius_client = Genius()

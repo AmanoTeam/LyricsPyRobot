@@ -7,30 +7,31 @@ from hydrogram.types import (
 
 import db
 from locales import use_chat_lang
-from utils import musixmatch
+from utils import musixmatch_client
 
 # + original, - traduzido, _ telegraph
 
 
 @Client.on_chosen_inline_result()
 @use_chat_lang()
-async def choosen(c: Client, m: ChosenInlineResult, t):
+async def chosen(c: Client, m: ChosenInlineResult, t):
     if m.result_id == "MySpotify":
         return
-    hash = m.result_id[1:] if m.result_id[0] in {"s", "l"} else m.result_id
-    a = await musixmatch.lyrics(hash)
-    a = musixmatch.parce(a)
-    uid = m.from_user.id
-    if ma := db.theme(uid)[2]:
-        if a["traducao"]:
+
+    song_hash = m.result_id[1:] if m.result_id[0] in {"s", "l"} else m.result_id
+    lyrics_data = await musixmatch_client.lyrics(song_hash)
+    parsed_lyrics = musixmatch_client.parce(lyrics_data)
+    user_id = m.from_user.id
+    if db.theme(user_id)[2]:
+        if parsed_lyrics["traducao"]:
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text=t("text"), callback_data=f"+{uid}|{hash}"
+                            text=t("text"), callback_data=f"+{user_id}|{song_hash}"
                         ),
                         InlineKeyboardButton(
-                            text=t("port"), callback_data=f"_-{uid}|{hash}"
+                            text=t("port"), callback_data=f"_-{user_id}|{song_hash}"
                         ),
                     ]
                 ]
@@ -40,14 +41,14 @@ async def choosen(c: Client, m: ChosenInlineResult, t):
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text=t("text"), callback_data=f"+{uid}|{hash}"
+                            text=t("text"), callback_data=f"+{user_id}|{song_hash}"
                         )
                     ]
                 ]
             )
         await c.edit_inline_text(
             m.inline_message_id,
-            f'{a["musica"]} - {a["autor"]}\n{db.get_url(hash)[1]}',
+            f'{parsed_lyrics["musica"]} - {parsed_lyrics["autor"]}\n{db.get_url(song_hash)[1]}',
             reply_markup=keyboard,
             parse_mode=None,
         )
@@ -57,29 +58,31 @@ async def choosen(c: Client, m: ChosenInlineResult, t):
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text=t("tgph"), callback_data=f"_+{uid}|{hash}"
+                            text=t("tgph"), callback_data=f"_+{user_id}|{song_hash}"
                         ),
                         InlineKeyboardButton(
-                            text=t("port"), callback_data=f"-{uid}|{hash}"
+                            text=t("port"), callback_data=f"-{user_id}|{song_hash}"
                         ),
                     ]
                 ]
             )
-            if a["traducao"]
+            if parsed_lyrics["traducao"]
             else InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text=t("tgph"), callback_data=f"_+{uid}|{hash}"
+                            text=t("tgph"), callback_data=f"_+{user_id}|{song_hash}"
                         )
                     ]
                 ]
             )
         )
-        db.add_hash(hash, a)
+        db.add_hash(song_hash, parsed_lyrics)
         await c.edit_inline_text(
             m.inline_message_id,
-            f"[{a['musica']} - {a['autor']}]({a['link']})\n{a['letra']}"[:4096],
+            f"[{parsed_lyrics['musica']} - {parsed_lyrics['autor']}]({parsed_lyrics['link']})\n{parsed_lyrics['letra']}"[
+                :4096
+            ],
             reply_markup=keyboard,
             disable_web_page_preview=True,
         )

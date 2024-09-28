@@ -14,456 +14,481 @@ from spotipy.exceptions import SpotifyException
 
 import db
 from locales import use_chat_lang, use_user_lang
+from plugins.letra import get_lyrics
 from utils import (
-    get_current,
+    get_current_track,
     get_song_art,
-    get_spoti_session,
+    get_spotify_session,
     get_track_info,
-    http_pool,
-    musixmatch,
+    http_client,
+    musixmatch_client,
 )
 
-from .letra import letra
-
-LFM_LINK_RE = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
+LASTFM_IMAGE_REGEX = re.compile(r"<meta property=\"og:image\" +?content=\"(.+)\"")
 
 
 @Client.on_message(filters.command("np"))
 @use_chat_lang()
-async def np(c: Client, m: Message, t):
-    text = m.text.split(" ", 1)
-    duid = m.from_user.id
-    if len(text) == 2:
+async def now_playing(c: Client, m: Message, t):
+    command_text = m.text.split(" ", 1)
+    display_user_id = m.from_user.id
+    if len(command_text) == 2:
         if m.reply_to_message:
-            user_id = m.reply_to_message.from_user.id
+            target_user_id = m.reply_to_message.from_user.id
         elif m.entities and m.entities[0].type == MessageEntityType.TEXT_MENTION:
-            user_id = m.entities[0].user.id
+            target_user_id = m.entities[0].user.id
         # User ids: integers
         elif m.command[1].isdigit():
-            user_id = int(m.command[1])
+            target_user_id = int(m.command[1])
         # Usernames and phone numbers with +
         else:
-            user_id = m.command[1]
-        usr = await c.get_chat(user_id)
-        xm = db.get_aproved(usr.id, m.from_user.id)
-        if usr.type != ChatType.PRIVATE:
+            target_user_id = m.command[1]
+        target_user = await c.get_chat(target_user_id)
+        approval_status = db.get_aproved(target_user.id, m.from_user.id)
+        if target_user.type != ChatType.PRIVATE:
             await m.reply_text(t("only_users"))
             return
-        if usr.id == m.from_user.id or (xm and xm[0] == 1):
-            usages = xm[1] + 1 if xm[1] else 1
+        if target_user.id == m.from_user.id or (
+            approval_status and approval_status[0] == 1
+        ):
+            usage_count = approval_status[1] + 1 if approval_status[1] else 1
             db.add_aproved(
-                usr.id,
+                target_user.id,
                 m.from_user.id,
-                xm[0],
-                usages=usages,
+                approval_status[0],
+                usages=usage_count,
                 uusage=datetime.now().timestamp(),
             )
-            duid = m.from_user.id
-            m.from_user.id = usr.id
-        elif xm and xm[0] == 0:
-            await m.reply_text(t("not_aproved").format(first_name=usr.first_name))
+            display_user_id = m.from_user.id
+            m.from_user.id = target_user.id
+        elif approval_status and approval_status[0] == 0:
+            await m.reply_text(
+                t("not_aproved").format(first_name=target_user.first_name)
+            )
             return
-        elif xm and xm[0] == 2:
-            await m.reply_text(t("blocked").format(first_name=usr.first_name))
+        elif approval_status and approval_status[0] == 2:
+            await m.reply_text(t("blocked").format(first_name=target_user.first_name))
             return
         else:
-            ut = use_user_lang(usr.id)
-            kb = InlineKeyboardMarkup(
+            user_lang = use_user_lang(target_user.id)
+            approval_keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text=ut("aprove"),
+                            text=user_lang("aprove"),
                             callback_data=f"aprova|{m.from_user.id}",
                         ),
                         InlineKeyboardButton(
-                            text=ut("deny"),
+                            text=user_lang("deny"),
                             callback_data=f"negar|{m.from_user.id}",
                         ),
                     ]
                 ]
             )
             db.add_aproved(
-                usr.id, m.from_user.id, False, dates=datetime.now().timestamp()
+                target_user.id, m.from_user.id, False, dates=datetime.now().timestamp()
             )
             await c.send_message(
-                usr.id,
-                ut("aprrovedu").format(name=m.from_user.first_name),
-                reply_markup=kb,
+                target_user.id,
+                user_lang("aprrovedu").format(name=m.from_user.first_name),
+                reply_markup=approval_keyboard,
             )
-            await m.reply_text(t("approvedr").format(name=usr.first_name))
+            await m.reply_text(t("approvedr").format(name=target_user.first_name))
             return
     try:
-        sess = await get_spoti_session(m.from_user.id)
+        spotify_session = await get_spotify_session(m.from_user.id)
     except SpotifyException:
-        sess = None
-    if not sess or sess.current_playback() is None:
-        tk = db.get(m.from_user.id)
-        if not tk or not tk[2]:
+        spotify_session = None
+    if not spotify_session or spotify_session.current_playback() is None:
+        user_token = db.get(m.from_user.id)
+        if not user_token or not user_token[2]:
             await m.reply_text(t("not_logged"))
             return
-        a = await get_current(tk[2])
-        if not a:
+        current_track = await get_current_track(user_token[2])
+        if not current_track:
             await m.reply_text(t("not_playing"))
             return
-        track_info = await get_track_info(tk[2], a[0]["artist"]["#text"], a[0]["name"])
-        stick = db.theme(duid)[3]
-        mtext = f"🎵 {a[0]['artist']['#text']} - {a[0]['name']}"
-        if stick is not None and not stick:
+        track_info = await get_track_info(
+            user_token[2], current_track[0]["artist"]["#text"], current_track[0]["name"]
+        )
+        use_sticker = db.theme(display_user_id)[3]
+        track_message = (
+            f"🎵 {current_track[0]['artist']['#text']} - {current_track[0]['name']}"
+        )
+        if use_sticker is not None and not use_sticker:
             await m.reply_text(
-                mtext,
+                track_message,
                 parse_mode=ParseMode.HTML,
             )
             return
 
-        album_url = a[0]["image"][-1]["#text"]
-        if not album_url:
+        album_cover_url = current_track[0]["image"][-1]["#text"]
+        if not album_cover_url:
             # if not present in api return, try to get album url from page
-            r = await http_pool.get(a[0]["url"].replace("/_/", "/"))
-            if r.status_code == 200:
-                album_url = LFM_LINK_RE.findall(r.text)[0]
+            response = await http_client.get(
+                current_track[0]["url"].replace("/_/", "/")
+            )
+            if response.status_code == 200:
+                album_cover_url = LASTFM_IMAGE_REGEX.findall(response.text)[0]
             else:
-                r2 = await http_pool.get(a[0]["url"])
-                album_url = LFM_LINK_RE.findall(r2.text)[0]
+                fallback_response = await http_client.get(current_track[0]["url"])
+                album_cover_url = LASTFM_IMAGE_REGEX.findall(fallback_response.text)[0]
         album_art = await get_song_art(
-            song_name=a[0]["name"],
-            artist=a[0]["artist"]["#text"],
-            album_url=album_url,
-            color="dark" if db.theme(duid)[0] else "light",
-            blur=db.theme(duid)[1],
+            song_name=current_track[0]["name"],
+            artist=current_track[0]["artist"]["#text"],
+            album_url=album_cover_url,
+            color="dark" if db.theme(display_user_id)[0] else "light",
+            blur=db.theme(display_user_id)[1],
             scrobbles=track_info["track"]["userplaycount"],
         )
-        await m.reply_document(album_art, caption=mtext)
+        await m.reply_document(album_art, caption=track_message)
         return
-    spotify_json = sess.current_playback(additional_types="episode,track")
-    stick = db.theme(duid)[3]
-    if "artists" in spotify_json["item"]:
-        publi = spotify_json["item"]["artists"][0]["name"]
+    spotify_data = spotify_session.current_playback(additional_types="episode,track")
+    use_sticker = db.theme(display_user_id)[3]
+    if "artists" in spotify_data["item"]:
+        artist_name = spotify_data["item"]["artists"][0]["name"]
     else:
-        publi = spotify_json["item"]["show"]["name"]
+        artist_name = spotify_data["item"]["show"]["name"]
     try:
-        fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[0]
+        is_favorite = spotify_session.current_user_saved_tracks_contains([
+            spotify_data["item"]["id"]
+        ])[0]
     except SpotifyException:
-        fav = False
-    if stick is None or stick:
+        is_favorite = False
+    if use_sticker is None or use_sticker:
         album_art = await get_song_art(
-            song_name=spotify_json["item"]["name"],
-            artist=publi,
-            album_url=spotify_json["item"]["album"]["images"][0]["url"]
-            if "album" in spotify_json["item"]
-            else spotify_json["item"]["images"][0]["url"],
-            duration=spotify_json["item"]["duration_ms"] // 1000,
-            progress=spotify_json["progress_ms"] // 1000,
-            color="dark" if db.theme(duid)[0] else "light",
-            blur=db.theme(duid)[1],
+            song_name=spotify_data["item"]["name"],
+            artist_name=artist_name,
+            album_cover_url=spotify_data["item"]["album"]["images"][0]["url"]
+            if "album" in spotify_data["item"]
+            else spotify_data["item"]["images"][0]["url"],
+            song_duration=spotify_data["item"]["duration_ms"] // 1000,
+            playback_progress=spotify_data["progress_ms"] // 1000,
+            theme_color="dark" if db.theme(display_user_id)[0] else "light",
+            blur_background=db.theme(display_user_id)[1],
         )
-    mtext = f"🎵 {publi} - {spotify_json['item']['name']}"
-    play_kb = [
+    track_message = f"🎵 {artist_name} - {spotify_data['item']['name']}"
+    playback_controls = [
         InlineKeyboardButton(text="⏮", callback_data=f"previous|{m.from_user.id}"),
         InlineKeyboardButton(
-            text="⏸" if spotify_json["is_playing"] else "▶️",
+            text="⏸" if spotify_data["is_playing"] else "▶️",
             callback_data=f"pause|{m.from_user.id}"
-            if spotify_json["is_playing"]
+            if spotify_data["is_playing"]
             else f"play|{m.from_user.id}",
         ),
         InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
     ]
-    kb = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            play_kb,
+            playback_controls,
             [
                 InlineKeyboardButton(
                     text=t("play_in_sp"),
-                    callback_data=f'tcs|{spotify_json["item"]["id"]}',
+                    callback_data=f'tcs|{spotify_data["item"]["id"]}',
                 ),
                 InlineKeyboardButton(
                     text=t("search_lyric"),
-                    callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}',
+                    callback_data=f'sp_s|{spotify_data["item"]["id"]}|{m.from_user.id}',
                 ),
             ],
         ]
     )
-    if stick is None or stick:
-        mes = await m.reply_document(album_art, reply_markup=kb, caption=mtext)
+    if use_sticker is None or use_sticker:
+        sent_message = await m.reply_document(
+            album_art, reply_markup=keyboard, caption=track_message
+        )
     else:
-        mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
-        mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
-        mes = await m.reply_text(
-            mtext,
-            reply_markup=kb,
+        track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
+        track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
+        sent_message = await m.reply_text(
+            track_message,
+            reply_markup=keyboard,
             parse_mode=ParseMode.HTML,
         )
 
-    if fav:
-        await mes.react("❤")
+    if is_favorite:
+        await sent_message.react("❤")
     return
 
 
 @Client.on_callback_query(filters.regex(r"^aprova"))
 @use_chat_lang()
-async def aprova(c: Client, m: CallbackQuery, t):
-    uid = m.data.split("|")[1]
-    db.add_aproved(m.from_user.id, uid, True, dates=datetime.now().timestamp())
-    usr = await c.get_users(uid)
-    ut = use_user_lang(usr.id)
-    await c.send_message(uid, ut("aproved").format(first_name=m.from_user.first_name))
-    await m.edit_message_text(t("saproved").format(first_name=usr.first_name))
+async def approve(c: Client, m: CallbackQuery, t):
+    user_id = m.data.split("|")[1]
+    db.add_approved(m.from_user.id, user_id, True, dates=datetime.now().timestamp())
+    user = await c.get_users(user_id)
+    user_lang = use_user_lang(user.id)
+    await c.send_message(
+        user_id, user_lang("aproved").format(first_name=m.from_user.first_name)
+    )
+    await m.edit_message_text(t("saproved").format(first_name=user.first_name))
 
 
 @Client.on_callback_query(filters.regex(r"^negar"))
 @use_chat_lang()
-async def negar(c: Client, m: CallbackQuery, t):
-    uid = m.data.split("|")[1]
-    db.add_aproved(m.from_user.id, uid, 2, dates=datetime.now().timestamp())
-    usr = await c.get_users(uid)
-    ut = use_user_lang(usr.id)
-    await c.send_message(uid, ut("denied").format(first_name=m.from_user.first_name))
-    await m.edit_message_text(t("sdenied").format(first_name=usr.first_name))
+async def deny(c: Client, m: CallbackQuery, t):
+    user_id = m.data.split("|")[1]
+    db.add_aproved(m.from_user.id, user_id, 2, dates=datetime.now().timestamp())
+    user = await c.get_users(user_id)
+    user_lang = use_user_lang(user.id)
+    await c.send_message(
+        user_id, user_lang("denied").format(first_name=m.from_user.first_name)
+    )
+    await m.edit_message_text(t("sdenied").format(first_name=user.first_name))
 
 
 @Client.on_callback_query(filters.regex(r"^sp_s"))
-async def sp_search(c: Client, m: CallbackQuery):
-    track, uid = m.data.split("|")[1:]
-    if m.from_user.id == int(uid):
-        sess = await get_spoti_session(m.from_user.id)
-        om = m.message
-        om.from_user = m.from_user
-        spotify_json = sess.track(track)
-        a = await musixmatch.spotify_lyrics(
-            artist=spotify_json["artists"][0]["name"],
-            track=spotify_json["name"],
+@use_chat_lang()
+async def spotify_search(c: Client, m: CallbackQuery, t):
+    track, user_id = m.data.split("|")[1:]
+    if m.from_user.id != int(user_id):
+        return
+
+    spotify_session = await get_spotify_session(m.from_user.id)
+    original_message = m.message
+    original_message.from_user = m.from_user
+    spotify_track = spotify_session.track(track)
+    lyrics_data = await musixmatch_client.spotify_lyrics(
+        artist=spotify_track["artists"][0]["name"],
+        track=spotify_track["name"],
+    )
+    if lyrics_data:
+        original_message.text = "/letra spotify:" + str(
+            lyrics_data["message"]["body"]["macro_calls"]["matcher.track.get"][
+                "message"
+            ]["body"]["track"]["track_id"]
         )
-        if a:
-            om.text = "/letra spotify:" + str(
-                a["message"]["body"]["macro_calls"]["matcher.track.get"]["message"][
-                    "body"
-                ]["track"]["track_id"]
-            )
-            try:
-                await letra(c, om)
-            except Exception:
-                await om.reply_text(t("lyrics_nf"))
+        try:
+            await get_lyrics(c, original_message)
+        except Exception:
+            await original_message.reply_text(t("lyrics_nf"))
 
 
 @Client.on_callback_query(filters.regex(r"^tcs"))
 @use_chat_lang()
-async def tcs(c: Client, m: CallbackQuery, t):
-    sess = await get_spoti_session(m.from_user.id)
-    sess.add_to_queue(uri=f'spotify:track:{m.data.split("|")[1]}')
+async def add_to_queue(c: Client, m: CallbackQuery, t):
+    spotify_session = await get_spotify_session(m.from_user.id)
+    spotify_session.add_to_queue(uri=f'spotify:track:{m.data.split("|")[1]}')
     await m.answer(t("song_added"))
 
 
 @Client.on_callback_query(filters.regex(r"^previous"))
 @use_chat_lang()
-async def previous(c: Client, m: CallbackQuery, t):
-    user = m.data.split("|")[1]
-    if m.from_user.id == int(user):
-        sess = await get_spoti_session(m.from_user.id)
-        devices = sess.devices()
-        for i in devices["devices"]:
-            if i["is_active"]:
-                device_id = i["id"]
-                break
-        sess.previous_track(device_id)
-        spotify_json = sess.current_playback(additional_types="episode,track")
-        kb = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="⏮", callback_data=f"previous|{m.from_user.id}"
-                    ),
-                    InlineKeyboardButton(
-                        text="⏸" if spotify_json["is_playing"] else "▶️",
-                        callback_data=f"pause|{m.from_user.id}"
-                        if spotify_json["is_playing"]
-                        else f"play|{m.from_user.id}",
-                    ),
-                    InlineKeyboardButton(
-                        text="⏭", callback_data=f"next|{m.from_user.id}"
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        text=t("play_in_sp"),
-                        callback_data=f'tcs|{spotify_json["item"]["id"]}',
-                    ),
-                    InlineKeyboardButton(
-                        text=t("search_lyric"),
-                        callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}',
-                    ),
-                ],
-            ]
-        )
-        if "artists" in spotify_json["item"]:
-            publi = spotify_json["item"]["artists"][0]["name"]
-        else:
-            publi = spotify_json["item"]["show"]["name"]
-        spotify_json = sess.current_playback(additional_types="episode,track")
-        try:
-            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[
-                0
-            ]
-        except SpotifyException:
-            fav = False
+async def previous_track(c: Client, m: CallbackQuery, t):
+    user_id = m.data.split("|")[1]
+    if m.from_user.id != int(user_id):
+        user = await c.get_chat(int(user_id))
+        await m.answer(t("not_allowed").format(first_name=user.first_name))
 
-        if fav:
-            await m.message.react("❤")
+    spotify_session = await get_spotify_session(m.from_user.id)
+    devices = spotify_session.devices()
+    active_device = next(
+        (device for device in devices["devices"] if device["is_active"]), None
+    )
+    if not active_device:
+        return
 
-        if not db.theme(m.from_user.id)[3]:
-            mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
-            mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
-            await m.edit_message_text(
-                mtext,
-                reply_markup=kb,
-                parse_mode=ParseMode.HTML,
-            )
-        else:
-            await m.answer(f"🎵 {publi} - {spotify_json['item']['name']}")
+    device_id = active_device["id"]
+    spotify_session.previous_track(device_id)
+    spotify_data = spotify_session.current_playback(additional_types="episode,track")
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="⏮", callback_data=f"previous|{m.from_user.id}"
+                ),
+                InlineKeyboardButton(
+                    text="⏸" if spotify_data["is_playing"] else "▶️",
+                    callback_data=f"pause|{m.from_user.id}"
+                    if spotify_data["is_playing"]
+                    else f"play|{m.from_user.id}",
+                ),
+                InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("play_in_sp"),
+                    callback_data=f'tcs|{spotify_data["item"]["id"]}',
+                ),
+                InlineKeyboardButton(
+                    text=t("search_lyric"),
+                    callback_data=f'sp_s|{spotify_data["item"]["id"]}|{m.from_user.id}',
+                ),
+            ],
+        ]
+    )
+    if "artists" in spotify_data["item"]:
+        artist_name = spotify_data["item"]["artists"][0]["name"]
     else:
-        a = await c.get_chat(int(user))
-        await m.answer(t("not_allowed").format(first_name=a.first_name))
+        artist_name = spotify_data["item"]["show"]["name"]
+    spotify_data = spotify_session.current_playback(additional_types="episode,track")
+    try:
+        is_favorite = spotify_session.current_user_saved_tracks_contains([
+            spotify_data["item"]["id"]
+        ])[0]
+    except SpotifyException:
+        is_favorite = False
+
+    if is_favorite:
+        await m.message.react("❤")
+
+    if not db.theme(m.from_user.id)[3]:
+        track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
+        track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
+        await m.edit_message_text(
+            track_message,
+            reply_markup=keyboard,
+            parse_mode=ParseMode.HTML,
+        )
+    else:
+        await m.answer(f"🎵 {artist_name} - {spotify_data['item']['name']}")
 
 
 @Client.on_callback_query(filters.regex(r"^next"))
 @use_chat_lang()
-async def next(c: Client, m: CallbackQuery, t):
-    user = m.data.split("|")[1]
-    if m.from_user.id == int(user):
-        sess = await get_spoti_session(m.from_user.id)
-        devices = sess.devices()
-        for i in devices["devices"]:
-            if i["is_active"]:
-                device_id = i["id"]
-                break
-        sess.next_track(device_id)
-        spotify_json = sess.current_playback(additional_types="episode,track")
-        kb = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="⏮", callback_data=f"previous|{m.from_user.id}"
-                    ),
-                    InlineKeyboardButton(
-                        text="⏸" if spotify_json["is_playing"] else "▶️",
-                        callback_data=f"pause|{m.from_user.id}"
-                        if spotify_json["is_playing"]
-                        else f"play|{m.from_user.id}",
-                    ),
-                    InlineKeyboardButton(
-                        text="⏭", callback_data=f"next|{m.from_user.id}"
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        text=t("play_in_sp"),
-                        callback_data=f'tcs|{spotify_json["item"]["id"]}',
-                    ),
-                    InlineKeyboardButton(
-                        text=t("search_lyric"),
-                        callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}',
-                    ),
-                ],
-            ]
-        )
+async def next_track(c: Client, m: CallbackQuery, t):
+    user_id = m.data.split("|")[1]
+    if m.from_user.id != int(user_id):
+        user = await c.get_chat(int(user_id))
+        await m.answer(t("not_allowed").format(first_name=user.first_name))
+        return
 
-        if "artists" in spotify_json["item"]:
-            publi = spotify_json["item"]["artists"][0]["name"]
-        else:
-            publi = spotify_json["item"]["show"]["name"]
-        spotify_json = sess.current_playback(additional_types="episode,track")
-        try:
-            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[
-                0
-            ]
-        except SpotifyException:
-            fav = False
+    spotify_session = await get_spotify_session(m.from_user.id)
+    devices = spotify_session.devices()
+    active_device = next(
+        (device for device in devices["devices"] if device["is_active"]), None
+    )
+    if not active_device:
+        return
 
-        if fav:
-            await m.message.react("❤")
+    device_id = active_device["id"]
+    spotify_session.next_track(device_id)
+    spotify_data = spotify_session.current_playback(additional_types="episode,track")
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="⏮", callback_data=f"previous|{m.from_user.id}"
+                ),
+                InlineKeyboardButton(
+                    text="⏸" if spotify_data["is_playing"] else "▶️",
+                    callback_data=f"pause|{m.from_user.id}"
+                    if spotify_data["is_playing"]
+                    else f"play|{m.from_user.id}",
+                ),
+                InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("play_in_sp"),
+                    callback_data=f'tcs|{spotify_data["item"]["id"]}',
+                ),
+                InlineKeyboardButton(
+                    text=t("search_lyric"),
+                    callback_data=f'sp_s|{spotify_data["item"]["id"]}|{m.from_user.id}',
+                ),
+            ],
+        ]
+    )
 
-        if not db.theme(m.from_user.id)[3]:
-            mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
-            mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
-            await m.edit_message_text(
-                mtext,
-                reply_markup=kb,
-                parse_mode=ParseMode.HTML,
-            )
-        else:
-            await m.answer(f"🎵 {publi} - {spotify_json['item']['name']}")
+    if "artists" in spotify_data["item"]:
+        artist_name = spotify_data["item"]["artists"][0]["name"]
     else:
-        a = await c.get_chat(int(user))
-        await m.answer(t("not_allowed").format(first_name=a.first_name))
+        artist_name = spotify_data["item"]["show"]["name"]
+    spotify_data = spotify_session.current_playback(additional_types="episode,track")
+    try:
+        is_favorite = spotify_session.current_user_saved_tracks_contains([
+            spotify_data["item"]["id"]
+        ])[0]
+    except SpotifyException:
+        is_favorite = False
+
+    if is_favorite:
+        await m.message.react("❤")
+
+    if not db.theme(m.from_user.id)[3]:
+        track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
+        track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
+        await m.edit_message_text(
+            track_message,
+            reply_markup=keyboard,
+            parse_mode=ParseMode.HTML,
+        )
+    else:
+        await m.answer(f"🎵 {artist_name} - {spotify_data['item']['name']}")
 
 
 @Client.on_callback_query(filters.regex(r"^(pause|play)"))
 @use_chat_lang()
-async def ppa(c: Client, m: CallbackQuery, t):
-    cmd, user = m.data.split("|")
-    if m.from_user.id == int(user):
-        sess = await get_spoti_session(m.from_user.id)
-        devices = sess.devices()
-        for i in devices["devices"]:
-            if i["is_active"]:
-                device_id = i["id"]
-                break
-        if "pause" in cmd:
-            sess.pause_playback(device_id)
-        else:
-            sess.start_playback(device_id)
-        spotify_json = sess.current_playback(additional_types="episode,track")
-        try:
-            fav = sess.current_user_saved_tracks_contains([spotify_json["item"]["id"]])[
-                0
-            ]
-        except SpotifyException:
-            fav = False
+async def pause_play_action(c: Client, m: CallbackQuery, t):
+    action, user_id = m.data.split("|")
+    if m.from_user.id != int(user_id):
+        user = await c.get_chat(int(user_id))
+        await m.answer(t("not_allowed").format(first_name=user.first_name))
+        return
 
-        if fav:
-            await m.message.react("❤")
+    spotify_session = await get_spotify_session(m.from_user.id)
+    devices = spotify_session.devices()
+    active_device = next(
+        (device for device in devices["devices"] if device["is_active"]), None
+    )
+    if not active_device:
+        return
 
-        kb = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="⏮", callback_data=f"previous|{m.from_user.id}"
-                    ),
-                    InlineKeyboardButton(
-                        text="⏸" if "play" in cmd else "▶️",
-                        callback_data=f"pause|{m.from_user.id}"
-                        if "play" in cmd
-                        else f"play|{m.from_user.id}",
-                    ),
-                    InlineKeyboardButton(
-                        text="⏭", callback_data=f"next|{m.from_user.id}"
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        text=t("play_in_sp"),
-                        callback_data=f'tcs|{spotify_json["item"]["id"]}',
-                    ),
-                    InlineKeyboardButton(
-                        text=t("search_lyric"),
-                        callback_data=f'sp_s|{spotify_json["item"]["id"]}|{m.from_user.id}',
-                    ),
-                ],
-            ]
-        )
-
-        if "artists" in spotify_json["item"]:
-            publi = spotify_json["item"]["artists"][0]["name"]
-        else:
-            publi = spotify_json["item"]["show"]["name"]
-        if not db.theme(m.from_user.id)[3]:
-            mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
-            mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
-            await m.edit_message_text(
-                mtext,
-                reply_markup=kb,
-                parse_mode=ParseMode.HTML,
-            )
-        else:
-            await m.edit_message_reply_markup(reply_markup=kb)
+    device_id = active_device["id"]
+    if "pause" in action:
+        spotify_session.pause_playback(device_id)
     else:
-        a = await c.get_chat(int(user))
-        await m.answer(t("not_allowed").format(first_name=a.first_name))
+        spotify_session.start_playback(device_id)
+    spotify_data = spotify_session.current_playback(additional_types="episode,track")
+    try:
+        is_favorite = spotify_session.current_user_saved_tracks_contains([
+            spotify_data["item"]["id"]
+        ])[0]
+    except SpotifyException:
+        is_favorite = False
+
+    if is_favorite:
+        await m.message.react("❤")
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="⏮", callback_data=f"previous|{m.from_user.id}"
+                ),
+                InlineKeyboardButton(
+                    text="⏸" if "play" in action else "▶️",
+                    callback_data=f"pause|{m.from_user.id}"
+                    if "play" in action
+                    else f"play|{m.from_user.id}",
+                ),
+                InlineKeyboardButton(text="⏭", callback_data=f"next|{m.from_user.id}"),
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("play_in_sp"),
+                    callback_data=f'tcs|{spotify_data["item"]["id"]}',
+                ),
+                InlineKeyboardButton(
+                    text=t("search_lyric"),
+                    callback_data=f'sp_s|{spotify_data["item"]["id"]}|{m.from_user.id}',
+                ),
+            ],
+        ]
+    )
+
+    if "artists" in spotify_data["item"]:
+        artist_name = spotify_data["item"]["artists"][0]["name"]
+    else:
+        artist_name = spotify_data["item"]["show"]["name"]
+    if not db.theme(m.from_user.id)[3]:
+        track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
+        track_message += f'🗣 {spotify_data["device"]["name"]} | ⏳{timedelta(seconds=spotify_data["progress_ms"] // 1000)}'
+        await m.edit_message_text(
+            track_message,
+            reply_markup=keyboard,
+            parse_mode=ParseMode.HTML,
+        )
+    else:
+        await m.edit_message_reply_markup(reply_markup=keyboard)
