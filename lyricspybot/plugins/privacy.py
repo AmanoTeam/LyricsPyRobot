@@ -44,7 +44,7 @@ async def delete_data_confirm(c: Client, query: CallbackQuery, t):
         "DELETE FROM users WHERE user_id = ?", (query.from_user.id,)
     )
     database_cursor.execute(
-        "DELETE FROM aproved WHERE user_id = ? OR user = ?",
+        "DELETE FROM approved WHERE user_id = ? OR user = ?",
         (
             query.from_user.id,
             query.from_user.id,

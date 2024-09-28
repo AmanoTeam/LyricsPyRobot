@@ -363,7 +363,7 @@ async def now_playing_approvals(c: Client, m: CallbackQuery, t):
 async def now_playing_approval_user(c: Client, m: CallbackQuery, t):
     user_id, page = m.data.split("_")[2:]
     page = page.split("pg")[1]
-    approval = database.get_aproved(m.from_user.id, user_id)
+    approval = database.get_approved(m.from_user.id, user_id)
     user = await c.get_chat(user_id)
     text = t("apuser").format(
         name=f"<a href='tg://user?id={user.id}'>{user.first_name}</a>"
@@ -416,7 +416,7 @@ async def now_playing_approval_toggle(c: Client, m: CallbackQuery, t):
     page = page.split("pg")[1]
     if approval := database.get_approved(m.from_user.id, user_id):
         approval_status = "1" if approval[0] in {0, 2} else "2"
-        database.add_aproved(
+        database.add_approved(
             m.from_user.id,
             user_id,
             approval_status,

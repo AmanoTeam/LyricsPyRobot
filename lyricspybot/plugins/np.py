@@ -57,13 +57,13 @@ async def now_playing(c: Client, m: Message, t):
                 m.from_user.id,
                 approval_status[0],
                 usages=usage_count,
-                uusage=datetime.now().timestamp(),
+                usage=datetime.now().timestamp(),
             )
             display_user_id = m.from_user.id
             m.from_user.id = target_user.id
         elif approval_status and approval_status[0] == 0:
             await m.reply_text(
-                t("not_aproved").format(first_name=target_user.first_name)
+                t("not_approved").format(first_name=target_user.first_name)
             )
             return
         elif approval_status and approval_status[0] == 2:
@@ -221,9 +221,9 @@ async def approve(c: Client, m: CallbackQuery, t):
     user = await c.get_users(user_id)
     user_lang = use_user_lang(user.id)
     await c.send_message(
-        user_id, user_lang("aproved").format(first_name=m.from_user.first_name)
+        user_id, user_lang("approved").format(first_name=m.from_user.first_name)
     )
-    await m.edit_message_text(t("saproved").format(first_name=user.first_name))
+    await m.edit_message_text(t("sapproved").format(first_name=user.first_name))
 
 
 @Client.on_callback_query(filters.regex(r"^negar"))
