@@ -119,10 +119,10 @@ async def refresh_token(user_id):
     return response_data["access_token"]
 
 
-async def get_spotify_session(user_id) -> spotipy.Spotify | bool:
+async def get_spotify_session(user_id) -> spotipy.Spotify | None:
     user_tokens = database.get(user_id)
     if not user_tokens:
-        return False
+        return None
     spotify_client = spotipy.Spotify(auth=user_tokens[0])
     try:
         spotify_client.devices()
