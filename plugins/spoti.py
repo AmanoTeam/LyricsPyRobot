@@ -183,5 +183,5 @@ async def spoti(c: Client, m: Message, t):
                     )
                     try:
                         await letra(c, m)
-                    except:
+                    except Exception:
                         await m.reply_text(t("lyrics_nf"))

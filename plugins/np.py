@@ -89,9 +89,7 @@ async def np(c: Client, m: Message, t):
                 ut("aprrovedu").format(name=m.from_user.first_name),
                 reply_markup=kb,
             )
-            return await m.reply_text(
-                t("approvedr").format(name=usr.first_name)
-            )
+            return await m.reply_text(t("approvedr").format(name=usr.first_name))
     try:
         sess = await get_spoti_session(m.from_user.id)
     except SpotifyException:
@@ -235,7 +233,7 @@ async def sp_search(c: Client, m: CallbackQuery):
             )
             try:
                 await letra(c, om)
-            except:
+            except Exception:
                 await om.reply_text(t("lyrics_nf"))
 
 

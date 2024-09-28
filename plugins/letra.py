@@ -44,37 +44,7 @@ async def letra(c: Client, m: Message, t):
     hash = str(a["id"])
     db.add_hash(hash, a)
     uid = m.from_user.id
-    ma = db.theme(m.from_user.id)[2]
-    if not ma:
-        if a["traducao"]:
-            keyboard = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text=t("tgph"), callback_data=f"_+{uid}|{hash}"
-                        ),
-                        InlineKeyboardButton(
-                            text=t("port"), callback_data=f"-{uid}|{hash}"
-                        ),
-                    ]
-                ]
-            )
-        else:
-            keyboard = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text=t("tgph"), callback_data=f"_+{uid}|{hash}"
-                        )
-                    ]
-                ]
-            )
-        await m.reply_text(
-            f"[{a['musica']} - {a['autor']}]({a['link']})\n{a['letra']}"[:4096],
-            reply_markup=keyboard,
-            disable_web_page_preview=True,
-        )
-    else:
+    if ma := db.theme(m.from_user.id)[2]:
         if a["traducao"]:
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
@@ -102,5 +72,35 @@ async def letra(c: Client, m: Message, t):
             f'{a["musica"]} - {a["autor"]}\n{db.get_url(hash)[1]}',
             reply_markup=keyboard,
             parse_mode=None,
+        )
+    else:
+        keyboard = (
+            InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text=t("tgph"), callback_data=f"_+{uid}|{hash}"
+                        ),
+                        InlineKeyboardButton(
+                            text=t("port"), callback_data=f"-{uid}|{hash}"
+                        ),
+                    ]
+                ]
+            )
+            if a["traducao"]
+            else InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text=t("tgph"), callback_data=f"_+{uid}|{hash}"
+                        )
+                    ]
+                ]
+            )
+        )
+        await m.reply_text(
+            f"[{a['musica']} - {a['autor']}]({a['link']})\n{a['letra']}"[:4096],
+            reply_markup=keyboard,
+            disable_web_page_preview=True,
         )
     return True

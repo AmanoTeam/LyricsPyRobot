@@ -50,10 +50,7 @@ def gen_langs_kb():
 async def teor(c: Client, m: CallbackQuery, t):
     user, hash = m.data[2:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
-        n = db.get_url(hash)
-        if not n:
-            await m.answer(t("hash_nf"), show_alert=True)
-        else:
+        if n := db.get_url(hash):
             if re.match(
                 r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]
             ):
@@ -67,21 +64,22 @@ async def teor(c: Client, m: CallbackQuery, t):
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
             a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
-            if musixmatch.translation(hash, "pt", None):
-                keyboard = InlineKeyboardMarkup(
+            keyboard = (
+                InlineKeyboardMarkup(
                     inline_keyboard=[
                         [
                             InlineKeyboardButton(
                                 text=t("text"), callback_data=f"+{user}|{hash}"
                             ),
                             InlineKeyboardButton(
-                                text=t("port"), callback_data=f"_-{user}|{hash}"
+                                text=t("port"),
+                                callback_data=f"_-{user}|{hash}",
                             ),
                         ]
                     ]
                 )
-            else:
-                keyboard = InlineKeyboardMarkup(
+                if musixmatch.translation(hash, "pt", None)
+                else InlineKeyboardMarkup(
                     inline_keyboard=[
                         [
                             InlineKeyboardButton(
@@ -90,11 +88,14 @@ async def teor(c: Client, m: CallbackQuery, t):
                         ]
                     ]
                 )
+            )
             await m.edit_message_text(
                 f'{a["musica"]} - {a["autor"]}\n{n[1]}',
                 reply_markup=keyboard,
                 parse_mode=None,
             )
+        else:
+            await m.answer(t("hash_nf"), show_alert=True)
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
@@ -106,10 +107,7 @@ async def teor(c: Client, m: CallbackQuery, t):
 async def tetr(c: Client, m: CallbackQuery, t):
     user, hash = m.data[2:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
-        n = db.get_url(hash)
-        if not n:
-            await m.answer(t("hash_nf"), show_alert=True)
-        else:
+        if n := db.get_url(hash):
             if re.match(
                 r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]
             ):
@@ -140,6 +138,8 @@ async def tetr(c: Client, m: CallbackQuery, t):
                 reply_markup=keyboard,
                 parse_mode=None,
             )
+        else:
+            await m.answer(t("hash_nf"), show_alert=True)
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
@@ -151,10 +151,7 @@ async def tetr(c: Client, m: CallbackQuery, t):
 async def ori(c: Client, m: CallbackQuery, t):
     user, hash = m.data[1:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
-        n = db.get_url(hash)
-        if not n:
-            await m.answer(t("hash_nf"), show_alert=True)
-        else:
+        if n := db.get_url(hash):
             if re.match(
                 r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]
             ):
@@ -168,12 +165,13 @@ async def ori(c: Client, m: CallbackQuery, t):
                 await m.answer(t("url_nf").format(text=n[0]), show_alert=True)
                 return True
             a = genius.parse(a) if "meta" in a else musixmatch.parce(a)
-            if musixmatch.translation(hash, "pt", None):
-                keyboard = InlineKeyboardMarkup(
+            keyboard = (
+                InlineKeyboardMarkup(
                     inline_keyboard=[
                         [
                             InlineKeyboardButton(
-                                text=t("tgph"), callback_data=f"_+{user}|{hash}"
+                                text=t("tgph"),
+                                callback_data=f"_+{user}|{hash}",
                             ),
                             InlineKeyboardButton(
                                 text=t("port"), callback_data=f"-{user}|{hash}"
@@ -181,21 +179,25 @@ async def ori(c: Client, m: CallbackQuery, t):
                         ]
                     ]
                 )
-            else:
-                keyboard = InlineKeyboardMarkup(
+                if musixmatch.translation(hash, "pt", None)
+                else InlineKeyboardMarkup(
                     inline_keyboard=[
                         [
                             InlineKeyboardButton(
-                                text=t("tgph"), callback_data=f"_+{user}|{hash}"
+                                text=t("tgph"),
+                                callback_data=f"_+{user}|{hash}",
                             )
                         ]
                     ]
                 )
+            )
             await m.edit_message_text(
                 f'[{a["musica"]} - {a["autor"]}]({a["link"]})\n{a["letra"]}'[:4096],
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
+        else:
+            await m.answer(t("hash_nf"), show_alert=True)
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
@@ -207,10 +209,7 @@ async def ori(c: Client, m: CallbackQuery, t):
 async def tr(c: Client, m: CallbackQuery, t):
     user, hash = m.data[1:].split("|")
     if m.from_user.id == int(user) or m.from_user.id in sudos:
-        n = db.get_url(hash)
-        if not n:
-            await m.answer(t("hash_nf"), show_alert=True)
-        else:
+        if n := db.get_url(hash):
             if re.match(
                 r"^(https?://)?(genius\.com/|(m\.|www\.)?genius\.com/).+", n[0]
             ):
@@ -242,6 +241,8 @@ async def tr(c: Client, m: CallbackQuery, t):
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
+        else:
+            await m.answer(t("hash_nf"), show_alert=True)
     else:
         a = await c.get_chat(int(user))
         await m.answer(t("not_allowed").format(first_name=a.first_name))
@@ -378,8 +379,7 @@ async def np_apvu(c: Client, m: CallbackQuery, t):
 async def np_apvt(c: Client, m: CallbackQuery, t):
     id, pg = m.data.split("_")[2:]
     pg = pg.split("pg")[1]
-    app = db.get_aproved(m.from_user.id, id)
-    if app:
+    if app := db.get_aproved(m.from_user.id, id):
         appv = "1" if app[0] in {0, 2} else "2"
         db.add_aproved(
             m.from_user.id, id, appv, dates=datetime.now().timestamp(), usages=0
