@@ -44,7 +44,7 @@ async def now_playing(c: Client, m: Message, t):
         else:
             target_user_id = m.command[1]
         target_user = await c.get_chat(target_user_id)
-        approval_status = database.get_aproved(target_user.id, m.from_user.id)
+        approval_status = database.get_approved(target_user.id, m.from_user.id)
         if target_user.type != ChatType.PRIVATE:
             await m.reply_text(t("only_users"))
             return
@@ -52,7 +52,7 @@ async def now_playing(c: Client, m: Message, t):
             approval_status and approval_status[0] == 1
         ):
             usage_count = approval_status[1] + 1 if approval_status[1] else 1
-            database.add_aproved(
+            database.add_approved(
                 target_user.id,
                 m.from_user.id,
                 approval_status[0],
@@ -85,7 +85,7 @@ async def now_playing(c: Client, m: Message, t):
                     ]
                 ]
             )
-            database.add_aproved(
+            database.add_approved(
                 target_user.id, m.from_user.id, False, dates=datetime.now().timestamp()
             )
             await c.send_message(
@@ -230,7 +230,7 @@ async def approve(c: Client, m: CallbackQuery, t):
 @use_chat_lang()
 async def deny(c: Client, m: CallbackQuery, t):
     user_id = m.data.split("|")[1]
-    database.add_aproved(m.from_user.id, user_id, 2, dates=datetime.now().timestamp())
+    database.add_approved(m.from_user.id, user_id, 2, dates=datetime.now().timestamp())
     user = await c.get_users(user_id)
     user_lang = use_user_lang(user.id)
     await c.send_message(

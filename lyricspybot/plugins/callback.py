@@ -324,7 +324,7 @@ async def player_settings(c: Client, m: CallbackQuery, t):
 @use_chat_lang()
 async def now_playing_approvals(c: Client, m: CallbackQuery, t):
     page = m.data.split("pg")[1]
-    approved_ids = database.get_all_aproved(m.from_user.id)
+    approved_ids = database.get_all_approved(m.from_user.id)
     table = []
     row = []
     for i, id_data in enumerate(approved_ids):
@@ -414,7 +414,7 @@ async def now_playing_approval_user(c: Client, m: CallbackQuery, t):
 async def now_playing_approval_toggle(c: Client, m: CallbackQuery, t):
     user_id, page = m.data.split("_")[2:]
     page = page.split("pg")[1]
-    if approval := database.get_aproved(m.from_user.id, user_id):
+    if approval := database.get_approved(m.from_user.id, user_id):
         approval_status = "1" if approval[0] in {0, 2} else "2"
         database.add_aproved(
             m.from_user.id,
