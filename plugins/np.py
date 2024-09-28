@@ -89,7 +89,9 @@ async def np(c: Client, m: Message, t):
                 ut("aprrovedu").format(name=m.from_user.first_name),
                 reply_markup=kb,
             )
-            return await m.reply(t("approvedr").format(name=usr.first_name))
+            return await m.reply_text(
+                t("approvedr").format(name=usr.first_name)
+            )
     try:
         sess = await get_spoti_session(m.from_user.id)
     except SpotifyException:
@@ -105,7 +107,7 @@ async def np(c: Client, m: Message, t):
         stick = db.theme(duid)[3]
         mtext = f"🎵 {a[0]['artist']['#text']} - {a[0]['name']}"
         if stick is not None and not stick:
-            return await m.reply(
+            return await m.reply_text(
                 mtext,
                 parse_mode=ParseMode.HTML,
             )
@@ -181,7 +183,7 @@ async def np(c: Client, m: Message, t):
     else:
         mtext = f'🎧 {spotify_json["item"]["name"]} - {publi}\n'
         mtext += f'🗣 {spotify_json["device"]["name"]} | ⏳{timedelta(seconds=spotify_json["progress_ms"] // 1000)}'
-        mes = await m.reply(
+        mes = await m.reply_text(
             mtext,
             reply_markup=kb,
             parse_mode=ParseMode.HTML,

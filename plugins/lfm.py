@@ -60,7 +60,7 @@ async def lfm(c: Client, m: Message, t):
                     )
                     await m.reply_document(album_art, caption=mtext)
                 else:
-                    await m.reply(
+                    await m.reply_text(
                         mtext,
                         parse_mode="html",
                     )

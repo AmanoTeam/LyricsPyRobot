@@ -166,7 +166,7 @@ async def spoti(c: Client, m: Message, t):
                 if stick is None or stick:
                     mes = await m.reply_document(album_art, caption=mtext)
                 else:
-                    mes = await m.reply(
+                    mes = await m.reply_text(
                         mtext,
                         parse_mode=ParseMode.HTML,
                     )
