@@ -1,12 +1,9 @@
 {
-    "not_approved": "Vi ne estas aprobita. Kontaktu {first_name} por esti aprobita",
     "blocked": "Vi estas blokita. Kontaktu {first_name} por esti malblokita",
     "not_logged": "Vi ne estas ensalutinta. Uzu /spoti aŭ /lfm por ensaluti",
     "not_playing": "Vi ludas nenion",
     "play_in_sp": "Aldoni al Vico",
     "search_lyric": "Serĉu kantotekstojn",
-    "approved": "{first_name} aprobis vian aliron",
-    "sapproved": "Vi aprobis aliron al {first_name}",
     "denied": "{first_name} rifuzis vian aliron",
     "sdenied": "Vi rifuzis aliron al {first_name}",
     "song_added": "Kanto aldonita al vico",
