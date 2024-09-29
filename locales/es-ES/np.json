@@ -1,12 +1,9 @@
 {
-    "not_approved": "No estás aprobado. Ponte en contacto con {first_name} para obtener la aprobación",
     "blocked": "Estás bloqueado. Ponte en contacto con {first_name} para desbloquearte",
     "not_logged": "No has iniciado sesión. Utiliza /spoti o /lfm para iniciar sesión",
     "not_playing": "No estás reproduciendo nada",
     "play_in_sp": "Agregar a la cola",
     "search_lyric": "Buscar letras",
-    "approved": "{first_name} ha aprobado tu acceso",
-    "sapproved": "Has aprobado el acceso de {first_name}",
     "denied": "{first_name} ha denegado tu acceso",
     "sdenied": "Has denegado el acceso de {first_name}",
     "song_added": "Canción añadida a la cola",
