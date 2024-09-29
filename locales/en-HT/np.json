@@ -1,11 +1,10 @@
 {
+    "not_approved": "You don't know yourself Source: {first_name}",
     "blocked": "User {first_name} does not have permission.",
     "not_logged": "Allows full integration with /space or /fm.",
     "not_playing": "game over",
     "play_in_sp": "I asked again.",
     "search_lyric": "Researching",
-    "denied": "{first_name} and sign.",
-    "sdenied": "{first_name} I don't know.",
     "song_added": "Follow the plan",
     "not_allowed": "Not good {first_name}.",
     "aprrovedu": "Hi, {name} wants to use Spotify",
