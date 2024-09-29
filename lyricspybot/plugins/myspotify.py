@@ -89,6 +89,7 @@ async def my_spotify(c: Client, m: InlineQuery, t):
                 theme_color="dark" if database.theme(m.from_user.id)[0] else "light",
                 blur_background=database.theme(m.from_user.id)[1],
                 play_count=track_info["track"]["userplaycount"],
+                source="lastfm",
             )
 
             msg = await c.send_document(cache_chat, album_art, caption=message_text)
@@ -181,6 +182,7 @@ async def my_spotify(c: Client, m: InlineQuery, t):
                 playback_progress=spotify_json["progress_ms"] // 1000,
                 theme_color="dark" if database.theme(m.from_user.id)[0] else "light",
                 blur_background=database.theme(m.from_user.id)[1],
+                source="lastfm",
             )
 
             msg = await c.send_document(cache_chat, album_art, caption=text)

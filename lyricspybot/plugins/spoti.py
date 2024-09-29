@@ -177,6 +177,7 @@ async def spoti(c: Client, m: Message, t):
                 playback_progress=playback_info["progress_ms"] // 1000,
                 theme_color="dark" if database.theme(m.from_user.id)[0] else "light",
                 blur_background=database.theme(m.from_user.id)[1],
+                source="spotify",
             )
         message_text = f"🎵 {publisher} - {playback_info['item']['name']}"
         if use_sticker is None or use_sticker:

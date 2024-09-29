@@ -26,6 +26,7 @@ async def get_song_art(
     play_count: int = 0,
     theme_color: str = "dark",
     blur_background: bool = False,
+    source: str | None = None,
 ) -> BytesIO:
     request_params = {
         "cover": album_cover_url,
@@ -36,6 +37,7 @@ async def get_song_art(
         "scrobbles": play_count,
         "theme": theme_color,
         "blurbg": int(blur_background if blur_background is not None else True),
+        "source": source,
     }
 
     nowplaying_url = (

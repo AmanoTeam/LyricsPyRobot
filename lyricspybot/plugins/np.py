@@ -140,6 +140,7 @@ async def now_playing(c: Client, m: Message, t):
             theme_color="dark" if database.theme(display_user_id)[0] else "light",
             blur_background=database.theme(display_user_id)[1],
             play_count=track_info["track"]["userplaycount"],
+            source="lastfm",
         )
         await m.reply_document(album_art, caption=track_message)
         return
@@ -166,6 +167,7 @@ async def now_playing(c: Client, m: Message, t):
             playback_progress=spotify_data["progress_ms"] // 1000,
             theme_color="dark" if database.theme(display_user_id)[0] else "light",
             blur_background=database.theme(display_user_id)[1],
+            source="spotify",
         )
     track_message = f"🎵 {artist_name} - {spotify_data['item']['name']}"
     playback_controls = [

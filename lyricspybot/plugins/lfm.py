@@ -55,6 +55,7 @@ async def last_fm_command(c: Client, m: Message, t):
             theme_color="dark" if database.theme(m.from_user.id)[0] else "light",
             blur_background=database.theme(m.from_user.id)[1],
             play_count=track_info["track"]["userplaycount"],
+            source="lastfm",
         )
         await m.reply_document(album_art, caption=message_text)
     else:
