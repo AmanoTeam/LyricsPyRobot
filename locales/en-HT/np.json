@@ -1,12 +1,9 @@
 {
-    "not_approved": "You don't know yourself Source: {first_name}",
     "blocked": "User {first_name} does not have permission.",
     "not_logged": "Allows full integration with /space or /fm.",
     "not_playing": "game over",
     "play_in_sp": "I asked again.",
     "search_lyric": "Researching",
-    "approved": "Thank you for visiting {first_name}.",
-    "sapproved": "contact {first_name}",
     "denied": "{first_name} and sign.",
     "sdenied": "{first_name} I don't know.",
     "song_added": "Follow the plan",
