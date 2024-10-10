@@ -18,6 +18,7 @@ from lyricspybot import database
 from lyricspybot.locales import use_chat_lang
 from lyricspybot.plugins.letra import get_lyrics
 from lyricspybot.utils import (
+    genius_client,
     get_song_art,
     get_spotify_session,
     get_token,
@@ -189,17 +190,26 @@ async def spoti(c: Client, m: Message, t):
             )
         if is_favorite:
             await message.react("❤")
-        lyrics_info = await musixmatch_client.spotify_lyrics(
+
+        genius_lyrics = await genius_client.spotify_lyrics(
             artist=playback_info["item"]["artists"][0]["name"],
             track=playback_info["item"]["name"],
         )
-        if lyrics_info:
-            m.text = "/letra spotify:" + str(
-                lyrics_info["message"]["body"]["macro_calls"]["matcher.track.get"][
-                    "message"
-                ]["body"]["track"]["track_id"]
+        if genius_lyrics:
+            m.text = "/letra genius:" + str(genius_lyrics)
+        else:
+            lyrics_info = await musixmatch_client.spotify_lyrics(
+                artist=playback_info["item"]["artists"][0]["name"],
+                track=playback_info["item"]["name"],
             )
-            try:
-                await get_lyrics(c, m)
-            except Exception:
-                await m.reply_text(t("lyrics_nf"))
+            if lyrics_info:
+                m.text = "/letra musixmatch:" + str(
+                    lyrics_info["message"]["body"]["macro_calls"]["matcher.track.get"][
+                        "message"
+                    ]["body"]["track"]["track_id"]
+                )
+            else:
+                return await m.reply_text(t("lyrics_nf"))
+
+        await get_lyrics(c, m)
+    return

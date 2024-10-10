@@ -8,6 +8,7 @@ from lyricspybot import database
 from lyricspybot.locales import use_chat_lang
 from lyricspybot.plugins.letra import get_lyrics
 from lyricspybot.utils import (
+    genius_client,
     get_current_track,
     get_song_art,
     get_track_info,
@@ -61,16 +62,20 @@ async def last_fm_command(c: Client, m: Message, t):
     else:
         await m.reply_text(message_text, parse_mode=ParseMode.HTML)
 
-    lyrics = await musixmatch_client.spotify_lyrics(
+    genius_lyrics = await genius_client.spotify_lyrics(
         artist=current_track[0]["artist"]["#text"], track=current_track[0]["name"]
     )
-    if lyrics:
-        m.text = f"/letra spotify:{lyrics['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id']}"
-        try:
-            await get_lyrics(c, m)
-        except Exception:
+    if genius_lyrics:
+        m.text = f"/letra genius:{genius_lyrics}"
+    else:
+        lyrics = await musixmatch_client.spotify_lyrics(
+            artist=current_track[0]["artist"]["#text"], track=current_track[0]["name"]
+        )
+        if lyrics:
+            m.text = f"/letra musixmatch:{lyrics['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id']}"
+        else:
             await m.reply_text(t("lyrics_nf"))
-
+    return await get_lyrics(c, m)
 
 async def get_album_url(track_info):
     album_url = track_info["image"][-1]["#text"]

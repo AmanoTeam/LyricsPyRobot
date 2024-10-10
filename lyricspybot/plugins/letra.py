@@ -17,8 +17,10 @@ async def get_lyrics(c: Client, m: Message, t):
     query = m.text.split(" ", 1)[1]
     if not query:
         await m.reply_text(t("use"))
-    elif "spotify:" in query:
+    elif "musixmatch:" in query:
         lyrics_data = await musixmatch_client.auto(id=query.split(":", 1)[1])
+    elif "genius:" in query:
+        lyrics_data = await genius_client.lyrics(query.split(":", 1)[1])
     elif re.match(
         r"^(https?://)?(letras\.mus.br/|(m\.|www\.)?letras\.mus\.br/).+", query
     ):

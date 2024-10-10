@@ -16,6 +16,7 @@ from lyricspybot import database
 from lyricspybot.locales import use_chat_lang, use_user_lang
 from lyricspybot.plugins.letra import get_lyrics
 from lyricspybot.utils import (
+    genius_client,
     get_current_track,
     get_song_art,
     get_spotify_session,
@@ -251,20 +252,28 @@ async def spotify_search(c: Client, m: CallbackQuery, t):
     original_message = m.message
     original_message.from_user = m.from_user
     spotify_track = spotify_session.track(track)
-    lyrics_data = await musixmatch_client.spotify_lyrics(
+    genius_lyrics = await genius_client.spotify_lyrics(
         artist=spotify_track["artists"][0]["name"],
         track=spotify_track["name"],
     )
-    if lyrics_data:
-        original_message.text = "/letra spotify:" + str(
-            lyrics_data["message"]["body"]["macro_calls"]["matcher.track.get"][
-                "message"
-            ]["body"]["track"]["track_id"]
+    if genius_lyrics:
+        original_message.text = "/letra genius:" + str(genius_lyrics)
+    else:
+        lyrics_data = await musixmatch_client.spotify_lyrics(
+            artist=spotify_track["artists"][0]["name"],
+            track=spotify_track["name"],
         )
-        try:
-            await get_lyrics(c, original_message)
-        except Exception:
-            await original_message.reply_text(t("lyrics_nf"))
+        if lyrics_data:
+            original_message.text = "/letra musixmatch:" + str(
+                lyrics_data["message"]["body"]["macro_calls"]["matcher.track.get"][
+                    "message"
+                ]["body"]["track"]["track_id"]
+            )
+        else:
+            return await original_message.reply_text(t("lyrics_nf"))
+
+    await get_lyrics(c, original_message)
+    return
 
 
 @Client.on_callback_query(filters.regex(r"^tcs"))
