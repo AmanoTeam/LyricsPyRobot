@@ -1,10 +1,12 @@
 import asyncio
 import re
+from contextlib import suppress
 from datetime import datetime, timedelta
 
 from hydrogram import Client, filters
 from hydrogram.enums import ChatType, MessageEntityType
 from hydrogram.enums.parse_mode import ParseMode
+from hydrogram.errors import ReactionEmpty
 from hydrogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
@@ -396,7 +398,8 @@ async def update_playback_info(c: Client, m: CallbackQuery, t):
     except SpotifyException:
         is_favorite = False
 
-    await m.message.react("❤" if is_favorite else "")
+    with suppress(ReactionEmpty):
+        await m.message.react("❤" if is_favorite else "")
 
     if not database.theme(m.from_user.id)[3]:
         track_message = f'🎧 {spotify_data["item"]["name"]} - {artist_name}\n'
