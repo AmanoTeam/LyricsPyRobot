@@ -1,3 +1,4 @@
+import asyncio
 import re
 from datetime import datetime, timedelta
 
@@ -353,7 +354,9 @@ async def update_playback_info(c: Client, m: CallbackQuery, t):
     elif action == "play":
         spotify_session.start_playback(device_id)
 
+    asyncio.sleep(1)
     spotify_data = spotify_session.current_playback(additional_types="episode,track")
+
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
