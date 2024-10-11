@@ -134,6 +134,18 @@ async def now_playing(c: Client, m: Message, t):
             else:
                 fallback_response = await http_client.get(current_track[0]["url"])
                 album_cover_url = LASTFM_IMAGE_REGEX.findall(fallback_response.text)[0]
+
+        keyb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text=t("search_lyric"),
+                        callback_data=f'lf_s|{current_track[0]["artist"]["#text"]}|{current_track[0]["name"]}|{m.from_user.id}',
+                    )
+                ]
+            ]
+        )
+
         album_art = await get_song_art(
             song_name=current_track[0]["name"],
             artist_name=current_track[0]["artist"]["#text"],
@@ -143,7 +155,7 @@ async def now_playing(c: Client, m: Message, t):
             play_count=track_info["track"]["userplaycount"],
             source="lastfm",
         )
-        await m.reply_document(album_art, caption=track_message)
+        await m.reply_document(album_art, caption=track_message, reply_markup=keyb)
         return
     spotify_data = spotify_session.current_playback(additional_types="episode,track")
     use_sticker = database.theme(display_user_id)[3]
@@ -263,6 +275,35 @@ async def spotify_search(c: Client, m: CallbackQuery, t):
             artist=spotify_track["artists"][0]["name"],
             track=spotify_track["name"],
         )
+        if lyrics_data:
+            original_message.text = "/letra musixmatch:" + str(
+                lyrics_data["message"]["body"]["macro_calls"]["matcher.track.get"][
+                    "message"
+                ]["body"]["track"]["track_id"]
+            )
+        else:
+            return await original_message.reply_text(t("lyrics_nf"))
+
+    await get_lyrics(c, original_message)
+    return
+
+
+@Client.on_callback_query(filters.regex(r"^lf_s"))
+@use_chat_lang()
+async def lastfm_search(c: Client, m: CallbackQuery, t):
+    artist, track, user_id = m.data.split("|")[1:]
+    print(artist, track, user_id)
+    if m.from_user.id != int(user_id):
+        return
+
+    original_message = m.message
+    original_message.from_user = m.from_user
+    genius_lyrics = await genius_client.spotify_lyrics(artist=artist, track=track)
+    if genius_lyrics:
+        original_message.text = "/letra genius:" + str(genius_lyrics)
+        print(original_message.text)
+    else:
+        lyrics_data = await musixmatch_client.lyrics(f"{artist} {track}")
         if lyrics_data:
             original_message.text = "/letra musixmatch:" + str(
                 lyrics_data["message"]["body"]["macro_calls"]["matcher.track.get"][

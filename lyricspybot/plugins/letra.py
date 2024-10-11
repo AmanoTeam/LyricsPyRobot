@@ -30,12 +30,9 @@ async def get_lyrics(c: Client, m: Message, t):
     ):
         lyrics_data = await musixmatch_client.lyrics(query)
     else:
-        try:
-            lyrics_data = await musixmatch_client.auto(
-                query, limit=1, lang="pt"
-            ) or await genius_client.auto(query, limit=1)
-        except Exception:
-            lyrics_data = await genius_client.auto(query, limit=1)
+        lyrics_data = await genius_client.auto(query, limit=1)
+        if not lyrics_data:
+            lyrics_data = await musixmatch_client.auto(q=query, limit=1)
         if not lyrics_data:
             await m.reply_text(t("lyrics_nf"))
             return
