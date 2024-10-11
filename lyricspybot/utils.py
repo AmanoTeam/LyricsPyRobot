@@ -123,7 +123,7 @@ async def refresh_token(user_id):
 
 async def get_spotify_session(user_id) -> spotipy.Spotify | None:
     user_tokens = database.get(user_id)
-    if not user_tokens:
+    if not user_tokens or not user_tokens[0]:
         return None
     spotify_client = spotipy.Spotify(auth=user_tokens[0])
     try:
