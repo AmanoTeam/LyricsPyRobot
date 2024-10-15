@@ -285,7 +285,8 @@ async def spotify_search(c: Client, m: CallbackQuery, t):
                 ]["body"]["track"]["track_id"]
             )
         else:
-            return await original_message.reply_text(t("lyrics_nf"))
+            await original_message.reply_text(t("lyrics_nf", context="letra"))
+            return
 
     await get_lyrics(c, original_message)
     return
@@ -314,10 +315,10 @@ async def lastfm_search(c: Client, m: CallbackQuery, t):
                 ]["body"]["track"]["track_id"]
             )
         else:
-            return await original_message.reply_text(t("lyrics_nf"))
+            await original_message.reply_text(t("lyrics_nf", context="letra"))
+            return
 
     await get_lyrics(c, original_message)
-    return
 
 
 @Client.on_callback_query(filters.regex(r"^tcs"))

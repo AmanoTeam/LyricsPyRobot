@@ -209,7 +209,7 @@ async def spoti(c: Client, m: Message, t):
                     ]["body"]["track"]["track_id"]
                 )
             else:
-                return await m.reply_text(t("lyrics_nf"))
+                await m.reply_text(t("lyrics_nf", context="letra"))
+                return
 
         await get_lyrics(c, m)
-    return

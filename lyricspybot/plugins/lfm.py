@@ -74,8 +74,10 @@ async def last_fm_command(c: Client, m: Message, t):
         if lyrics:
             m.text = f"/letra musixmatch:{lyrics['message']['body']['macro_calls']['matcher.track.get']['message']['body']['track']['track_id']}"
         else:
-            await m.reply_text(t("lyrics_nf"))
-    return await get_lyrics(c, m)
+            await m.reply_text(t("lyrics_nf", context="letra"))
+
+    await get_lyrics(c, m)
+
 
 async def get_album_url(track_info):
     album_url = track_info["image"][-1]["#text"]
