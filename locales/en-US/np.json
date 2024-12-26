@@ -17,5 +17,6 @@
     "aprove": "Approve access",
     "deny": "Deny access",
     "track_notfoud": "Lastfm track not found",
-    "private_session": "You are in a private session, please disable it or enable and disable again"
+    "private_session": "You are in a private session, please disable it or enable and disable again",
+    "refresh_error": "Error refreshing token, please relogin with /spoti or /lfm"
 }

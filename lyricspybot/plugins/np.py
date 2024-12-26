@@ -103,6 +103,8 @@ async def now_playing(c: Client, m: Message, t):
         spotify_session = await get_spotify_session(m.from_user.id)
     except SpotifyException:
         spotify_session = None
+    except Exception:
+        return await m.reply_text(t("refresh_error"))
     if not spotify_session or spotify_session.current_playback() is None:
         user_token = database.get(m.from_user.id)
         if not user_token or not user_token[2]:
