@@ -15,5 +15,7 @@
     "approvedr": "You have not been approved, requesting {name} to approve...",
     "only_users": "Please use this command only on users",
     "aprove": "Approve access",
-    "deny": "Deny access"
+    "deny": "Deny access",
+    "track_notfoud": "Lastfm track not found",
+    "private_session": "You are in a private session, please disable it or enable and disable again"
 }

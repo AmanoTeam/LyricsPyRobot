@@ -148,6 +148,10 @@ async def now_playing(c: Client, m: Message, t):
                 ]
             ]
         )
+        
+        if track_info.get("error"):
+            await m.reply_text(t("track_notfoud"))
+            return
 
         album_art = await get_song_art(
             song_name=current_track[0]["name"],
@@ -162,6 +166,10 @@ async def now_playing(c: Client, m: Message, t):
         return
     spotify_data = spotify_session.current_playback(additional_types="episode,track")
     use_sticker = database.theme(display_user_id)[3]
+
+    if spotify_data["device"]["is_private_session"]:
+        await m.reply_text(t("private_session"))
+        return
     if "artists" in spotify_data["item"]:
         artist_name = spotify_data["item"]["artists"][0]["name"]
     else:
