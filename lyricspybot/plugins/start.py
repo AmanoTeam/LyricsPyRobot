@@ -14,6 +14,9 @@ from lyricspybot.locales import use_chat_lang
 @Client.on_callback_query(filters.regex(r"start_back"))
 @use_chat_lang()
 async def start(c, m: Message | CallbackQuery, t):
+    """
+    Welcome message and initial bot menu.
+    """
     if not isinstance(m, CallbackQuery) and m.chat.type != ChatType.PRIVATE:
         inline_keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
@@ -52,4 +55,7 @@ async def start(c, m: Message | CallbackQuery, t):
 @Client.on_message(filters.command("help"))
 @use_chat_lang()
 async def help_command(c: Client, m: Message, t):
+    """
+    Displays the help message with available commands.
+    """
     await m.reply_text(t("help"))

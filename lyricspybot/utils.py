@@ -53,15 +53,17 @@ async def get_song_art(
     await browser_page.screenshot(path=screenshot_filename)
 
     await browser_page.close()
+    try:
+        screenshot_image = Image.open(screenshot_filename)
 
-    screenshot_image = Image.open(screenshot_filename)
+        sticker_file = BytesIO()
+        sticker_file.name = "sticker.webp"
 
-    sticker_file = BytesIO()
-    sticker_file.name = "sticker.webp"
-
-    screenshot_image.save(sticker_file)
-
-    os.remove(screenshot_filename)
+        screenshot_image.save(sticker_file)
+        sticker_file.seek(0)
+    finally:
+        if os.path.exists(screenshot_filename):
+            os.remove(screenshot_filename)
 
     return sticker_file
 
@@ -85,7 +87,7 @@ async def build_browser_object(browser_type: str) -> BrowserContext:
     return await browser_instance.new_context(viewport={"width": 512, "height": 288})
 
 
-async def get_token(user_id, auth_code):
+async def get_token(user_id: int, auth_code: str) -> tuple[bool, str]:
     response = await http_client.post(
         "https://accounts.spotify.com/api/token",
         headers={"Authorization": f"Basic {BASIC}"},
@@ -105,7 +107,7 @@ async def get_token(user_id, auth_code):
     return True, response_data["access_token"]
 
 
-async def refresh_token(user_id):
+async def refresh_token(user_id: int) -> str:
     print("refresh")
     user_tokens = database.get(user_id)
     print(user_tokens[1])

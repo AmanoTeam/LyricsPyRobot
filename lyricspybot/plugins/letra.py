@@ -7,16 +7,23 @@ from lyricspybot import database
 from lyricspybot.locales import use_chat_lang
 from lyricspybot.utils import genius_client, musixmatch_client
 
-# + original, - traduzido, _ telegraph
+# + original, - translated, _ telegraph
 
 
 @Client.on_message(filters.command(["lyrics", "letra"]))
 @use_chat_lang()
 async def get_lyrics(c: Client, m: Message, t):
+    """
+    Searches and displays the lyrics of the song provided by the user.
+    """
     print(m)
-    query = m.text.split(" ", 1)[1]
+    if not m.text or len(m.text.split(" ", 1)) < 2:
+        await m.reply_text(t("use"))
+        return
+    query = m.text.split(" ", 1)[1].strip()
     if not query:
         await m.reply_text(t("use"))
+        return
     elif "musixmatch:" in query:
         lyrics_data = await musixmatch_client.auto(id=query.split(":", 1)[1])
     elif "genius:" in query:

@@ -22,7 +22,7 @@ from lyricspybot.locales import (
 )
 from lyricspybot.utils import genius_client, get_spotify_session, musixmatch_client
 
-# + original, - traduzido, _ telegraph
+# + original, - translated, _ telegraph
 
 
 def generate_language_keyboard():

@@ -56,12 +56,14 @@ def get_locale_string(
 
 
 def get_lang(cid) -> str:
+    """
+    Returns the user's language from the database, or the default.
+    """
     lang = database.db_get_lang(cid)
-
     lang = lang[0] if lang and lang[0] else default_language
 
+    # Normaliza o formato do idioma
     if len(lang.split("-")) == 1:
-        # Try to find a language that starts with the provided language_code
         for locale_ in enabled_locales:
             if locale_.startswith(lang):
                 lang = locale_
@@ -69,6 +71,7 @@ def get_lang(cid) -> str:
         lang = lang.split("-")
         lang[1] = lang[1].upper()
         lang = "-".join(lang)
+    # Garante que sempre retorna um idioma válido
     return lang if lang in enabled_locales else default_language
 
 
