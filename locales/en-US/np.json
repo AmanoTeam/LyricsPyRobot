@@ -18,5 +18,6 @@
     "deny": "Deny access",
     "track_notfoud": "Lastfm track not found",
     "private_session": "You are in a private session, please disable it or enable and disable again",
-    "refresh_error": "Error refreshing token, please relogin with /spoti or /lfm"
+    "refresh_error": "Error refreshing token, please relogin with /spoti or /lfm",
+    "cant_send_request": "Cannot send approval request to {name}. The user must start the bot first or has blocked it"
 }

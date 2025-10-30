@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from hydrogram import Client, filters
 from hydrogram.enums import ChatType, MessageEntityType
 from hydrogram.enums.parse_mode import ParseMode
-from hydrogram.errors import ReactionEmpty
+from hydrogram.errors import PeerIdInvalid, ReactionEmpty
 from hydrogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
@@ -119,11 +119,17 @@ async def now_playing(c: Client, m: Message, t):
             database.add_approved(
                 target_user.id, m.from_user.id, False, dates=datetime.now().timestamp()
             )
-            await c.send_message(
-                target_user.id,
-                user_lang("aprrovedu").format(name=m.from_user.first_name),
-                reply_markup=approval_keyboard,
-            )
+            try:
+                await c.send_message(
+                    target_user.id,
+                    user_lang("aprrovedu").format(name=m.from_user.first_name),
+                    reply_markup=approval_keyboard,
+                )
+            except PeerIdInvalid:
+                # Bot cannot send message to this user (never interacted or blocked)
+                return await m.reply_text(
+                    t("cant_send_request").format(name=target_user.first_name)
+                )
             return await m.reply_text(
                 t("approvedr").format(name=target_user.first_name)
             )

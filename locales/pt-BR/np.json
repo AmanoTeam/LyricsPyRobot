@@ -15,5 +15,9 @@
     "approvedr": "Você não foi aprovado, solicitando {name} para aprovar...",
     "only_users": "Por favor, use este comando apenas em usuários",
     "aprove": "Aprovar acesso",
-    "deny": "Negar acesso"
+    "deny": "Negar acesso",
+    "track_notfoud": "Faixa do Lastfm não encontrada",
+    "private_session": "Você está em uma sessão privada, por favor desative ou ative e desative novamente",
+    "refresh_error": "Erro ao atualizar token, por favor faça login novamente com /spoti ou /lfm",
+    "cant_send_request": "Não foi possível enviar solicitação de aprovação para {name}. O usuário precisa iniciar o bot primeiro ou bloqueou o bot"
 }
