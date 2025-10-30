@@ -76,7 +76,7 @@ async def last_fm_command(c: Client, m: Message, t):
         else:
             await m.reply_text(t("lyrics_nf", context="letra"))
 
-    await get_lyrics(c, m)
+    await get_lyrics(c, m, t)
 
 
 async def get_album_url(track_info):
@@ -84,8 +84,10 @@ async def get_album_url(track_info):
     if not album_url:
         response = await http_client.get(track_info["url"].replace("/_/", "/"))
         if response.status_code == 200:
-            album_url = ALBUM_ART_REGEX.findall(response.text)[0]
+            matches = ALBUM_ART_REGEX.findall(response.text)
+            album_url = matches[0] if matches else None
         else:
             fallback_response = await http_client.get(track_info["url"])
-            album_url = ALBUM_ART_REGEX.findall(fallback_response.text)[0]
+            matches = ALBUM_ART_REGEX.findall(fallback_response.text)
+            album_url = matches[0] if matches else None
     return album_url

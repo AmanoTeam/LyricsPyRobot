@@ -20,7 +20,7 @@ http_client = httpx.AsyncClient(http2=True)
 async def get_song_art(
     song_name: str,
     artist_name: str,
-    album_cover_url: str,
+    album_cover_url: str | None,
     song_duration: int = 0,
     playback_progress: int = 0,
     play_count: int = 0,
@@ -29,7 +29,7 @@ async def get_song_art(
     source: str | None = None,
 ) -> BytesIO:
     request_params = {
-        "cover": album_cover_url,
+        "cover": album_cover_url or "",
         "track": song_name,
         "artist": artist_name,
         "timenow": playback_progress,
@@ -37,7 +37,7 @@ async def get_song_art(
         "scrobbles": play_count,
         "theme": theme_color,
         "blurbg": int(blur_background if blur_background is not None else True),
-        "source": source,
+        "source": source or "",
     }
 
     nowplaying_url = (
